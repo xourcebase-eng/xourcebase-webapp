@@ -105,7 +105,7 @@ export default function Header() {
             />
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation */ }
           <nav className="hidden lg:flex items-center space-x-10 font-manrope">
             <div className="relative" ref={dropdownRef}>
               <button
