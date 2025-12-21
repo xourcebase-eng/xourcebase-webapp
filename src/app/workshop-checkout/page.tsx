@@ -1,3 +1,4 @@
+// app/workshop-checkout/page.tsx
 'use client';
 
 import { motion } from 'framer-motion';
@@ -55,6 +56,7 @@ export default function WorkshopCheckoutPage() {
     XOURCE50: { discount: 50, message: '🎉 XOURCE50 applied! 50% OFF → ₹49' },
     WELCOME99: { discount: 0, message: '✅ Coupon applied!' },
     FREEPASS: { discount: 100, message: '🎊 FREEPASS applied! FREE ACCESS!' },
+    ONEFOR1: { discount: 98, message: '🔥 ONEFOR1 applied! Pay just ₹1' }, // ← NEW ₹1 COUPON
   };
 
   const validateForm = () => {
@@ -193,8 +195,6 @@ export default function WorkshopCheckoutPage() {
     };
   }, [mounted]);
 
-  // workshop-checkout/page.tsx (only the changed parts shown)
-
   const handlePayment = async () => {
     if (!validateForm()) {
       alert('Please fix the errors in the form.');
@@ -211,11 +211,9 @@ export default function WorkshopCheckoutPage() {
 
     if (couponStatus.discount === 100) {
       alert('🎉 Congratulations! You got FREE access with coupon FREEPASS!');
-      // Optionally redirect to success/thank you page
       return;
     }
 
-    // Step 1: Create order on backend
     try {
       const response = await fetch('/api/create-razorpay-order', {
         method: 'POST',
@@ -233,32 +231,28 @@ export default function WorkshopCheckoutPage() {
         return;
       }
 
-      // Step 2: Open Razorpay Checkout
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, // Your public key
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
         amount: data.amount,
         currency: data.currency,
         order_id: data.order_id,
         name: 'XourceBase',
         description: 'Career Accelerator Workshop Registration',
-        image: 'https://xourcebase.com/logo.png', // optional
+        image: 'https://xourcebase.com/logo.png',
         prefill: {
           name: formData.fullName,
           email: formData.email,
-          contact: formData.phone.replace(/\D/g, ''), // remove non-digits
+          contact: formData.phone.replace(/\D/g, ''),
         },
         theme: {
           color: '#4f46e5',
         },
         handler: function (response: any) {
-          // Payment successful
           alert('Payment Successful! 🎉');
           console.log('Payment ID:', response.razorpay_payment_id);
           console.log('Order ID:', response.razorpay_order_id);
           console.log('Signature:', response.razorpay_signature);
 
-          // Optional: Verify payment on backend here
-          // Then redirect to success page
           window.location.href = '/workshop-success?payment_id=' + response.razorpay_payment_id;
         },
         modal: {
@@ -268,7 +262,7 @@ export default function WorkshopCheckoutPage() {
         },
       };
 
-      // @ts-ignore - Razorpay type issue
+      // @ts-ignore
       const rzp = new (window as any).Razorpay(options);
       rzp.open();
 
@@ -279,7 +273,7 @@ export default function WorkshopCheckoutPage() {
   };
 
   if (!mounted) {
-    return null; // Prevent hydration mismatch
+    return null;
   }
 
   return (
@@ -478,6 +472,8 @@ export default function WorkshopCheckoutPage() {
                       <Lock className="w-8 h-8" />
                       {couponStatus.discount === 100
                         ? 'CLAIM FREE ACCESS'
+                        : couponStatus.discount === 98
+                        ? 'PAY ₹1 & JOIN NOW'
                         : couponStatus.discount >= 50
                         ? 'PAY ₹49 & JOIN NOW'
                         : 'PAY ₹99 & JOIN NOW'}
@@ -523,7 +519,13 @@ export default function WorkshopCheckoutPage() {
                   <div className="flex justify-between text-3xl font-bold">
                     <span>Today's Special Price</span>
                     <span className="text-indigo-300">
-                      {couponStatus.discount === 100 ? 'FREE' : couponStatus.discount >= 50 ? '₹49' : '₹99'}
+                      {couponStatus.discount === 100
+                        ? 'FREE'
+                        : couponStatus.discount === 98
+                        ? '₹1'
+                        : couponStatus.discount >= 50
+                        ? '₹49'
+                        : '₹99'}
                     </span>
                   </div>
                 </div>
