@@ -2,10 +2,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Suspense } from 'react'; // ← Add this import
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Calendar, Clock, Users, Award, Mail, Phone, ArrowLeft } from 'lucide-react';
 
-export default function WorkshopSuccessPage() {
+// Separate component that uses useSearchParams
+function SuccessContent() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('payment_id');
 
@@ -195,5 +197,13 @@ export default function WorkshopSuccessPage() {
         </div>
       </section>
     </>
+  );
+}
+
+export default function WorkshopSuccessPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><p className="text-xl">Loading your success details...</p></div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }
