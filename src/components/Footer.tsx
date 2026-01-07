@@ -31,7 +31,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Business */}
+          {/* Column 3: Business*/}
           <div>
             <h3 className="text-white font-semibold mb-4">XourceBase for Business</h3>
             <ul className="space-y-2 text-sm">

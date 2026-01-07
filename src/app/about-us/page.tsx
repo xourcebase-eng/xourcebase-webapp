@@ -163,7 +163,7 @@ export default function AboutPage() {
             href="/programs"
             className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-br from-rose-700 via-red-600 to-orange-500 rounded-xl hover:from-red-700 hover:to-orange-700 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            Explore Programs
+            Join Workshop Now
             <BookOpen className="w-6 h-6" />
           </Link>
         </motion.div>
