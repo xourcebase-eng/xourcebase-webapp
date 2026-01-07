@@ -492,8 +492,8 @@ export default function HomePage() {
                         RS
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900">Rahul Sharma</h4>
-                        <p className="text-sm text-gray-600">Cloud Engineer at TechMahindra</p>
+                        <h4 className="font-bold text-gray-900">Ankush Vishwakarma</h4>
+                        <p className="text-sm text-gray-600">DevOps Engineer at Capgemini</p>
                       </div>
                     </div>
                   </motion.div>
@@ -522,8 +522,8 @@ export default function HomePage() {
                         PP
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900">Priya Patel</h4>
-                        <p className="text-sm text-gray-600">Customer Support at Concentrix</p>
+                        <h4 className="font-bold text-gray-900">Sachin Tiwari</h4>
+                        <p className="text-sm text-gray-600">Cloud Engineer at Sapients</p>
                       </div>
                     </div>
                   </motion.div>
@@ -552,8 +552,8 @@ export default function HomePage() {
                         AV
                       </div>
                       <div>
-                        <h4 className="font-bold text-gray-900">Ankit Verma</h4>
-                        <p className="text-sm text-gray-600">DevOps Engineer at Infosys</p>
+                        <h4 className="font-bold text-gray-900">Ganesh Pawar</h4>
+                        <p className="text-sm text-gray-600">DevOps Engineer at Gigmos</p>
                       </div>
                     </div>
                   </motion.div>

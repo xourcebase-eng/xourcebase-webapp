@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Mail, Phone, MapPin, Send, Linkedin, Twitter, Instagram, Youtube, Facebook } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -27,15 +28,24 @@ export default function ContactPage() {
     setIsLoading(true);
     setSubmitStatus('idle');
 
-    // Placeholder for EmailJS or your backend integration
-    // Remove or replace with actual email sending logic when ready
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Send email using EmailJS
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      );
+
       setSubmitStatus('success');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error('EmailJS error:', error);
       setSubmitStatus('error');
     } finally {
       setIsLoading(false);
