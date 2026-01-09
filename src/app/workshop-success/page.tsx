@@ -44,9 +44,8 @@ function SuccessContent() {
   const [whatsappSent, setWhatsappSent] = useState(false);
   const [whatsappSending, setWhatsappSending] = useState(true);
 
-  // Confetti + Auto-send receipt email
   useEffect(() => {
-    // Confetti celebration
+    // Confetti (always show on load — it's nice!)
     confetti({
       particleCount: 200,
       spread: 80,
@@ -59,68 +58,71 @@ function SuccessContent() {
       confetti({ particleCount: 100, angle: 120, spread: 55, origin: { x: 1 } });
     }, 300);
 
-    // Automatically send receipt email
-    if (email && paymentId !== 'N/A') {
-      const sendEmailReceipt = async () => {
-        try {
-          const response = await fetch('/api/send-receipt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fullName,
-              email,
-              phone,
-              whatsapp,
-              currentRole,
-              experience,
-              coupon,
-              paymentId,
-            }),
-          });
+    // Unique key based on paymentId to prevent duplicates across different payments
+    const storageKey = `workshop_receipt_sent_${paymentId}`;
 
-          const data = await response.json();
-
-          if (data.success) {
-            setEmailSent(true);
-          } else {
-            console.error('Email send failed:', data.message);
-          }
-        } catch (err) {
-          console.error('Error sending receipt email:', err);
-        } finally {
-          setEmailSending(false);
-        }
-      };
-
-      sendEmailReceipt();
-    } else {
+    // Check if we already sent messages for this payment
+    if (sessionStorage.getItem(storageKey) === 'true') {
+      // Already sent — just update UI state
+      setEmailSent(true);
+      setWhatsappSent(true);
       setEmailSending(false);
+      setWhatsappSending(false);
+      return;
     }
 
-    // Send WhatsApp message if phone is valid
-    if (phone && phone !== '-' && phone.replace(/\D/g, '').length >= 10) {
-      const sendWhatsApp = async () => {
-        try {
-          const res = await fetch('/api/send-whatsapp', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ phone, fullName }),
-          });
+    let hasSentAnything = false;
 
-          const data = await res.json();
+    // Send Email Receipt (only if not sent before)
+    if (email && paymentId !== 'N/A' && !sessionStorage.getItem(storageKey)) {
+      setEmailSending(true);
+      fetch('/api/send-receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName,
+          email,
+          phone,
+          whatsapp,
+          currentRole,
+          experience,
+          coupon,
+          paymentId,
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setEmailSent(true);
+            hasSentAnything = true;
+          }
+        })
+        .catch(err => console.error('Email send error:', err))
+        .finally(() => setEmailSending(false));
+    }
+
+    // Send WhatsApp (only if valid phone and not sent before)
+    if (phone && phone !== '-' && phone.replace(/\D/g, '').length >= 10 && !sessionStorage.getItem(storageKey)) {
+      setWhatsappSending(true);
+      fetch('/api/send-whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, fullName }),
+      })
+        .then(res => res.json())
+        .then(data => {
           if (data.success) {
             setWhatsappSent(true);
+            hasSentAnything = true;
           }
-        } catch (err) {
-          console.error('WhatsApp send failed:', err);
-        } finally {
-          setWhatsappSending(false);
-        }
-      };
+        })
+        .catch(err => console.error('WhatsApp send error:', err))
+        .finally(() => setWhatsappSending(false));
+    }
 
-      sendWhatsApp();
-    } else {
-      setWhatsappSending(false);
+    // Mark as sent only if at least one message was attempted
+    if (hasSentAnything || (email && phone)) {
+      sessionStorage.setItem(storageKey, 'true');
     }
   }, [email, paymentId, fullName, phone, whatsapp, currentRole, experience, coupon]);
 
@@ -271,36 +273,31 @@ function SuccessContent() {
             Download Receipt (PDF)
           </button>
 
-          {/* Email Status */}
-          <div className="mt-6">
+          {/* Email & WhatsApp Status */}
+          <div className="mt-6 space-y-3">
             {emailSending && (
-              <p className="text-emerald-700 font-medium text-lg">Sending your receipt to {email}...</p>
+              <p className="text-emerald-700 font-medium">Sending email receipt...</p>
             )}
             {emailSent && (
-              <p className="text-emerald-600 font-bold text-lg flex items-center justify-center gap-2">
-                <Mail className="w-6 h-6" />
-                Receipt successfully sent to {email}!
+              <p className="text-emerald-600 font-bold flex items-center justify-center gap-2">
+                <Mail className="w-6 h-6" /> Receipt sent to {email}!
               </p>
             )}
-            {!emailSending && !emailSent && email && (
-              <p className="text-orange-600 font-medium">
-                Automatic email failed — you can download the receipt above.
-              </p>
-            )}
-          </div>
-          
-          {/* WhatsApp Status */}
-          <div className="mt-4">
+
             {whatsappSending && (
               <p className="text-green-700 font-medium">Sending WhatsApp confirmation...</p>
             )}
             {whatsappSent && (
               <p className="text-green-600 font-bold flex items-center justify-center gap-2">
-                <MessageCircle className="w-5 h-5" />
-                Confirmation sent to WhatsApp!
+                <MessageCircle className="w-6 h-6" /> WhatsApp confirmation sent!
               </p>
             )}
-            {!whatsappSending && !whatsappSent && phone !== '-' && (
+
+            {/* Only show error if we tried and failed */}
+            {!emailSending && !emailSent && email && sessionStorage.getItem(`workshop_receipt_sent_${paymentId}`) && (
+              <p className="text-orange-600">Email receipt could not be sent automatically</p>
+            )}
+            {!whatsappSending && !whatsappSent && phone !== '-' && sessionStorage.getItem(`workshop_receipt_sent_${paymentId}`) && (
               <p className="text-orange-600">WhatsApp message could not be sent</p>
             )}
           </div>
