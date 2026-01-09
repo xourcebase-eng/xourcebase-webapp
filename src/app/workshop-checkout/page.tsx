@@ -232,8 +232,12 @@ export default function WorkshopCheckoutPage() {
       }
 
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
-        amount: data.amount,
+        // Use test key in development, live key in production
+        key: process.env.NODE_ENV === 'development'
+          ? 'rzp_test_S1Q7YVN8VPD2k0'
+          : process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+
+        amount: data.amount, // in paise
         currency: data.currency,
         order_id: data.order_id,
         name: 'XourceBase',
@@ -247,17 +251,57 @@ export default function WorkshopCheckoutPage() {
         theme: {
           color: '#4f46e5',
         },
-        handler: function (response: any) {
-          alert('Payment Successful! 🎉');
-          console.log('Payment ID:', response.razorpay_payment_id);
-          console.log('Order ID:', response.razorpay_order_id);
-          console.log('Signature:', response.razorpay_signature);
 
-          window.location.href = '/workshop-success?payment_id=' + response.razorpay_payment_id;
+        handler: async function (response: any) {
+          try {
+            // Show user that verification is in progress
+            alert('Verifying your payment... Please do not refresh or close this page.');
+
+            const verifyRes = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              alert('Payment Successful & Verified! 🎉\nYou are now registered for the workshop.');
+              console.log('Verified Payment ID:', verifyData.payment_id);
+
+              // Only redirect after successful backend verification
+              // After successful verification
+              window.location.href = `/workshop-success?payment_id=${verifyData.payment_id}&` +
+                `name=${encodeURIComponent(formData.fullName)}&` +
+                `email=${encodeURIComponent(formData.email)}&` +
+                `phone=${encodeURIComponent(formData.phone)}&` +
+                `whatsapp=${encodeURIComponent(formData.whatsapp || '')}&` +
+                `role=${encodeURIComponent(formData.currentRole || '')}&` +
+                `experience=${encodeURIComponent(formData.experience || '')}&` +
+                `coupon=${encodeURIComponent(formData.coupon || 'None')}`;
+            } else {
+              alert(`Payment verification failed: ${verifyData.message || 'Please try again or contact support.'}`);
+              console.error('Verification failed:', verifyData);
+            }
+          } catch (error) {
+            console.error('Error during payment verification:', error);
+            alert(
+              'Something went wrong while verifying your payment.\n' +
+              'If money was deducted, please contact support at contact@xourcebase.com with your Payment ID.\n' +
+              `Payment ID: ${response.razorpay_payment_id}`
+            );
+          }
         },
+
         modal: {
           ondismiss: function () {
-            alert('Payment cancelled.');
+            alert('Payment was cancelled. You can try again anytime.');
           },
         },
       };
