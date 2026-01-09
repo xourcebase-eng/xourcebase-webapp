@@ -2,26 +2,51 @@
 import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
+const getRazorpayInstance = () => {
+  // Determine environment
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
+  const key_id = isDevelopment
+    ? process.env.RAZORPAY_TEST_KEY_ID!
+    : process.env.RAZORPAY_KEY_ID!;
+
+  const key_secret = isDevelopment
+    ? process.env.RAZORPAY_TEST_KEY_SECRET!
+    : process.env.RAZORPAY_KEY_SECRET!;
+
+  if (!key_id || !key_secret) {
+    throw new Error('Razorpay credentials are not configured properly.');
+  }
+
+  return new Razorpay({
+    key_id,
+    key_secret,
+  });
+};
 
 export async function POST(request: Request) {
   try {
     const { amount, currency = 'INR', receipt } = await request.json();
 
-    // Amount should be in paise (₹99 = 9900 paise)
+    if (!amount || amount < 1) {
+      return NextResponse.json(
+        { success: false, message: 'Invalid amount' },
+        { status: 400 }
+      );
+    }
+
+    const razorpay = getRazorpayInstance();
+
     const order = await razorpay.orders.create({
-      amount: amount * 100, // convert to paise
+      amount: amount * 100, // Razorpay expects amount in paise
       currency,
-      receipt: receipt || `receipt_${Date.now()}`,
+      receipt: receipt || `workshop_${Date.now()}`,
     });
 
     return NextResponse.json({
       success: true,
       order_id: order.id,
-      amount: order.amount,
+      amount: order.amount, // in paise
       currency: order.currency,
     });
   } catch (error: any) {
