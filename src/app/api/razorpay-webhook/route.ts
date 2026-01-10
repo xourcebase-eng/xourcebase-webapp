@@ -1,13 +1,11 @@
 // app/api/razorpay-webhook/route.ts
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { PrismaClient } from '../../../generated/prisma';  // Adjust path based on your file location
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma'; // ← Use the singleton from lib/prisma.ts
 
 export async function POST(request: Request) {
   try {
-    // Get raw body for signature verification
+    // Get raw body text for signature verification
     const text = await request.text();
     const signature = request.headers.get('x-razorpay-signature');
 
@@ -38,10 +36,10 @@ export async function POST(request: Request) {
       }
 
       const paymentId = payment.id;
-      const amountPaid = (payment.amount / 100).toFixed(2); // Convert paise to rupees
+      const amountPaid = (payment.amount / 100).toFixed(2);
       const coupon = payment.notes?.coupon || 'None';
 
-      // Extract user data from notes (sent during order creation)
+      // Extract user data from notes
       const fullName = payment.notes?.name || 'Unknown User';
       const email = payment.email || payment.notes?.email || '';
       const rawPhone = payment.contact || payment.notes?.phone || '';
@@ -50,7 +48,7 @@ export async function POST(request: Request) {
       const currentRole = payment.notes?.role || null;
       const experience = payment.notes?.experience || null;
 
-      // Save to database using upsert (safe for retries)
+      // Save to database using upsert
       await prisma.workshopRegistration.upsert({
         where: { paymentId },
         update: {
@@ -71,17 +69,15 @@ export async function POST(request: Request) {
         },
       });
 
-      console.log(`Registration saved successfully: ${paymentId} | ${fullName} | ₹${amountPaid} | ${email}`);
+      console.log(`Registration saved: ${paymentId} | ${fullName} | ₹${amountPaid} | ${email}`);
     }
 
-    // Optional: Log failed payments
+    // Optional: Handle failed payments
     if (event.event === 'payment.failed') {
       const payment = event.payload.payment?.entity;
       if (payment) {
-        console.log(`Payment failed: ${payment.id} | Amount: ₹${payment.amount / 100}`);
-        
-        // Optional: Record failed attempt
-        // await prisma.workshopRegistration.upsert({ ... });
+        console.log(`Payment failed: ${payment.id} | ₹${payment.amount / 100}`);
+        // Optional: Save failed attempt if needed
       }
     }
 
@@ -92,14 +88,7 @@ export async function POST(request: Request) {
       { error: 'Internal server error' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect(); // Good practice
   }
 }
 
-// Critical: Disable body parsing to get raw body for signature verification
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// Removed deprecated config — raw body is available by default in App Router

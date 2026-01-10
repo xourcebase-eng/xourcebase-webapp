@@ -1,22 +1,20 @@
 // app/api/admin/registrations/route.ts
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma'; // Adjust path if needed
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma'; // ← Use the singleton
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const search = searchParams.get('search') || '';
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
+    const limit = Math.max(1, Math.min(100, parseInt(searchParams.get('limit') || '10')));
+    const search = (searchParams.get('search') || '').trim();
     const coupon = searchParams.get('coupon') || 'all';
     const fromDate = searchParams.get('fromDate');
     const toDate = searchParams.get('toDate');
 
     const skip = (page - 1) * limit;
 
-    // Build where clause
+    // Build where condition
     const where: any = {};
 
     if (search) {
@@ -43,7 +41,7 @@ export async function GET(request: Request) {
       }
     }
 
-    // Fetch paginated data
+    // Fetch paginated data + total count
     const [registrations, totalCount] = await Promise.all([
       prisma.workshopRegistration.findMany({
         where,
@@ -67,10 +65,11 @@ export async function GET(request: Request) {
         hasPrev: page > 1,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to fetch registrations:', error);
-    return NextResponse.json({ success: false, message: 'Failed to load data' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
+    return NextResponse.json(
+      { success: false, message: error.message || 'Failed to load data' },
+      { status: 500 }
+    );
   }
 }
