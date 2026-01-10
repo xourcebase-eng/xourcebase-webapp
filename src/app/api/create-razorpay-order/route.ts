@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 
 const getRazorpayInstance = () => {
-  // Determine environment
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   const key_id = isDevelopment
@@ -26,7 +25,19 @@ const getRazorpayInstance = () => {
 
 export async function POST(request: Request) {
   try {
-    const { amount, currency = 'INR', receipt } = await request.json();
+    const body = await request.json();
+    const {
+      amount,
+      currency = 'INR',
+      receipt,
+      fullName,
+      email,
+      phone,
+      whatsapp,
+      currentRole,
+      experience,
+      coupon = 'None',
+    } = body;
 
     if (!amount || amount < 1) {
       return NextResponse.json(
@@ -35,12 +46,29 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!fullName || !email || !phone) {
+      return NextResponse.json(
+        { success: false, message: 'Missing required user details' },
+        { status: 400 }
+      );
+    }
+
     const razorpay = getRazorpayInstance();
 
     const order = await razorpay.orders.create({
-      amount: amount * 100, // Razorpay expects amount in paise
+      amount: amount * 100, // Convert to paise
       currency,
       receipt: receipt || `workshop_${Date.now()}`,
+      notes: {
+        // These notes will be available in the webhook payload
+        name: fullName,
+        email: email,
+        phone: phone,
+        whatsapp: whatsapp || '',
+        role: currentRole || '',
+        experience: experience || '',
+        coupon: coupon,
+      },
     });
 
     return NextResponse.json({
@@ -48,6 +76,7 @@ export async function POST(request: Request) {
       order_id: order.id,
       amount: order.amount, // in paise
       currency: order.currency,
+      receipt: order.receipt,
     });
   } catch (error: any) {
     console.error('Razorpay order creation failed:', error);

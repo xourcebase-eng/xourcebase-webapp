@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model WorkshopRegistration {
+  id          BigInt    @id @default(autoincrement())
+  paymentId   String    @unique
+  fullName    String
+  email       String
+  phone       String
+  whatsapp    String?
+  currentRole String?
+  experience  String?
+  coupon      String    @default("None")
+  amountPaid  Decimal   @default(99.0)
+  status      String    @default("confirmed")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime? @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([coupon])
+  @@map("workshop_registrations")
+}
