@@ -221,6 +221,13 @@ export default function WorkshopCheckoutPage() {
         body: JSON.stringify({
           amount: finalAmount,
           receipt: `workshop_${Date.now()}`,
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          whatsapp: formData.whatsapp,
+          currentRole: formData.currentRole,
+          experience: formData.experience,
+          coupon: formData.coupon || 'None',
         }),
       });
 
