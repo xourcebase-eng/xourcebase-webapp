@@ -1,5 +1,5 @@
 // src/lib/prisma.ts
-import { PrismaClient } from '@/generated/prisma'; // ← Your custom path
+import { PrismaClient } from '../generated/prisma'; // ← Your custom path
 
 declare global {
   // eslint-disable-next-line no-var
