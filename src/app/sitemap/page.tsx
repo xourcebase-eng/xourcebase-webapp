@@ -24,7 +24,6 @@ export default function SitemapPage() {
       { name: 'About Us', path: '/about-us' },
       { name: 'Plans & Pricing', path: '/plans-pricing' },
       { name: 'Workshops', path: '/workshops' },
-      { name: 'Programs', path: '/programs' },
       { name: 'Contact', path: '/contact' },
     ],
     resources: [
@@ -33,8 +32,8 @@ export default function SitemapPage() {
       { name: 'Teach on XourceBase', path: '/teach-xourcebase' },
     ],
     programSections: [
-      { name: 'Tech Career Accelerator', path: '/programs/tech-career-accelerator' },
-      { name: 'Communication & Support Excellence', path: '/programs/communication-support-excellence' },
+      { name: 'Tech Career Accelerator', path: '/tech-career-accelerator' },
+      { name: 'Communication & Support Excellence', path: '/communication-support-excellence' },
     ],
     company: [
       { name: 'Careers', path: '/careers' },
