@@ -14,6 +14,9 @@ const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
   title: 'XourceBase',
   description: 'Advance your skills with XourceBase - Your gateway to expert-led coding workshops and projects.',
+  verification: {
+    google: 'sf85vAlVH5V9S3jkmLEi7cZ9EuxOEMwNcSBxqrVKCnY', // ← Replace this!
+  },
 };
 
 export default function RootLayout({

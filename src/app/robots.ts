@@ -8,7 +8,6 @@ export default function robots() {
         disallow: [
           '/workshop-checkout',
           '/workshop-success',
-          '/admin/',
           '/api/',
         ],
       },
