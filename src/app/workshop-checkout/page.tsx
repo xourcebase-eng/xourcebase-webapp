@@ -241,7 +241,7 @@ export default function WorkshopCheckoutPage() {
       const options = {
         // Use test key in development, live key in production
         key: process.env.NODE_ENV === 'development'
-          ? 'rzp_test_S1Q7YVN8VPD2k0'
+          ? 'rzp_test_S31sBB34MdQR0m'
           : process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
 
         amount: data.amount, // in paise
