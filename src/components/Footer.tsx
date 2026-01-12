@@ -44,7 +44,7 @@ export default function Footer() {
             <h3 className="text-white font-semibold mb-4">Legal & Accessibility</h3>
             <ul className="space-y-2 text-sm">
               <li><Link href="/privacy-policy" className="hover:text-white transition">Privacy policy</Link></li>
-              <li><Link href="/sitemap" className="hover:text-white transition">Sitemap</Link></li>
+              <li><Link href="/sitemap-page" className="hover:text-white transition">Sitemap</Link></li>
               <li><Link href="/terms-conditions" className="hover:text-white transition">Terms</Link></li>
             </ul>
           </div>
