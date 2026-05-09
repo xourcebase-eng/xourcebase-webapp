@@ -39,7 +39,7 @@ export default function HelpAndSupportPage() {
   const faqs = [
     {
       question: 'How do I join a workshop?',
-      answer: 'Visit the workshop page, click "Join Now a", fill in your details, and complete payment. You’ll receive instant access and joining instructions via email.',
+      answer: 'Visit the workshop page, click "Join Now", fill in your details, and complete payment. You’ll receive instant access and joining instructions via email.',
     },
     {
       question: 'What payment methods do you accept?',
