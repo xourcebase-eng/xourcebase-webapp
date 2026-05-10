@@ -1,277 +1,197 @@
+'use client';
+
 // src/components/Header.tsx
-// dummy commit
-"use client";
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { Menu, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import logo from "@/assets/xourcebase-logo.png";
 
+const NAV_LINKS = [
+  { label: 'Workshops', href: '/workshops' },
+  { label: 'Trainings', href: '/trainings' },
+  { label: 'Community Forum', href: '/community-forum' },
+  { label: 'Contact', href: '/contact' },
+];
+
 export default function Header() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProgramsOpen, setIsProgramsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Determine if current viewport is mobile (lg breakpoint = 1024px)
-  const checkIsMobile = () => {
-    setIsMobile(window.innerWidth < 1024); // Tailwind 'lg' = 1024px
-  };
-
-  // Reset all open states when switching between mobile/desktop
-  const resetMenuStates = () => {
-    setIsMobileMenuOpen(false);
-    setIsProgramsOpen(false);
-  };
-
-  // Initial check + listener for window resize
+  // Close drawer on route change
   useEffect(() => {
-    checkIsMobile();
-    const handleResize = () => {
-      const wasMobile = isMobile;
-      checkIsMobile();
-      const nowMobile = window.innerWidth < 1024;
+    setMenuOpen(false);
+  }, [pathname]);
 
-      // Only reset if crossing the lg breakpoint
-      if (wasMobile !== nowMobile) {
-        resetMenuStates();
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isMobile]);
-
-  // Lock body scroll when mobile menu is open
+  // Lock body scroll when drawer is open
   useEffect(() => {
-    if (isMobileMenuOpen && isMobile) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
 
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen, isMobile]);
-
-  // Close desktop dropdown when clicking outside
+  // Scroll shadow
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsProgramsOpen(false);
-      }
-    };
+    const onScroll = () => setScrolled(window.scrollY > 6);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
-    if (isProgramsOpen && !isMobile) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isProgramsOpen, isMobile]);
-
-  const isActive = (path: string) => {
-    return pathname === path || pathname.startsWith(path + '/');
-  };
-
-  const isProgramsActive = isActive('/programs');
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(prev => !prev);
-  };
-
-  const togglePrograms = () => {
-    setIsProgramsOpen(prev => !prev);
-  };
-
-  const handleLinkClick = () => {
-    setIsMobileMenuOpen(false);
-    setIsProgramsOpen(false);
-  };
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + '/');
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <img 
-              src={logo.src} 
-              alt="XourceBase" 
-              className="h-9 w-auto transition-transform duration-200 group-hover:scale-105" 
-            />
-          </Link>
+    <>
+      {/* ── Header bar ── */}
+      <header
+        className={`sticky top-0 z-50 w-full bg-white transition-shadow duration-300 ${
+          scrolled ? 'shadow-md shadow-gray-100' : 'border-b border-gray-100'
+        }`}
+      >
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+          <div className="flex h-16 items-center justify-between gap-6">
 
-          {/* Desktop Navigation */ }
-          <nav className="hidden lg:flex items-center space-x-10 font-manrope">
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={togglePrograms}
-                className={`flex items-center space-x-1 font-medium transition ${
-                  isProgramsActive ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-                }`}
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0">
+              <img
+                src={logo.src}
+                alt="XourceBase"
+                className="h-8 w-auto"
+              />
+            </Link>
+
+            {/* Desktop nav */}
+            <nav className="hidden lg:flex items-center gap-1 flex-1">
+              {NAV_LINKS.map(({ label, href }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`text-sm font-semibold px-3 py-2 rounded-lg transition-colors ${
+                    isActive(href)
+                      ? 'text-[#8B0000] bg-red-50'
+                      : 'text-gray-700 hover:text-[#8B0000] hover:bg-red-50'
+                  }`}
+                >
+                  {label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Desktop CTAs */}
+            <div className="hidden lg:flex items-center gap-3 flex-shrink-0">
+              <Link
+                href="/login"
+                className="text-sm font-semibold text-gray-700 hover:text-[#8B0000] transition-colors px-3 py-2"
               >
-                <span>Programs</span>
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform duration-200 ${isProgramsOpen ? 'rotate-180' : ''}`}
-                />
-              </button>
-
-              {isProgramsOpen && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 font-manrope">
-                  <Link
-                    href="/tech-career-accelerator"
-                    onClick={handleLinkClick}
-                    className={`block px-5 py-3 text-sm transition ${
-                      pathname === '/programs/tech-career-accelerator'
-                        ? 'bg-purple-50 text-[#8B0000]'
-                        : 'text-gray-700 hover:text-[#8B0000] hover:bg-gray-100'
-                    }`}
-                  >
-                    Tech Career Accelerator
-                  </Link>
-                  <Link
-                    href="/communication-support-excellence"
-                    onClick={handleLinkClick}
-                    className={`block px-5 py-3 text-sm transition ${
-                      pathname === '/programs/communication-support-excellence'
-                        ? 'bg-purple-50 text-[#8B0000]'
-                        : 'text-gray-700 hover:text-[#8B0000] hover:bg-gray-100'
-                    }`}
-                  >
-                    Communication & Support Excellence
-                  </Link>
-                </div>
-              )}
+                Log in
+              </Link>
+              <Link
+                href="/signup"
+                className="text-sm font-bold bg-[#8B0000] hover:bg-[#700000] active:scale-95 text-white px-5 py-2.5 rounded-xl transition-all shadow-sm"
+              >
+                Get Started
+              </Link>
             </div>
 
-            <Link
-              href="/workshops"
-              className={`font-medium transition font-manrope ${
-                isActive('/workshops') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-              }`}
+            {/* Mobile hamburger */}
+            <button
+              type="button"
+              onClick={() => setMenuOpen((p) => !p)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+              className="lg:hidden w-10 h-10 flex items-center justify-center rounded-xl text-gray-700 hover:bg-gray-100 transition-colors"
             >
-              Workshops
-            </Link>
-            <Link
-              href="/plans-pricing"
-              className={`font-medium transition font-manrope ${
-                isActive('/plans-pricing') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-              }`}
-            >
-              Plans & Pricing
-            </Link>
-            <Link
-              href="/contact"
-              className={`font-medium transition font-manrope ${
-                isActive('/contact') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-              }`}
-            >
-              Contact
-            </Link>
-          </nav>
-
-          {/* Mobile Hamburger */}
-          <button
-            onClick={toggleMobileMenu}
-            className="lg:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition"
-            aria-label="Toggle menu"
-          >
-            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
-        </div>
-
-        {/* Mobile Drawer */}
-        <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? 'max-h-96 border-t border-gray-200' : 'max-h-0'
-          }`}
-        >
-          <div className="py-6">
-            <nav className="space-y-5 font-manrope">
-              {/* Programs - Collapsible in Mobile */}
-              <div>
-                <button
-                  onClick={togglePrograms}
-                  className={`flex w-full items-center justify-between text-left font-semibold py-2 transition ${
-                    isProgramsActive ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-                  }`}
-                  aria-expanded={isProgramsOpen}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={menuOpen ? 'close' : 'open'}
+                  initial={{ rotate: -90, opacity: 0 }}
+                  animate={{ rotate: 0, opacity: 1 }}
+                  exit={{ rotate: 90, opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                 >
-                  <span>Programs</span>
-                  <ChevronDown
-                    size={20}
-                    className={`transition-transform duration-200 ${isProgramsOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-
-                <div
-                  className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                    isProgramsOpen ? 'max-h-40 opacity-100 mt-3' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="ml-4 space-y-2 font-manrope">
-                    <Link
-                      href="/tech-career-accelerator"
-                      onClick={handleLinkClick}
-                      className={`block py-2 transition ${
-                        pathname === '/tech-career-accelerator'
-                          ? 'text-[#8B0000] font-medium'
-                          : 'text-gray-700 hover:text-[#8B0000]'
-                      }`}
-                    >
-                      Tech Career Accelerator
-                    </Link>
-                    <Link
-                      href="/communication-support-excellence"
-                      onClick={handleLinkClick}
-                      className={`block py-2 transition ${
-                        pathname === '/communication-support-excellence'
-                          ? 'text-[#8B0000] font-medium'
-                          : 'text-gray-700 hover:text-[#8B0000]'
-                      }`}
-                    >
-                      Communication & Support Excellence
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              <Link
-                href="/workshops"
-                onClick={handleLinkClick}
-                className={`block text-lg font-medium transition ${
-                  isActive('/workshops') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-                }`}
-              >
-                Workshops
-              </Link>
-              <Link
-                href="/plans-pricing"
-                onClick={handleLinkClick}
-                className={`block text-lg font-medium transition ${
-                  isActive('/plans-pricing') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-                }`}
-              >
-                Plans & Pricing
-              </Link>
-              <Link
-                href="/contact"
-                onClick={handleLinkClick}
-                className={`block text-lg font-medium transition ${
-                  isActive('/contact') ? 'text-[#8B0000]' : 'text-gray-700 hover:text-[#8B0000]'
-                }`}
-              >
-                Contact
-              </Link>
-            </nav>
+                  {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                </motion.span>
+              </AnimatePresence>
+            </button>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* ── Mobile drawer (outside header so it overlays page) ── */}
+      <AnimatePresence>
+        {menuOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMenuOpen(false)}
+              className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+            />
+
+            {/* Slide-in panel from right */}
+            <motion.div
+              key="drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+              className="lg:hidden fixed top-0 right-0 bottom-0 z-50 w-[80vw] max-w-xs bg-white flex flex-col shadow-2xl"
+            >
+              {/* Drawer header */}
+              <div className="flex items-center justify-between px-5 h-16 border-b border-gray-100">
+                <Link href="/" onClick={() => setMenuOpen(false)}>
+                  <img src={logo.src} alt="XourceBase" className="h-7 w-auto" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Drawer links */}
+              <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-1">
+                {NAV_LINKS.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className={`flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${
+                      isActive(href)
+                        ? 'text-[#8B0000] bg-red-50'
+                        : 'text-gray-800 hover:text-[#8B0000] hover:bg-red-50'
+                    }`}
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </nav>
+
+              {/* Drawer footer CTAs */}
+              <div className="flex-shrink-0 px-4 py-5 border-t border-gray-100 space-y-3">
+                <Link
+                  href="/login"
+                  className="block w-full text-center text-sm font-semibold text-gray-700 border border-gray-200 hover:border-[#8B0000] hover:text-[#8B0000] py-3 rounded-xl transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="block w-full text-center text-sm font-bold bg-[#8B0000] hover:bg-[#700000] text-white py-3 rounded-xl transition-colors"
+                >
+                  Get Started — It's Free
+                </Link>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -22,18 +22,14 @@ export default function SitemapPage() {
     main: [
       { name: 'Home', path: '/' },
       { name: 'About Us', path: '/about-us' },
-      { name: 'Plans & Pricing', path: '/plans-pricing' },
       { name: 'Workshops', path: '/workshops' },
+      { name: 'Trainings', path: '/trainings' },
       { name: 'Contact', path: '/contact' },
     ],
     resources: [
       { name: 'Blog', path: '/blog' },
       { name: 'Help & Support', path: '/help-support' },
       { name: 'Teach on XourceBase', path: '/teach-xourcebase' },
-    ],
-    programSections: [
-      { name: 'Tech Career Accelerator', path: '/tech-career-accelerator' },
-      { name: 'Communication & Support Excellence', path: '/communication-support-excellence' },
     ],
     company: [
       { name: 'Careers', path: '/careers' },
@@ -98,23 +94,6 @@ export default function SitemapPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Resources</h2>
             <ul className="space-y-4">
               {pages.resources.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.path}
-                    className="text-lg text-gray-700 hover:text-[#8B0000] transition-colors duration-200 block"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Program Sections */}
-          <motion.div variants={fadeInUp} className="space-y-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Programs</h2>
-            <ul className="space-y-4">
-              {pages.programSections.map((item) => (
                 <li key={item.name}>
                   <Link
                     href={item.path}
