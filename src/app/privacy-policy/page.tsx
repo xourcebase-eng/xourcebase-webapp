@@ -1,184 +1,299 @@
 'use client';
 
+// src/app/privacy-policy/page.tsx
+
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Cookie, UserCheck, Mail } from 'lucide-react';
+import type { Variants } from 'framer-motion';
+import Link from 'next/link';
+import {
+  Shield,
+  Lock,
+  Cookie,
+  UserCheck,
+  Mail,
+  Eye,
+  ChevronRight,
+  Database,
+} from 'lucide-react';
+
+/* ── Variants ── */
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.06, duration: 0.45, ease: 'easeOut' },
+  }),
+};
+
+/* ── Section data ── */
+const SECTIONS = [
+  {
+    id: 'collect',
+    icon: Database,
+    title: 'Information We Collect',
+    intro: 'We collect information to provide and improve our services. This includes:',
+    bullets: [
+      {
+        label: 'Personal Information',
+        text: 'Name, email address, phone number, and payment details when you enrol in programmes or contact us.',
+      },
+      {
+        label: 'Usage Data',
+        text: 'Information about how you interact with our site — pages visited and time spent — to enhance user experience.',
+      },
+      {
+        label: 'Cookies & Tracking',
+        text: 'Small data files to remember preferences and analyse site performance (see Cookies Policy below).',
+      },
+    ],
+    footer: 'We only collect what is necessary and do not sell your data to third parties.',
+  },
+  {
+    id: 'use',
+    icon: Eye,
+    title: 'How We Use Information',
+    intro: 'Your information helps us:',
+    bullets: [
+      {
+        label: null,
+        text: 'Process enrolments and provide personalised programme recommendations.',
+      },
+      {
+        label: null,
+        text: 'Send updates, newsletters, and promotional content — you can opt out at any time.',
+      },
+      {
+        label: null,
+        text: 'Improve our platform through analytics and feedback.',
+      },
+      {
+        label: null,
+        text: 'Comply with legal obligations, such as fraud prevention.',
+      },
+    ],
+    footer: 'We use secure processors for payments and do not store sensitive financial details.',
+  },
+  {
+    id: 'security',
+    icon: Lock,
+    title: 'Data Security',
+    intro: 'Protecting your data is essential. We implement:',
+    bullets: [
+      {
+        label: 'Encryption',
+        text: 'Industry-standard SSL/TLS encryption for data in transit and at rest.',
+      },
+      {
+        label: 'Access Controls',
+        text: 'Regular security audits and strict access controls to prevent unauthorised access.',
+      },
+      {
+        label: 'Compliance',
+        text: 'Full compliance with GDPR and Indian data protection laws.',
+      },
+    ],
+    footer: 'In the unlikely event of a breach, we will notify affected users promptly.',
+  },
+  {
+    id: 'cookies',
+    icon: Cookie,
+    title: 'Cookies Policy',
+    intro: 'We use cookies to enhance your experience:',
+    bullets: [
+      {
+        label: 'Essential Cookies',
+        text: 'Necessary for core site functionality, such as session management.',
+      },
+      {
+        label: 'Analytics Cookies',
+        text: 'To understand usage patterns (e.g. Google Analytics — anonymised data only).',
+      },
+      {
+        label: 'Marketing Cookies',
+        text: 'For personalised ads. You can manage or disable these via your browser settings.',
+      },
+    ],
+    footer: 'You can disable cookies in your browser, though this may affect certain site features. Cookie Settings coming soon.',
+  },
+  {
+    id: 'rights',
+    icon: UserCheck,
+    title: 'Your Rights & Choices',
+    intro: 'You have full control over your data:',
+    bullets: [
+      {
+        label: 'Access & Update',
+        text: 'View or edit your information at any time via your account dashboard.',
+      },
+      {
+        label: 'Deletion',
+        text: 'Request data deletion, subject to any legal retention requirements.',
+      },
+      {
+        label: 'Opt-Out',
+        text: 'Unsubscribe from marketing emails or disable cookies at any point.',
+      },
+      {
+        label: 'Complaints',
+        text: 'Contact us or the relevant data authority if you have concerns about data handling.',
+      },
+    ],
+    footer: 'We respond to all data requests within 30 days.',
+  },
+  {
+    id: 'contact',
+    icon: Mail,
+    title: 'Contact Information',
+    intro: 'Questions about this policy? Reach out to our privacy team:',
+    bullets: [],
+    footer: null,
+    isContact: true,
+  },
+];
 
 export default function PrivacyPolicyPage() {
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-      },
-    },
-  };
+  const [active, setActive] = useState<string | null>(null);
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 py-16 px-6 lg:py-20">
-      <div className="container mx-auto max-w-7xl">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={containerVariants}
-          className="max-w-4xl mx-auto"
-        >
-          {/* Header */}
-          <motion.div variants={fadeInUp} className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+
+      {/* ── Hero ── */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-14 lg:py-18">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">
+              <Shield className="w-3.5 h-3.5" />
+              Legal
+            </div>
+            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-3">
               Privacy Policy
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              At XourceBase, your privacy is our priority. We are committed to protecting your personal information and ensuring transparency in how we handle your data.
+            <p className="text-gray-500 text-sm md:text-base max-w-xl leading-relaxed mb-4">
+              At XourceBase, your privacy is our priority. We are committed to protecting your personal information and being fully transparent about how your data is handled.
             </p>
+            <p className="text-xs text-gray-400">Last updated: December 15, 2025</p>
           </motion.div>
+        </div>
+      </div>
 
-          {/* Sections */}
-          <div className="space-y-12">
-            {/* Information We Collect */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <Shield className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">Information We Collect</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>We collect information to provide and improve our services. This includes:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Personal Information:</strong> Name, email address, phone number, and payment details when you enroll in programs or contact us.</li>
-                  <li><strong>Usage Data:</strong> Information about how you interact with our site, such as pages visited and time spent, to enhance user experience.</li>
-                  <li><strong>Cookies and Tracking:</strong> Small data files to remember preferences and analyze site performance (see Cookies Policy below).</li>
-                </ul>
-                <p>We only collect what is necessary and do not sell your data to third parties.</p>
-              </div>
-            </motion.section>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-12 lg:py-16">
+        <div className="lg:grid lg:grid-cols-[220px_1fr] lg:gap-12 items-start">
 
-            {/* How We Use Information */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <UserCheck className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">How We Use Information</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>Your information helps us:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Process enrollments and provide personalized program recommendations.</li>
-                  <li>Send updates, newsletters, and promotional content (you can opt out anytime).</li>
-                  <li>Improve our platform through analytics and feedback.</li>
-                  <li>Comply with legal obligations, such as fraud prevention.</li>
-                </ul>
-                <p>We use secure processors for payments and do not store sensitive financial details.</p>
-              </div>
-            </motion.section>
+          {/* ── Sticky TOC (desktop) ── */}
+          <aside className="hidden lg:block sticky top-24 self-start">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">
+              On this page
+            </p>
+            <nav className="space-y-1">
+              {SECTIONS.map((s) => (
+                <a
+                  key={s.id}
+                  href={`#${s.id}`}
+                  onClick={() => setActive(s.id)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-colors ${
+                    active === s.id
+                      ? 'bg-red-50 text-[#8B0000] font-semibold'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <ChevronRight className="w-3 h-3 flex-shrink-0" />
+                  {s.title}
+                </a>
+              ))}
+            </nav>
 
-            {/* Data Security */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <Lock className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">Data Security</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>Protecting your data is essential. We implement:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Industry-standard encryption (SSL/TLS) for data in transit and at rest.</li>
-                  <li>Regular security audits and access controls to prevent unauthorized access.</li>
-                  <li>Compliance with GDPR and Indian data protection laws.</li>
-                </ul>
-                <p>In the unlikely event of a breach, we will notify affected users promptly.</p>
-              </div>
-            </motion.section>
+            <div className="mt-8 p-4 bg-red-50 rounded-2xl border border-red-100">
+              <p className="text-xs text-[#8B0000] font-semibold mb-1">Questions?</p>
+              <p className="text-xs text-gray-500 mb-2">
+                Our team is happy to clarify any part of this policy.
+              </p>
+              <Link
+                href="/contact"
+                className="text-xs font-bold text-[#8B0000] hover:underline"
+              >
+                Contact us →
+              </Link>
+            </div>
+          </aside>
 
-            {/* Cookies Policy */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <Cookie className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">Cookies Policy</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>We use cookies to enhance your experience:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Essential Cookies:</strong> Necessary for site functionality (e.g., session management).</li>
-                  <li><strong>Analytics Cookies:</strong> To understand usage patterns (e.g., Google Analytics, anonymized).</li>
-                  <li><strong>Marketing Cookies:</strong> For personalized ads (you can manage via browser settings).</li>
-                </ul>
-                <p>You can disable cookies in your browser, but this may affect site features. Learn more in our Cookie Settings (coming soon).</p>
-              </div>
-            </motion.section>
+          {/* ── Sections ── */}
+          <div className="space-y-5">
+            {SECTIONS.map((s, i) => (
+              <motion.div
+                key={s.id}
+                id={s.id}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                variants={fadeUp}
+                viewport={{ once: true }}
+                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 scroll-mt-24"
+              >
+                {/* Section header */}
+                <div className="flex items-start gap-4 mb-5">
+                  <div className="w-10 h-10 bg-red-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <s.icon className="w-4 h-4 text-[#8B0000]" />
+                  </div>
+                  <h2 className="text-lg font-extrabold text-gray-900 pt-1.5">{s.title}</h2>
+                </div>
 
-            {/* User Rights and Choices */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <UserCheck className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">User Rights and Choices</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>You have control over your data:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li><strong>Access & Update:</strong> View or edit your information anytime via your account dashboard.</li>
-                  <li><strong>Deletion:</strong> Request data deletion (subject to legal retention).</li>
-                  <li><strong>Opt-Out:</strong> Unsubscribe from emails or cookies.</li>
-                  <li><strong>Complaints:</strong> Contact us or relevant authorities if concerned.</li>
-                </ul>
-                <p>We respond to requests within 30 days.</p>
-              </div>
-            </motion.section>
+                <div className="space-y-4 text-sm text-gray-600 leading-relaxed pl-14">
+                  {s.intro && <p>{s.intro}</p>}
 
-            {/* Contact Information */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white rounded-xl shadow-md p-8 border border-gray-100"
-            >
-              <div className="flex items-start space-x-4 mb-6">
-                <Mail className="w-8 h-8 text-[#8B0000] mt-1 flex-shrink-0" />
-                <h2 className="text-2xl font-bold text-gray-900">Contact Information</h2>
-              </div>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>Questions about this policy? Reach out to us:</p>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>
-                    <strong>Email:</strong>{' '}
-                    <a
-                      href="mailto:contact@xourcebase.com"
-                      className="text-[#8B0000] hover:underline"
-                    >
-                      contact@xourcebase.com
-                    </a>
-                  </li>
-                </ul>
-                <p>We'll respond within 48 hours.</p>
-              </div>
-            </motion.section>
+                  {/* Bullets */}
+                  {s.bullets.length > 0 && (
+                    <ul className="space-y-2.5 mt-1">
+                      {s.bullets.map((b, j) => (
+                        <li key={j} className="flex items-start gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#8B0000] flex-shrink-0 mt-1.5" />
+                          <span>
+                            {b.label && (
+                              <strong className="text-gray-800">{b.label}: </strong>
+                            )}
+                            {b.text}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+
+                  {/* Contact block */}
+                  {s.isContact && (
+                    <div className="mt-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <p className="font-semibold text-gray-800 text-xs mb-1">Email</p>
+                      <a
+                        href="mailto:contact@xourcebase.com"
+                        className="text-[#8B0000] font-semibold hover:underline text-sm"
+                      >
+                        contact@xourcebase.com
+                      </a>
+                      <p className="text-xs text-gray-400 mt-1">
+                        We respond within 48 hours.
+                      </p>
+                    </div>
+                  )}
+
+                  {s.footer && (
+                    <p className="text-gray-500 italic text-xs pt-1">{s.footer}</p>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+
+            {/* Bottom note */}
+            <p className="text-center text-xs text-gray-400 pt-4">
+              Last updated: December 15, 2025 · © {new Date().getFullYear()} XourceBase, Inc.
+            </p>
           </div>
 
-          {/* Last Updated */}
-          <motion.div
-            variants={fadeInUp}
-            className="text-center mt-16 text-sm text-gray-500"
-          >
-            <p>Last Updated: December 15, 2025</p>
-          </motion.div>
-        </motion.div>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
