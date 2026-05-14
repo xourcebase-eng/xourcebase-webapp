@@ -8,7 +8,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { GoogleAnalytics } from '@next/third-parties/google'; // ← For GA4
+import { GoogleAnalytics } from '@next/third-parties/google';
+import Providers from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   title: 'XourceBase',
   description: 'Advance your skills with XourceBase - Your gateway to expert-led coding workshops and projects.',
   verification: {
-    google: 'sf85vAlVH5V9S3jkmLEi7cZ9EuxOEMwNcSBxqrVKCnY', // ← Your real verification code
+    google: 'sf85vAlVH5V9S3jkmLEi7cZ9EuxOEMwNcSBxqrVKCnY',
   },
 };
 
@@ -28,11 +29,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex min-h-screen flex-col bg-gray-50`}>
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <Providers>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </Providers>
 
-        {/* Google Analytics 4 - Official Integration */}
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!} />
       </body>
     </html>
