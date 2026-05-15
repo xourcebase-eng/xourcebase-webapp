@@ -22,14 +22,12 @@ const fadeUp: Variants = {
   }),
 };
 
-/* ── Avatar ── */
 function Avatar({ src, name }: { src?: string | null; name?: string | null }) {
   const initials = name
     ? name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
     : '?';
   return src ? (
-    <img src={src} alt={name ?? ''}
-      className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white shadow-lg" />
+    <img src={src} alt={name ?? ''} className="w-20 h-20 rounded-2xl object-cover ring-4 ring-white shadow-lg" />
   ) : (
     <div className="w-20 h-20 rounded-2xl bg-[#8B0000] flex items-center justify-center ring-4 ring-white shadow-lg">
       <span className="text-white text-2xl font-bold">{initials}</span>
@@ -37,7 +35,6 @@ function Avatar({ src, name }: { src?: string | null; name?: string | null }) {
   );
 }
 
-/* ── Info row ── */
 function InfoRow({ label, value, icon: Icon }: { label: string; value?: string | null; icon: any }) {
   return (
     <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
@@ -52,7 +49,7 @@ function InfoRow({ label, value, icon: Icon }: { label: string; value?: string |
   );
 }
 
-/* ── Toggle switch — uses inline styles to avoid Tailwind purge issues ── */
+/* ── Toggle — fully inline styles, zero Tailwind dynamic classes ── */
 function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
   return (
     <button
@@ -64,25 +61,26 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void 
         position: 'relative',
         display: 'inline-flex',
         alignItems: 'center',
-        width: '44px',
-        height: '24px',
-        borderRadius: '9999px',
+        width: 44,
+        height: 24,
+        borderRadius: 9999,
         backgroundColor: checked ? '#8B0000' : '#D1D5DB',
         border: 'none',
         cursor: 'pointer',
         transition: 'background-color 0.2s ease',
         flexShrink: 0,
         padding: 0,
+        outline: 'none',
       }}
     >
       <span
         style={{
           position: 'absolute',
-          top: '2px',
-          left: checked ? '22px' : '2px',
-          width: '20px',
-          height: '20px',
-          borderRadius: '9999px',
+          top: 2,
+          left: checked ? 22 : 2,
+          width: 20,
+          height: 20,
+          borderRadius: 9999,
           backgroundColor: '#ffffff',
           boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
           transition: 'left 0.2s ease',
@@ -98,7 +96,7 @@ export default function ProfilePage() {
 
   const [displayName, setDisplayName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [notifications, setNotifications] = useState({
     marketing: true,
@@ -139,10 +137,6 @@ export default function ProfilePage() {
     setTimeout(() => setSaveStatus('idle'), 2500);
   };
 
-  const toggleNotification = (key: keyof typeof notifications) => {
-    setNotifications((p) => ({ ...p, [key]: !p[key] }));
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 antialiased">
 
@@ -156,19 +150,16 @@ export default function ProfilePage() {
               <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
             </Link>
 
-            {/* Profile header — stacks on mobile */}
+            {/* Profile header */}
             <div className="flex flex-col sm:flex-row sm:items-end gap-5">
-              {/* Avatar */}
               <div className="relative flex-shrink-0 self-start">
                 <Avatar src={session.user?.image} name={session.user?.name} />
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#8B0000] rounded-xl flex items-center justify-center shadow-md"
-                  title="Profile picture is managed by your sign-in provider">
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-[#8B0000] rounded-xl flex items-center justify-center shadow-md">
                   <Camera className="w-3.5 h-3.5 text-white" />
                 </div>
               </div>
 
               <div className="flex-1 min-w-0">
-                {/* Provider badges */}
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   {isGithub && (
                     <span className="inline-flex items-center gap-1 text-xs font-bold bg-gray-900 text-white px-2.5 py-1 rounded-full">
@@ -190,9 +181,11 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-400 mt-0.5 truncate">{session.user?.email}</p>
               </div>
 
-              {/* Sign out — full width on mobile */}
-              <button onClick={() => signOut({ callbackUrl: '/login' })}
-                className="flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2.5 border border-red-200 text-[#8B0000] text-sm font-bold rounded-xl hover:bg-red-50 transition-colors flex-shrink-0">
+              {/* ← Key fix: inline-flex + self-start so never stretches full width on mobile */}
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2.5 border border-red-200 text-[#8B0000] text-sm font-bold rounded-xl hover:bg-red-50 transition-colors flex-shrink-0"
+              >
                 <LogOut className="w-4 h-4" /> Sign out
               </button>
             </div>
@@ -204,7 +197,7 @@ export default function ProfilePage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-8 sm:py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          {/* ── Left col ── */}
+          {/* Left col */}
           <div className="lg:col-span-2 space-y-6">
 
             {/* Account info */}
@@ -297,13 +290,13 @@ export default function ProfilePage() {
                 ] as const).map(({ key, label, desc }) => (
                   <div key={key}
                     className="flex items-center justify-between gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-gray-800">{label}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{desc}</p>
                     </div>
                     <Toggle
                       checked={notifications[key]}
-                      onChange={() => toggleNotification(key)}
+                      onChange={() => setNotifications((p) => ({ ...p, [key]: !p[key] }))}
                     />
                   </div>
                 ))}
@@ -325,12 +318,13 @@ export default function ProfilePage() {
 
               {!showDeleteConfirm ? (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-red-50 rounded-2xl border border-red-100">
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-bold text-gray-800">Delete Account</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Permanently delete your account and all data. This cannot be undone.</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Permanently delete your account and all data. Cannot be undone.</p>
                   </div>
+                  {/* inline-flex so it never stretches full width */}
                   <button onClick={() => setShowDeleteConfirm(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-red-300 text-red-700 text-xs font-bold rounded-xl hover:bg-red-100 transition-colors flex-shrink-0 w-full sm:w-auto justify-center">
+                    className="inline-flex items-center gap-2 self-start sm:self-auto px-4 py-2 border border-red-300 text-red-700 text-xs font-bold rounded-xl hover:bg-red-100 transition-colors flex-shrink-0">
                     <Trash2 className="w-3.5 h-3.5" /> Delete Account
                   </button>
                 </div>
@@ -340,14 +334,13 @@ export default function ProfilePage() {
                   <p className="text-xs text-red-600 mb-4">
                     This will permanently delete your account, all enrolments, and progress. This cannot be reversed.
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button
-                      onClick={() => signOut({ callbackUrl: '/' })}
-                      className="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-colors w-full sm:w-auto">
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={() => signOut({ callbackUrl: '/' })}
+                      className="inline-flex items-center px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white text-xs font-bold rounded-xl transition-colors">
                       Yes, delete my account
                     </button>
                     <button onClick={() => setShowDeleteConfirm(false)}
-                      className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-50 transition-colors w-full sm:w-auto">
+                      className="inline-flex items-center px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-50 transition-colors">
                       Cancel
                     </button>
                   </div>
@@ -356,10 +349,9 @@ export default function ProfilePage() {
             </motion.div>
           </div>
 
-          {/* ── Right sidebar ── */}
+          {/* Right sidebar */}
           <div className="space-y-6">
 
-            {/* Connected provider */}
             <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp}
               className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-extrabold text-gray-900 mb-4">Connected Account</h2>
@@ -382,7 +374,6 @@ export default function ProfilePage() {
               </p>
             </motion.div>
 
-            {/* Security */}
             <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp}
               className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <div className="flex items-center gap-3 mb-4">
@@ -403,15 +394,14 @@ export default function ProfilePage() {
               </div>
             </motion.div>
 
-            {/* Quick links */}
             <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp}
               className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-base font-extrabold text-gray-900 mb-4">Quick Links</h2>
               <div className="space-y-1">
                 {[
-                  { label: 'Your Dashboard', href: '/dashboard' },
+                  { label: 'Your Dashboard',   href: '/dashboard' },
                   { label: 'Browse Workshops', href: '/workshops' },
-                  { label: 'Privacy Policy', href: '/privacy-policy' },
+                  { label: 'Privacy Policy',   href: '/privacy-policy' },
                   { label: 'Terms & Conditions', href: '/terms-conditions' },
                 ].map(({ label, href }) => (
                   <Link key={href} href={href}
