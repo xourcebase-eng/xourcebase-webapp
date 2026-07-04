@@ -1,38 +1,32 @@
 'use client';
 
-import { motion } from 'framer-motion';
+// src/app/trainings/page.tsx
+
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
-  Clock,
-  Users,
-  Zap,
-  ArrowRight,
-  CheckCircle2,
-  BookOpen,
-  Award,
-  BarChart3,
-  Filter,
-  Search,
-  Star,
+  Clock, Users, Zap, ArrowRight, CheckCircle2,
+  BookOpen, Award, BarChart3, Filter, Search,
+  Star, Tag,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Level = 'All' | 'Beginner' | 'Intermediate' | 'Advanced';
+type Level    = 'All' | 'Beginner' | 'Intermediate' | 'Advanced';
 type Category = 'All' | 'Cloud & DevOps' | 'Communication' | 'Data' | 'Programming';
 
 interface Training {
   id: number;
   title: string;
   subtitle: string;
-  category: Category;
-  level: Level;
+  category: Exclude<Category, 'All'>;
+  level: Exclude<Level, 'All'>;
   duration: string;
   enrolled: number;
   rating: number;
   reviews: number;
-  accent: string;        // gradient classes
+  accent: string;
   badgeColor: string;
   tag: string;
   tagColor: string;
@@ -205,16 +199,16 @@ const trainings: Training[] = [
 ];
 
 const CATEGORIES: Category[] = ['All', 'Cloud & DevOps', 'Communication', 'Data', 'Programming'];
-const LEVELS: Level[] = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+const LEVELS: Level[]         = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 
-// ─── Animation ────────────────────────────────────────────────────────────────
+// ─── Animation (module-level — same pattern as workshops) ─────────────────────
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden:  { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 const containerVariants = {
-  hidden: { opacity: 0 },
+  hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
@@ -222,7 +216,7 @@ const containerVariants = {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
         <Star
           key={s}
@@ -235,9 +229,9 @@ function StarRating({ rating }: { rating: number }) {
 
 function LevelBadge({ level }: { level: string }) {
   const map: Record<string, string> = {
-    Beginner: 'bg-green-100 text-green-700',
+    Beginner:     'bg-green-100 text-green-700',
     Intermediate: 'bg-amber-100 text-amber-700',
-    Advanced: 'bg-red-100 text-red-700',
+    Advanced:     'bg-red-100   text-red-700',
   };
   return (
     <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${map[level] ?? 'bg-gray-100 text-gray-600'}`}>
@@ -247,166 +241,249 @@ function LevelBadge({ level }: { level: string }) {
   );
 }
 
-function TrainingCard({ t }: { t: Training }) {
-  const [expanded, setExpanded] = useState(false);
-
+// ── EnrolModal ─────────────────────────────────────────────────────────────────
+function EnrolModal({ training, onClose }: { training: Training; onClose: () => void }) {
   return (
     <motion.div
-      variants={fadeInUp}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3 }}
-      className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-indigo-100 overflow-hidden flex flex-col transition-all duration-400"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
     >
-      {/* Gradient stripe */}
-      <div className={`h-1.5 bg-gradient-to-r ${t.accent}`} />
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md"
+      >
+        <div className={`h-1.5 bg-gradient-to-r ${training.accent} rounded-full mb-6`} />
+        <h3 className="text-xl font-extrabold text-gray-900 mb-1">Enrol in Program</h3>
+        <p className="text-sm font-semibold text-gray-700 mb-1">{training.title}</p>
+        <p className="text-xs text-gray-400 mb-6">{training.subtitle}</p>
 
-      <div className="p-7 flex flex-col flex-1">
-        {/* Top row */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex flex-wrap gap-2">
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.tagColor}`}>{t.tag}</span>
-            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${t.badgeColor}`}>{t.category}</span>
+        <div className="bg-gray-50 rounded-2xl p-4 mb-6 space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Program fee</span>
+            <span className="font-bold text-gray-900">{training.price}</span>
           </div>
-          <LevelBadge level={t.level} />
-        </div>
-
-        <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors duration-300 leading-snug">
-          {t.title}
-        </h3>
-        <p className="text-xs text-gray-400 mb-3 font-medium">{t.subtitle}</p>
-        <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">{t.description}</p>
-
-        {/* Topics */}
-        <div className="flex flex-wrap gap-2 mb-5">
-          {t.topics.slice(0, 5).map((topic) => (
-            <span key={topic} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg font-medium">
-              {topic}
-            </span>
-          ))}
-          {t.topics.length > 5 && (
-            <span className="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-lg font-medium">
-              +{t.topics.length - 5} more
-            </span>
+          {training.originalPrice && (
+            <div className="flex justify-between text-xs">
+              <span className="text-gray-400">Original price</span>
+              <span className="text-gray-400 line-through">{training.originalPrice}</span>
+            </div>
           )}
-        </div>
-
-        {/* Expandable outcomes */}
-        {expanded && (
-          <motion.ul
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="space-y-2 mb-5"
-          >
-            {t.outcomes.map((o) => (
-              <li key={o} className="flex items-start gap-2 text-sm text-gray-700">
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                {o}
-              </li>
-            ))}
-          </motion.ul>
-        )}
-
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs text-indigo-600 font-semibold mb-5 text-left hover:underline"
-        >
-          {expanded ? '▲ Hide outcomes' : '▼ What you\'ll learn'}
-        </button>
-
-        {/* Meta */}
-        <div className="flex items-center gap-4 text-sm text-gray-500 mb-5">
-          <span className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-indigo-400" />{t.duration}</span>
-          <span className="flex items-center gap-1.5"><Users className="w-4 h-4 text-indigo-400" />{t.enrolled.toLocaleString()} enrolled</span>
-        </div>
-
-        {/* Rating */}
-        <div className="flex items-center gap-2 mb-6">
-          <span className="text-sm font-bold text-gray-800">{t.rating}</span>
-          <StarRating rating={t.rating} />
-          <span className="text-xs text-gray-400">({t.reviews} reviews)</span>
-        </div>
-
-        {/* Price + CTA */}
-        <div className="flex items-center justify-between gap-3 mt-auto">
-          <div>
-            <span className="text-xl font-bold text-gray-900">{t.price}</span>
-            {t.originalPrice && (
-              <span className="ml-2 text-sm text-gray-400 line-through">{t.originalPrice}</span>
-            )}
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-500">Duration</span>
+            <span className="font-semibold text-gray-700">{training.duration}</span>
           </div>
+        </div>
+
+        <div className="space-y-3">
           <Link
-            href="/plans-pricing"
-            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${t.accent} hover:opacity-90 transition-opacity duration-300 shadow-md whitespace-nowrap`}
+            href="/contact"
+            onClick={onClose}
+            className={`flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r ${training.accent} text-white font-bold text-sm rounded-xl transition-opacity hover:opacity-90`}
           >
-            Enrol Now
+            Proceed to Enrolment
             <ArrowRight className="w-4 h-4" />
           </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            Cancel
+          </button>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
+  );
+}
+
+// ── TrainingCard ───────────────────────────────────────────────────────────────
+
+function TrainingCard({ t }: { t: Training }) {
+  // Isolated state per card — same pattern as WorkshopCard
+  const [expanded, setExpanded]     = useState(false);
+  const [showEnrol, setShowEnrol]   = useState(false);
+
+  const discount = t.originalPrice
+    ? Math.round((1 - parseInt(t.price.replace(/[^\d]/g, '')) / parseInt(t.originalPrice.replace(/[^\d]/g, ''))) * 100)
+    : 0;
+
+  return (
+    <>
+      <motion.div
+        variants={fadeInUp}
+        whileHover={{ y: -6 }}
+        transition={{ duration: 0.3 }}
+        className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-indigo-100 overflow-hidden flex flex-col transition-all duration-300"
+      >
+        {/* Gradient stripe — matches workshop card */}
+        <div className={`h-1.5 bg-gradient-to-r ${t.accent}`} />
+
+        <div className="p-7 flex flex-col flex-1">
+
+          {/* Top row: tags + level badge */}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex flex-wrap gap-2">
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.tagColor}`}>
+                <Tag className="w-3 h-3 inline mr-1" />
+                {t.tag}
+              </span>
+              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${t.badgeColor}`}>
+                {t.category}
+              </span>
+            </div>
+            <LevelBadge level={t.level} />
+          </div>
+
+          {/* Title + subtitle */}
+          <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors duration-300 leading-snug">
+            {t.title}
+          </h3>
+          <p className="text-xs text-gray-400 mb-4 font-medium">{t.subtitle}</p>
+
+          {/* Description */}
+          <p className="text-sm text-gray-500 leading-relaxed mb-5">{t.description}</p>
+
+          {/* Topics chips */}
+          <div className="flex flex-wrap gap-2 mb-5">
+            {t.topics.slice(0, 5).map((topic) => (
+              <span key={topic} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg font-medium">
+                {topic}
+              </span>
+            ))}
+            {t.topics.length > 5 && (
+              <span className="text-xs bg-gray-100 text-gray-400 px-2.5 py-1 rounded-lg font-medium">
+                +{t.topics.length - 5} more
+              </span>
+            )}
+          </div>
+
+          {/* Expandable outcomes — AnimatePresence matches workshops */}
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.ul
+                key={`outcomes-${t.id}`}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-2 mb-5 overflow-hidden"
+              >
+                {t.outcomes.map((o) => (
+                  <li key={o} className="flex items-start gap-2 text-sm text-gray-700">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    {o}
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+
+          <button
+            onClick={() => setExpanded((p) => !p)}
+            className="text-xs text-indigo-600 font-semibold mb-5 text-left hover:underline"
+          >
+            {expanded ? "▲ Hide outcomes" : "▼ What you'll learn"}
+          </button>
+
+          {/* Meta row */}
+          <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm text-gray-600 mb-5">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span>{t.duration}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span>{t.enrolled.toLocaleString()} enrolled</span>
+            </div>
+          </div>
+
+          {/* Rating row */}
+          <div className="flex items-center gap-2 mb-6">
+            <span className="text-sm font-bold text-gray-800">{t.rating}</span>
+            <StarRating rating={t.rating} />
+            <span className="text-xs text-gray-400">({t.reviews} reviews)</span>
+          </div>
+
+          {/* Price + CTA — same layout as workshop card */}
+          <div className="flex items-center justify-between gap-3 mt-auto">
+            <div>
+              <span className="text-xl font-bold text-gray-900">{t.price}</span>
+              {t.originalPrice && (
+                <>
+                  <span className="ml-2 text-sm text-gray-400 line-through">{t.originalPrice}</span>
+                  <span className="ml-1.5 text-xs font-bold text-emerald-600">{discount}% off</span>
+                </>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowEnrol(true)}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${t.accent} hover:opacity-90 transition-opacity duration-300 shadow-md whitespace-nowrap`}
+            >
+              Enrol Now
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Enrol modal — per card, only when triggered */}
+      <AnimatePresence>
+        {showEnrol && (
+          <EnrolModal training={t} onClose={() => setShowEnrol(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function TrainingsPage() {
-  const [search, setSearch] = useState('');
+  const [search,   setSearch]   = useState('');
   const [category, setCategory] = useState<Category>('All');
-  const [level, setLevel] = useState<Level>('All');
+  const [level,    setLevel]    = useState<Level>('All');
 
   const filtered = trainings.filter((t) => {
-    const matchSearch =
-      t.title.toLowerCase().includes(search.toLowerCase()) ||
-      t.subtitle.toLowerCase().includes(search.toLowerCase()) ||
-      t.description.toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch   = t.title.toLowerCase().includes(q) || t.subtitle.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
     const matchCategory = category === 'All' || t.category === category;
-    const matchLevel = level === 'All' || t.level === level;
+    const matchLevel    = level    === 'All' || t.level    === level;
     return matchSearch && matchCategory && matchLevel;
   });
 
   return (
     <>
-      {/* Hero */}
+      {/* ── Hero — same structure as workshops hero ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-indigo-700 via-purple-600 to-rose-500 text-white py-24 lg:py-28">
         <div className="absolute inset-0 bg-black/20" />
-        {/* Decorative circles */}
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
 
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-block text-xs font-bold uppercase tracking-widest bg-white/20 px-4 py-1.5 rounded-full mb-6"
-            >
+          <motion.div initial="hidden" animate="visible" variants={containerVariants} className="text-center max-w-4xl mx-auto">
+            <motion.span variants={fadeInUp} className="inline-block text-xs font-bold uppercase tracking-widest bg-white/20 px-4 py-1.5 rounded-full mb-6">
               Structured Programs
             </motion.span>
-            <motion.h1
-              variants={fadeInUp}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight"
-            >
+            <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Training Programs Built for{' '}
               <span className="text-yellow-300">Real Careers</span>
             </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto"
-            >
+            <motion.p variants={fadeInUp} className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">
               Multi-week cohort programs with 1:1 mentorship, capstone projects, and placement support — designed for students, freshers, and working professionals.
             </motion.p>
-            <motion.div
-              variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-8 text-sm"
-            >
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-8 text-sm">
               {[
-                { icon: BookOpen, label: `${trainings.length} Programs` },
-                { icon: Users, label: '600+ Students Enrolled' },
-                { icon: Award, label: 'Placement Assistance' },
+                { icon: BookOpen,  label: `${trainings.length} Programs` },
+                { icon: Users,     label: '600+ Students Enrolled' },
+                { icon: Award,     label: 'Placement Assistance' },
                 { icon: BarChart3, label: 'Industry-Aligned Curriculum' },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 opacity-90">
@@ -419,19 +496,20 @@ export default function TrainingsPage() {
         </div>
       </section>
 
-      {/* Filters */}
+      {/* ── Sticky filter bar — same structure as workshops ── */}
       <section className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm py-4 px-6">
         <div className="container mx-auto max-w-7xl">
-          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+          <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-wrap">
+
             {/* Search */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search programs..."
+                placeholder="Search programs or topics…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent bg-gray-50"
               />
             </div>
 
@@ -439,15 +517,10 @@ export default function TrainingsPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
               {CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCategory(c)}
+                <button key={c} onClick={() => setCategory(c)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    category === c
-                      ? 'bg-indigo-600 text-white shadow'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
+                    category === c ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}>
                   {c}
                 </button>
               ))}
@@ -456,28 +529,25 @@ export default function TrainingsPage() {
             {/* Level */}
             <div className="flex items-center gap-2 flex-wrap">
               {LEVELS.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLevel(l)}
+                <button key={l} onClick={() => setLevel(l)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    level === l
-                      ? 'bg-rose-600 text-white shadow'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
+                    level === l ? 'bg-rose-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}>
                   {l}
                 </button>
               ))}
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* Cards Grid */}
-      <section className="py-16 px-6 bg-[#faf3f2] min-h-[60vh]">
+      {/* ── Cards grid — same bg and structure as workshops ── */}
+      <section className="py-16 px-6 bg-gray-50 min-h-[60vh]">
         <div className="container mx-auto max-w-7xl">
+
           {/* Result count */}
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex items-center justify-between flex-wrap gap-2">
             <p className="text-sm text-gray-500">
               Showing <span className="font-semibold text-gray-800">{filtered.length}</span> of {trainings.length} programs
             </p>
@@ -500,7 +570,7 @@ export default function TrainingsPage() {
               initial="hidden"
               animate="visible"
               variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start"
             >
               {filtered.map((t) => (
                 <TrainingCard key={t.id} t={t} />
@@ -510,33 +580,24 @@ export default function TrainingsPage() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
+      {/* ── Bottom CTA — same as workshops ── */}
       <section className="py-20 px-6 bg-gradient-to-br from-red-900 to-red-700 text-white">
         <div className="container mx-auto max-w-3xl text-center">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={containerVariants}
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               Not Sure Which Program to Choose?
             </motion.h2>
             <motion.p variants={fadeInUp} className="text-lg opacity-90 mb-8">
-              Book a free 1:1 career guidance call with our mentors and get a personalised roadmap.
+              Book a free 1:1 career guidance call with our mentors and get a personalised learning roadmap.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold bg-white text-[#8B0000] rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl"
-              >
+              <Link href="/contact"
+                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold bg-white text-[#8B0000] rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl">
                 Book Free Counselling
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link
-                href="/workshops"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold border-2 border-white rounded-xl hover:bg-white/10 transition-all duration-300"
-              >
+              <Link href="/workshops"
+                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold border-2 border-white rounded-xl hover:bg-white/10 transition-all duration-300">
                 Explore Workshops
                 <ArrowRight className="w-5 h-5" />
               </Link>

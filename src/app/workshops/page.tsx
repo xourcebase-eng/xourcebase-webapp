@@ -1,29 +1,18 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import {
-  Calendar,
-  Clock,
-  Users,
-  Wifi,
-  MapPin,
-  Tag,
-  ArrowRight,
-  Search,
-  Filter,
-  CheckCircle2,
-  Mic,
-  Star,
-  BookOpen,
-  Zap,
+  Calendar, Clock, Users, Wifi, MapPin, Tag, ArrowRight,
+  Search, Filter, CheckCircle2, Mic, Star, BookOpen, Zap, Bell,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Mode = 'All' | 'Online' | 'Offline' | 'Hybrid';
 type WCategory = 'All' | 'Cloud & DevOps' | 'Communication' | 'Data' | 'Programming' | 'Career';
+type WorkshopStatus = 'open' | 'coming_soon' | 'full';
 
 interface Workshop {
   id: number;
@@ -44,6 +33,12 @@ interface Workshop {
   agenda: string[];
   price: string;
   isFree: boolean;
+  status: WorkshopStatus;
+  opensOn?: string;
+  // If set → clicking CTA goes to this page.
+  // If not set → falls back to /contact.
+  // Add this per workshop as you build individual pages.
+  detailPage?: string;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -66,6 +61,9 @@ const workshops: Workshop[] = [
     accent: 'from-indigo-500 to-purple-600',
     isFree: true,
     price: 'Free',
+    status: 'open',
+    // ✅ Has its own page — goes directly there
+    detailPage: '/workshops/aws-cloud-foundations',
     description:
       'Kickstart your cloud journey with AWS fundamentals. Covers IAM, EC2, S3, VPC, and billing basics with live demos and interactive Q&A.',
     agenda: [
@@ -93,6 +91,8 @@ const workshops: Workshop[] = [
     accent: 'from-orange-500 to-rose-600',
     isFree: false,
     price: '₹299',
+    status: 'open',
+    // No detailPage yet → falls back to /contact
     description:
       'Hands-on workshop: build a full CI/CD pipeline using GitHub Actions, Docker, and Kubernetes. Participants leave with a working pipeline deployed to AWS EKS.',
     agenda: [
@@ -120,6 +120,7 @@ const workshops: Workshop[] = [
     accent: 'from-teal-500 to-green-600',
     isFree: true,
     price: 'Free',
+    status: 'open',
     description:
       'Master the STAR method, voice modulation, body language, and structured storytelling. Ends with a live mock interview and individual feedback.',
     agenda: [
@@ -147,6 +148,7 @@ const workshops: Workshop[] = [
     accent: 'from-yellow-500 to-orange-500',
     isFree: false,
     price: '₹199',
+    status: 'open',
     description:
       'Learn Python basics to intermediate scripting in a single focused session. Automate file operations, web scraping, and basic API calls — all live-coded.',
     agenda: [
@@ -174,11 +176,12 @@ const workshops: Workshop[] = [
     accent: 'from-violet-500 to-pink-500',
     isFree: true,
     price: 'Free',
+    status: 'open',
     description:
-      'A recruiter-led session on crafting ATS-friendly resumes and LinkedIn profiles that get callbacks. Includes live critique of volunteer participants\' profiles.',
+      "A recruiter-led session on crafting ATS-friendly resumes and LinkedIn profiles that get callbacks. Includes live critique of volunteer participants' profiles.",
     agenda: [
       'What recruiters actually look at (3-second rule)',
-      'ATS dos and don\'ts',
+      "ATS dos and don'ts",
       'Writing measurable bullet points',
       'LinkedIn headline, summary & skills optimization',
       'Live resume critique (volunteers)',
@@ -201,6 +204,7 @@ const workshops: Workshop[] = [
     accent: 'from-rose-500 to-orange-500',
     isFree: false,
     price: '₹499',
+    status: 'open',
     description:
       'Build a real-time data pipeline on AWS using Kinesis, Lambda, and Redshift. Every participant builds and runs their own pipeline during the session.',
     agenda: [
@@ -209,6 +213,64 @@ const workshops: Workshop[] = [
       'Processing with AWS Lambda',
       'Loading into Redshift',
       'Dashboarding with QuickSight',
+    ],
+  },
+  {
+    id: 7,
+    title: 'Generative AI & Prompt Engineering',
+    host: 'Kavya Menon',
+    hostRole: 'AI Engineer at Microsoft',
+    date: 'July 5, 2025',
+    time: '11:00 AM – 2:00 PM IST',
+    duration: '3 hrs',
+    mode: 'Online',
+    category: 'Programming',
+    seats: 60,
+    seatsLeft: 60,
+    tag: '₹399',
+    tagColor: 'bg-amber-100 text-amber-700',
+    accent: 'from-blue-500 to-cyan-500',
+    isFree: false,
+    price: '₹399',
+    status: 'coming_soon',
+    opensOn: 'June 20, 2025',
+    description:
+      'Dive into practical prompt engineering, fine-tuning strategies, and building LLM-powered apps with OpenAI, LangChain, and vector databases.',
+    agenda: [
+      'LLM fundamentals & model landscape',
+      'Prompt engineering patterns',
+      'Building with LangChain',
+      'Vector databases & RAG',
+      'Deploying AI apps to production',
+    ],
+  },
+  {
+    id: 8,
+    title: 'System Design for Interviews',
+    host: 'Rohan Verma',
+    hostRole: 'Staff Engineer at Flipkart',
+    date: 'July 12, 2025',
+    time: '10:00 AM – 1:00 PM IST',
+    duration: '3 hrs',
+    mode: 'Online',
+    category: 'Career',
+    seats: 50,
+    seatsLeft: 50,
+    tag: '₹499',
+    tagColor: 'bg-amber-100 text-amber-700',
+    accent: 'from-slate-600 to-gray-800',
+    isFree: false,
+    price: '₹499',
+    status: 'coming_soon',
+    opensOn: 'June 25, 2025',
+    description:
+      'Crack system design rounds at top product companies. Covers scalability, load balancing, databases, caching, and live design walkthroughs.',
+    agenda: [
+      'System design interview framework',
+      'Scalability & load balancing patterns',
+      'SQL vs NoSQL trade-offs',
+      'Caching strategies (Redis, CDN)',
+      'Live: design a URL shortener end-to-end',
     ],
   },
 ];
@@ -231,9 +293,9 @@ const containerVariants = {
 
 function ModeBadge({ mode }: { mode: string }) {
   const map: Record<string, string> = {
-    Online: 'bg-sky-100 text-sky-700',
+    Online:  'bg-sky-100 text-sky-700',
     Offline: 'bg-gray-100 text-gray-700',
-    Hybrid: 'bg-violet-100 text-violet-700',
+    Hybrid:  'bg-violet-100 text-violet-700',
   };
   const Icon = mode === 'Online' ? Wifi : MapPin;
   return (
@@ -244,196 +306,340 @@ function ModeBadge({ mode }: { mode: string }) {
   );
 }
 
-function SeatBar({ seatsLeft, seats }: { seatsLeft: number; seats: number }) {
+function SeatBar({ seatsLeft, seats, disabled }: { seatsLeft: number; seats: number; disabled?: boolean }) {
   const pct = Math.max(0, Math.min(100, (seatsLeft / seats) * 100));
-  const color = pct < 25 ? 'bg-red-500' : pct < 60 ? 'bg-amber-400' : 'bg-emerald-500';
+  const color = disabled ? 'bg-gray-300' : pct < 25 ? 'bg-red-500' : pct < 60 ? 'bg-amber-400' : 'bg-emerald-500';
   return (
     <div className="w-full">
       <div className="flex justify-between text-xs text-gray-500 mb-1">
-        <span>{seatsLeft} seats left</span>
+        <span>{disabled ? 'Registration not open yet' : `${seatsLeft} seats left`}</span>
         <span>{seats} total</span>
       </div>
       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-        <div className={`h-full rounded-full transition-all duration-500 ${color}`} style={{ width: `${pct}%` }} />
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${color}`}
+          style={{ width: disabled ? '100%' : `${pct}%` }}
+        />
       </div>
     </div>
   );
 }
 
-function WorkshopCard({ w }: { w: Workshop }) {
-  const [expanded, setExpanded] = useState(false);
+// ── Notify Me modal ───────────────────────────────────────────────────────────
+
+function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    // TODO: POST /api/notify { email, workshopId: workshop.id }
+    setSubmitted(true);
+  };
 
   return (
     <motion.div
-      variants={fadeInUp}
-      whileHover={{ y: -6 }}
-      transition={{ duration: 0.3 }}
-      className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-indigo-100 overflow-hidden flex flex-col transition-all duration-400"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
     >
-      {/* Gradient stripe */}
-      <div className={`h-1.5 bg-gradient-to-r ${w.accent}`} />
-
-      <div className="p-7 flex flex-col flex-1">
-        {/* Top row */}
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex flex-wrap gap-2">
-            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${w.tagColor}`}>
-              <Tag className="w-3 h-3 inline mr-1" />
-              {w.tag}
-            </span>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600">
-              {w.category}
-            </span>
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md"
+      >
+        {!submitted ? (
+          <>
+            <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
+              <Bell className="w-6 h-6 text-indigo-600" />
+            </div>
+            <h3 className="text-xl font-extrabold text-gray-900 mb-1">Get Notified</h3>
+            <p className="text-sm text-gray-500 mb-1">
+              <span className="font-semibold text-gray-700">{workshop.title}</span>
+            </p>
+            <p className="text-xs text-gray-400 mb-5">
+              Registration opens on{' '}
+              <span className="font-semibold text-indigo-600">{workshop.opensOn}</span>.
+              We'll email you the moment seats open.
+            </p>
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <input
+                type="email"
+                required
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all"
+              />
+              <button
+                type="submit"
+                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-colors"
+              >
+                Notify Me When Open
+              </button>
+              <button type="button" onClick={onClose}
+                className="w-full py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                Cancel
+              </button>
+            </form>
+          </>
+        ) : (
+          <div className="text-center py-4">
+            <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-7 h-7 text-green-500" />
+            </div>
+            <h3 className="text-lg font-extrabold text-gray-900 mb-1">You're on the list!</h3>
+            <p className="text-sm text-gray-500 mb-5">
+              We'll notify <span className="font-semibold text-gray-700">{email}</span> when
+              registration opens for this workshop.
+            </p>
+            <button
+              onClick={onClose}
+              className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-colors"
+            >
+              Done
+            </button>
           </div>
-          <ModeBadge mode={w.mode as string} />
-        </div>
-
-        {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-indigo-700 transition-colors duration-300 leading-snug">
-          {w.title}
-        </h3>
-
-        {/* Host */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${w.accent} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
-            {w.host.split(' ').map((n) => n[0]).join('')}
-          </div>
-          <div className="text-xs text-gray-500 leading-tight">
-            <span className="font-semibold text-gray-700">{w.host}</span>
-            <br />
-            {w.hostRole}
-          </div>
-        </div>
-
-        <p className="text-sm text-gray-500 leading-relaxed mb-5 flex-1">{w.description}</p>
-
-        {/* Agenda toggle */}
-        {expanded && (
-          <motion.ul
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            className="space-y-2 mb-5"
-          >
-            {w.agenda.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
-                <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                {item}
-              </li>
-            ))}
-          </motion.ul>
         )}
+      </motion.div>
+    </motion.div>
+  );
+}
 
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="text-xs text-indigo-600 font-semibold mb-5 text-left hover:underline"
-        >
-          {expanded ? '▲ Hide agenda' : '▼ View agenda'}
-        </button>
+// ── WorkshopCard ──────────────────────────────────────────────────────────────
 
-        {/* Meta */}
-        <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm text-gray-600 mb-5">
-          <div className="flex items-center gap-1.5">
-            <Calendar className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-            <span>{w.date}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-            <span>{w.time}</span>
-          </div>
-        </div>
+function WorkshopCard({ w }: { w: Workshop }) {
+  const [expanded, setExpanded]   = useState(false);
+  const [showNotify, setShowNotify] = useState(false);
 
-        {/* Seat bar */}
-        <div className="mb-6">
-          <SeatBar seatsLeft={w.seatsLeft} seats={w.seats} />
-        </div>
+  const isComingSoon = w.status === 'coming_soon';
+  const isFull       = w.status === 'full';
 
-        {/* Price + CTA */}
-        <div className="flex items-center justify-between gap-3 mt-auto">
-          <div>
-            <span className={`text-xl font-bold ${w.isFree ? 'text-emerald-600' : 'text-gray-900'}`}>
-              {w.price}
+  // ── Routing logic ──────────────────────────────────────────────────────────
+  // detailPage set  → go to the workshop's own page (e.g. /aws-cloud-foundations)
+  // detailPage not set → fall back to /contact so the user can reach out
+  // To add a new workshop page later, just add detailPage: '/your-slug' to its data object.
+  const ctaHref = w.detailPage ?? '/contact';
+
+  return (
+    <>
+      <motion.div
+        variants={fadeInUp}
+        whileHover={{ y: isComingSoon ? 0 : -6 }}
+        transition={{ duration: 0.3 }}
+        className={`group bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col transition-all duration-300 ${
+          isComingSoon
+            ? 'opacity-90 hover:opacity-100 hover:shadow-xl hover:border-indigo-100'
+            : 'hover:shadow-2xl hover:border-indigo-100'
+        }`}
+      >
+        {/* Gradient stripe */}
+        <div className={`h-1.5 bg-gradient-to-r ${w.accent} ${isComingSoon ? 'opacity-50' : ''}`} />
+
+        {/* Coming Soon banner */}
+        {isComingSoon && (
+          <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border-b border-indigo-100">
+            <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+              <Bell className="w-3.5 h-3.5" />
+              Coming Soon
             </span>
-            {!w.isFree && (
-              <span className="ml-2 text-xs text-gray-400">one-time</span>
+            {w.opensOn && (
+              <span className="text-xs text-indigo-500 ml-auto">
+                Registration opens {w.opensOn}
+              </span>
             )}
           </div>
-          <Link
-            href="/workshop-checkout"
-            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${w.accent} hover:opacity-90 transition-opacity duration-300 shadow-md whitespace-nowrap`}
+        )}
+
+        <div className="p-7 flex flex-col flex-1">
+
+          {/* Top row */}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex flex-wrap gap-2">
+              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${w.tagColor}`}>
+                <Tag className="w-3 h-3 inline mr-1" />
+                {w.tag}
+              </span>
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600">
+                {w.category}
+              </span>
+            </div>
+            <ModeBadge mode={w.mode as string} />
+          </div>
+
+          {/* Title */}
+          <h3 className={`text-lg font-bold text-gray-900 mb-1 transition-colors duration-300 leading-snug ${
+            isComingSoon ? '' : 'group-hover:text-indigo-700'
+          }`}>
+            {w.title}
+          </h3>
+
+          {/* Host */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${w.accent} flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${isComingSoon ? 'opacity-70' : ''}`}>
+              {w.host.split(' ').map((n) => n[0]).join('')}
+            </div>
+            <div className="text-xs text-gray-500 leading-tight">
+              <span className="font-semibold text-gray-700">{w.host}</span>
+              <br />
+              {w.hostRole}
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-500 leading-relaxed mb-5">{w.description}</p>
+
+          {/* Expandable agenda */}
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.ul
+                key={`agenda-${w.id}`}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="space-y-2 mb-5 overflow-hidden"
+              >
+                {w.agenda.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
+                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+
+          <button
+            onClick={() => setExpanded((p) => !p)}
+            className="text-xs text-indigo-600 font-semibold mb-5 text-left hover:underline"
           >
-            {w.isFree ? 'Register Free' : 'Register Now'}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+            {expanded ? '▲ Hide agenda' : '▼ View agenda'}
+          </button>
+
+          {/* Meta */}
+          <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm text-gray-600 mb-5">
+            <div className="flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span>{w.date}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <span>{w.time}</span>
+            </div>
+          </div>
+
+          {/* Seat bar */}
+          <div className="mb-6">
+            <SeatBar seatsLeft={w.seatsLeft} seats={w.seats} disabled={isComingSoon} />
+          </div>
+
+          {/* Price + CTA */}
+          <div className="flex items-center justify-between gap-3 mt-auto">
+            <div>
+              <span className={`text-xl font-bold ${w.isFree ? 'text-emerald-600' : isComingSoon ? 'text-gray-400' : 'text-gray-900'}`}>
+                {w.price}
+              </span>
+              {!w.isFree && (
+                <span className="ml-2 text-xs text-gray-400">one-time</span>
+              )}
+            </div>
+
+            {/* ── CTA logic ──────────────────────────────────────────────────
+                coming_soon → "Notify Me" button (opens modal)
+                full        → disabled "Seats Full" label
+                open        → Link to detailPage if set, otherwise /contact
+            ──────────────────────────────────────────────────────────────── */}
+            {isComingSoon ? (
+              <button
+                type="button"
+                onClick={() => setShowNotify(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors whitespace-nowrap"
+              >
+                <Bell className="w-4 h-4" />
+                Notify Me
+              </button>
+            ) : isFull ? (
+              <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed whitespace-nowrap">
+                Seats Full
+              </span>
+            ) : (
+              <Link
+                href={ctaHref}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${w.accent} hover:opacity-90 transition-opacity duration-300 shadow-md whitespace-nowrap`}
+              >
+                {w.isFree ? 'Register Free' : 'Register Now'}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
+          </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Notify Me modal */}
+      <AnimatePresence>
+        {showNotify && (
+          <NotifyModal workshop={w} onClose={() => setShowNotify(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WorkshopsPage() {
-  const [search, setSearch] = useState('');
-  const [mode, setMode] = useState<Mode>('All');
-  const [category, setCategory] = useState<WCategory>('All');
-  const [freeOnly, setFreeOnly] = useState(false);
+  const [search,        setSearch]        = useState('');
+  const [mode,          setMode]          = useState<Mode>('All');
+  const [category,      setCategory]      = useState<WCategory>('All');
+  const [freeOnly,      setFreeOnly]      = useState(false);
+  const [comingSoonOnly, setComingSoonOnly] = useState(false);
 
   const filtered = workshops.filter((w) => {
-    const matchSearch =
-      w.title.toLowerCase().includes(search.toLowerCase()) ||
-      w.description.toLowerCase().includes(search.toLowerCase()) ||
-      w.host.toLowerCase().includes(search.toLowerCase());
-    const matchMode = mode === 'All' || w.mode === mode;
-    const matchCategory = category === 'All' || w.category === category;
-    const matchFree = !freeOnly || w.isFree;
-    return matchSearch && matchMode && matchCategory && matchFree;
+    const q = search.toLowerCase();
+    const matchSearch     = w.title.toLowerCase().includes(q) || w.description.toLowerCase().includes(q) || w.host.toLowerCase().includes(q);
+    const matchMode       = mode     === 'All' || w.mode     === mode;
+    const matchCategory   = category === 'All' || w.category === category;
+    const matchFree       = !freeOnly       || w.isFree;
+    const matchComingSoon = !comingSoonOnly || w.status === 'coming_soon';
+    return matchSearch && matchMode && matchCategory && matchFree && matchComingSoon;
   });
 
-  const freeCount = workshops.filter((w) => w.isFree).length;
+  const freeCount        = workshops.filter((w) => w.isFree).length;
+  const comingSoonCount  = workshops.filter((w) => w.status === 'coming_soon').length;
 
   return (
     <>
-      {/* Hero */}
+      {/* ── Hero ── */}
       <section className="relative overflow-hidden bg-gradient-to-br from-rose-700 via-red-600 to-orange-500 text-white py-24 lg:py-28">
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
 
         <div className="container mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={containerVariants}
-            className="text-center max-w-4xl mx-auto"
-          >
-            <motion.span
-              variants={fadeInUp}
-              className="inline-block text-xs font-bold uppercase tracking-widest bg-white/20 px-4 py-1.5 rounded-full mb-6"
-            >
+          <motion.div initial="hidden" animate="visible" variants={containerVariants} className="text-center max-w-4xl mx-auto">
+            <motion.span variants={fadeInUp} className="inline-block text-xs font-bold uppercase tracking-widest bg-white/20 px-4 py-1.5 rounded-full mb-6">
               Live Events
             </motion.span>
-            <motion.h1
-              variants={fadeInUp}
-              className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight"
-            >
+            <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
               Workshops That{' '}
               <span className="text-yellow-300">Accelerate Careers</span>
             </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto"
-            >
+            <motion.p variants={fadeInUp} className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">
               Focused live sessions led by industry practitioners. Learn, build, and network — many are completely free.
             </motion.p>
-            <motion.div
-              variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-8 text-sm"
-            >
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-8 text-sm">
               {[
-                { icon: Mic, label: `${workshops.length} Upcoming Workshops` },
+                { icon: Mic,   label: `${workshops.length} Workshops` },
                 { icon: Users, label: 'Expert-Led Sessions' },
-                { icon: Star, label: `${freeCount} Free Workshops` },
-                { icon: Zap, label: 'Hands-On Learning' },
+                { icon: Star,  label: `${freeCount} Free Workshops` },
+                { icon: Bell,  label: `${comingSoonCount} Coming Soon` },
+                { icon: Zap,   label: 'Hands-On Learning' },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 opacity-90">
                   <Icon className="w-4 h-4" />
@@ -445,19 +651,20 @@ export default function WorkshopsPage() {
         </div>
       </section>
 
-      {/* Filters */}
+      {/* ── Sticky filter bar ── */}
       <section className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm py-4 px-6">
         <div className="container mx-auto max-w-7xl">
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-wrap">
+
             {/* Search */}
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search workshops or hosts..."
+                placeholder="Search workshops..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent bg-gray-50"
               />
             </div>
 
@@ -465,15 +672,10 @@ export default function WorkshopsPage() {
             <div className="flex items-center gap-2 flex-wrap">
               <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
               {WCATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => setCategory(c)}
+                <button key={c} onClick={() => setCategory(c)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    category === c
-                      ? 'bg-rose-600 text-white shadow'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
+                    category === c ? 'bg-rose-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}>
                   {c}
                 </button>
               ))}
@@ -482,42 +684,48 @@ export default function WorkshopsPage() {
             {/* Mode */}
             <div className="flex items-center gap-2 flex-wrap">
               {MODES.map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
+                <button key={m} onClick={() => setMode(m)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    mode === m
-                      ? 'bg-indigo-600 text-white shadow'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
+                    mode === m ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}>
                   {m}
                 </button>
               ))}
             </div>
 
-            {/* Free only toggle */}
-            <button
-              onClick={() => setFreeOnly(!freeOnly)}
+            {/* Free only */}
+            <button onClick={() => setFreeOnly(!freeOnly)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-all duration-200 ${
-                freeOnly
-                  ? 'bg-emerald-500 text-white border-emerald-500 shadow'
-                  : 'border-emerald-400 text-emerald-600 hover:bg-emerald-50'
-              }`}
-            >
+                freeOnly ? 'bg-emerald-500 text-white border-emerald-500 shadow' : 'border-emerald-400 text-emerald-600 hover:bg-emerald-50'
+              }`}>
               Free Only
+            </button>
+
+            {/* Coming soon toggle */}
+            <button onClick={() => setComingSoonOnly(!comingSoonOnly)}
+              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-all duration-200 ${
+                comingSoonOnly ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'border-indigo-400 text-indigo-600 hover:bg-indigo-50'
+              }`}>
+              <Bell className="w-3 h-3" />
+              Coming Soon
             </button>
           </div>
         </div>
       </section>
 
-      {/* Cards Grid */}
+      {/* ── Cards grid ── */}
       <section className="py-16 px-6 bg-gray-50 min-h-[60vh]">
         <div className="container mx-auto max-w-7xl">
-          <div className="mb-8">
+          <div className="mb-8 flex items-center justify-between flex-wrap gap-2">
             <p className="text-sm text-gray-500">
               Showing <span className="font-semibold text-gray-800">{filtered.length}</span> of {workshops.length} workshops
             </p>
+            {filtered.some((w) => w.status === 'coming_soon') && (
+              <p className="text-xs text-indigo-600 font-semibold flex items-center gap-1">
+                <Bell className="w-3.5 h-3.5" />
+                Some workshops aren't open yet — click "Notify Me" to get an alert.
+              </p>
+            )}
           </div>
 
           {filtered.length === 0 ? (
@@ -525,7 +733,7 @@ export default function WorkshopsPage() {
               <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-30" />
               <p className="text-lg font-medium">No workshops match your filters.</p>
               <button
-                onClick={() => { setSearch(''); setMode('All'); setCategory('All'); setFreeOnly(false); }}
+                onClick={() => { setSearch(''); setMode('All'); setCategory('All'); setFreeOnly(false); setComingSoonOnly(false); }}
                 className="mt-4 text-rose-600 text-sm font-semibold hover:underline"
               >
                 Clear all filters
@@ -533,11 +741,11 @@ export default function WorkshopsPage() {
             </div>
           ) : (
             <motion.div
-              key={`${search}-${mode}-${category}-${freeOnly}`}
+              key={`${search}-${mode}-${category}-${freeOnly}-${comingSoonOnly}`}
               initial="hidden"
               animate="visible"
               variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start"
             >
               {filtered.map((w) => (
                 <WorkshopCard key={w.id} w={w} />
@@ -547,15 +755,10 @@ export default function WorkshopsPage() {
         </div>
       </section>
 
-      {/* Bottom CTA */}
+      {/* ── Bottom CTA ── */}
       <section className="py-20 px-6 bg-gradient-to-br from-red-900 to-red-700 text-white">
         <div className="container mx-auto max-w-3xl text-center">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={containerVariants}
-          >
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
             <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
               Want a Deeper Dive?
             </motion.h2>
@@ -563,18 +766,14 @@ export default function WorkshopsPage() {
               Explore our full training programs for structured, mentor-led learning with placement support.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/trainings"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold bg-white text-[#8B0000] rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl"
-              >
+              <Link href="/trainings"
+                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold bg-white text-[#8B0000] rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl">
                 Explore Training Programs
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link
-                href="/plans-pricing"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold border-2 border-white rounded-xl hover:bg-white/10 transition-all duration-300"
-              >
-                View Pricing Plans
+              <Link href="/contact"
+                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold border-2 border-white rounded-xl hover:bg-white/10 transition-all duration-300">
+                Book Free Counselling
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </motion.div>
