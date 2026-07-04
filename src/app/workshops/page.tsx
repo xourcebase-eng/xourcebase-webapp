@@ -1,11 +1,16 @@
 'use client';
 
+// src/app/workshops/page.tsx
+// Same "Career Accelerator" visual system as /trainings — bold, color-blocked, hard-edged.
+// Signature element here is a live "Session Board" (departure-board style) since workshops
+// are single dated events, not multi-week journeys like the trainings' Sprint Track.
+
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
-  Calendar, Clock, Users, Wifi, MapPin, Tag, ArrowRight,
-  Search, Filter, CheckCircle2, Mic, Star, BookOpen, Zap, Bell,
+  Calendar, Clock, Wifi, MapPin, Tag, ArrowRight, ArrowUpRight,
+  Search, Filter, CheckCircle2, BookOpen, Bell, CheckCircle,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -23,55 +28,61 @@ interface Workshop {
   time: string;
   duration: string;
   mode: Omit<Mode, 'All'>;
-  category: WCategory;
-  seats: number;
-  seatsLeft: number;
+  category: Exclude<WCategory, 'All'>;
   tag: string;
-  tagColor: string;
-  accent: string;
-  description: string;
-  agenda: string[];
   price: string;
   isFree: boolean;
   status: WorkshopStatus;
   opensOn?: string;
-  // If set → clicking CTA goes to this page.
-  // If not set → falls back to /contact.
-  // Add this per workshop as you build individual pages.
+  description: string;
+  agenda: string[];
+  // If set → clicking CTA goes to this page. If not set → falls back to /contact.
   detailPage?: string;
 }
+
+// ─── Design tokens ─────────────────────────────────────────────────────────────
+// paper #F5F5F2 · ink #14141A · lime #C6FF3D · coral #FF3D57 · azure #3D5AFF · gold #FFB800 · violet #7C5CFF
+
+const TRACK_STYLE: Record<Exclude<WCategory, 'All'>, { bg: string; text: string }> = {
+  'Cloud & DevOps': { bg: '#C6FF3D', text: '#14141A' },
+  'Communication':  { bg: '#FF3D57', text: '#FFFFFF' },
+  'Data':           { bg: '#3D5AFF', text: '#FFFFFF' },
+  'Programming':    { bg: '#FFB800', text: '#14141A' },
+  'Career':         { bg: '#7C5CFF', text: '#FFFFFF' },
+};
+
+const STATUS_STYLE: Record<WorkshopStatus, { label: string; bg: string; text: string }> = {
+  open:         { label: 'OPEN', bg: '#C6FF3D', text: '#14141A' },
+  coming_soon:  { label: 'SOON', bg: '#14141A', text: '#FFFFFF' },
+  full:         { label: 'FULL', bg: '#FF3D57', text: '#FFFFFF' },
+};
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const workshops: Workshop[] = [
   {
     id: 1,
-    title: 'AWS Cloud Foundations Bootcamp',
+    title: 'Introduction to Git & GitHub for Beginners',
     host: 'Rahul Sharma',
-    hostRole: 'AWS Solutions Architect at Infosys',
+    hostRole: 'Senior Software Engineer at Infosys',
     date: 'May 18, 2025',
     time: '10:00 AM – 1:00 PM IST',
     duration: '3 hrs',
     mode: 'Online',
-    category: 'Cloud & DevOps',
-    seats: 50,
-    seatsLeft: 12,
+    category: 'Programming',
     tag: 'Free',
-    tagColor: 'bg-emerald-100 text-emerald-700',
-    accent: 'from-indigo-500 to-purple-600',
     isFree: true,
     price: 'Free',
     status: 'open',
-    // ✅ Has its own page — goes directly there
-    detailPage: '/workshops/aws-cloud-foundations',
+    detailPage: '/workshops/introduction-to-git-and-github',
     description:
-      'Kickstart your cloud journey with AWS fundamentals. Covers IAM, EC2, S3, VPC, and billing basics with live demos and interactive Q&A.',
+      'A beginner-friendly, hands-on introduction to version control with Git and collaboration on GitHub. Covers repos, commits, branching, merging, pull requests, and real-world team workflows.',
     agenda: [
-      'Why Cloud? Industry landscape 2025',
-      'AWS Core Services: IAM, EC2, S3',
-      'VPC & Networking basics',
-      'Live demo: deploying your first EC2',
-      'Q&A + Career roadmap discussion',
+      'Why version control? Git vs other VCS tools',
+      'Git basics: init, add, commit, status, log',
+      'Branching, merging & resolving conflicts',
+      'Working with GitHub: repos, issues, pull requests',
+      'Real-world team workflow + Q&A',
     ],
   },
   {
@@ -84,15 +95,11 @@ const workshops: Workshop[] = [
     duration: '3 hrs',
     mode: 'Online',
     category: 'Cloud & DevOps',
-    seats: 40,
-    seatsLeft: 7,
     tag: '₹299',
-    tagColor: 'bg-amber-100 text-amber-700',
-    accent: 'from-orange-500 to-rose-600',
     isFree: false,
     price: '₹299',
-    status: 'open',
-    // No detailPage yet → falls back to /contact
+    status: 'coming_soon',
+    opensOn: 'May 10, 2025',
     description:
       'Hands-on workshop: build a full CI/CD pipeline using GitHub Actions, Docker, and Kubernetes. Participants leave with a working pipeline deployed to AWS EKS.',
     agenda: [
@@ -113,14 +120,11 @@ const workshops: Workshop[] = [
     duration: '2 hrs',
     mode: 'Hybrid',
     category: 'Communication',
-    seats: 60,
-    seatsLeft: 25,
     tag: 'Free',
-    tagColor: 'bg-emerald-100 text-emerald-700',
-    accent: 'from-teal-500 to-green-600',
     isFree: true,
     price: 'Free',
-    status: 'open',
+    status: 'coming_soon',
+    opensOn: 'May 15, 2025',
     description:
       'Master the STAR method, voice modulation, body language, and structured storytelling. Ends with a live mock interview and individual feedback.',
     agenda: [
@@ -141,14 +145,11 @@ const workshops: Workshop[] = [
     duration: '2 hrs',
     mode: 'Online',
     category: 'Programming',
-    seats: 45,
-    seatsLeft: 30,
     tag: '₹199',
-    tagColor: 'bg-amber-100 text-amber-700',
-    accent: 'from-yellow-500 to-orange-500',
     isFree: false,
     price: '₹199',
-    status: 'open',
+    status: 'coming_soon',
+    opensOn: 'May 25, 2025',
     description:
       'Learn Python basics to intermediate scripting in a single focused session. Automate file operations, web scraping, and basic API calls — all live-coded.',
     agenda: [
@@ -169,14 +170,11 @@ const workshops: Workshop[] = [
     duration: '2 hrs',
     mode: 'Online',
     category: 'Career',
-    seats: 80,
-    seatsLeft: 46,
     tag: 'Free',
-    tagColor: 'bg-emerald-100 text-emerald-700',
-    accent: 'from-violet-500 to-pink-500',
     isFree: true,
     price: 'Free',
-    status: 'open',
+    status: 'coming_soon',
+    opensOn: 'May 30, 2025',
     description:
       "A recruiter-led session on crafting ATS-friendly resumes and LinkedIn profiles that get callbacks. Includes live critique of volunteer participants' profiles.",
     agenda: [
@@ -197,14 +195,11 @@ const workshops: Workshop[] = [
     duration: '3 hrs',
     mode: 'Online',
     category: 'Data',
-    seats: 35,
-    seatsLeft: 20,
     tag: '₹499',
-    tagColor: 'bg-amber-100 text-amber-700',
-    accent: 'from-rose-500 to-orange-500',
     isFree: false,
     price: '₹499',
-    status: 'open',
+    status: 'coming_soon',
+    opensOn: 'June 5, 2025',
     description:
       'Build a real-time data pipeline on AWS using Kinesis, Lambda, and Redshift. Every participant builds and runs their own pipeline during the session.',
     agenda: [
@@ -225,11 +220,7 @@ const workshops: Workshop[] = [
     duration: '3 hrs',
     mode: 'Online',
     category: 'Programming',
-    seats: 60,
-    seatsLeft: 60,
     tag: '₹399',
-    tagColor: 'bg-amber-100 text-amber-700',
-    accent: 'from-blue-500 to-cyan-500',
     isFree: false,
     price: '₹399',
     status: 'coming_soon',
@@ -254,11 +245,7 @@ const workshops: Workshop[] = [
     duration: '3 hrs',
     mode: 'Online',
     category: 'Career',
-    seats: 50,
-    seatsLeft: 50,
     tag: '₹499',
-    tagColor: 'bg-amber-100 text-amber-700',
-    accent: 'from-slate-600 to-gray-800',
     isFree: false,
     price: '₹499',
     status: 'coming_soon',
@@ -278,50 +265,89 @@ const workshops: Workshop[] = [
 const MODES: Mode[] = ['All', 'Online', 'Offline', 'Hybrid'];
 const WCATEGORIES: WCategory[] = ['All', 'Cloud & DevOps', 'Communication', 'Data', 'Programming', 'Career'];
 
-// ─── Animation ────────────────────────────────────────────────────────────────
+// ─── Animation ─────────────────────────────────────────────────────────────────
 
 const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden:  { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
 };
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Fonts (self-contained, same family set as /trainings) ────────────────────
 
-function ModeBadge({ mode }: { mode: string }) {
-  const map: Record<string, string> = {
-    Online:  'bg-sky-100 text-sky-700',
-    Offline: 'bg-gray-100 text-gray-700',
-    Hybrid:  'bg-violet-100 text-violet-700',
-  };
-  const Icon = mode === 'Online' ? Wifi : MapPin;
+function useAcceleratorFonts() {
+  useEffect(() => {
+    const id = 'accelerator-fonts';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
+}
+
+// ─── Session Board (hero signature element) ───────────────────────────────────
+// A departure-board style list of the next few live sessions — fits "live events"
+// the way the Sprint Track fits multi-week "journeys" on the trainings page.
+
+function SessionBoard() {
+  const upcoming = workshops.slice(0, 4);
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${map[mode] ?? 'bg-gray-100 text-gray-600'}`}>
-      <Icon className="w-3 h-3" />
-      {mode}
-    </span>
+    <div className="border-2 border-[#14141A] bg-white">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#14141A] text-white">
+        <span className="text-[11px] font-bold tracking-widest" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          NEXT SESSIONS
+        </span>
+        <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#C6FF3D]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C6FF3D] animate-pulse" />
+          LIVE SCHEDULE
+        </span>
+      </div>
+      {upcoming.map((w, i) => {
+        const s = STATUS_STYLE[w.status];
+        return (
+          <motion.div
+            key={w.id}
+            initial={{ opacity: 0, x: -8 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.15 + i * 0.09, duration: 0.35 }}
+            className={`flex items-center gap-3 px-4 py-3 ${i !== upcoming.length - 1 ? 'border-b border-[#14141A]/10' : ''}`}
+          >
+            <span className="text-xs font-bold text-[#14141A]/50 w-20 flex-shrink-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {w.date.replace(', 2025', '').toUpperCase()}
+            </span>
+            <span className="text-sm text-[#14141A] font-semibold truncate flex-1">{w.title}</span>
+            <span
+              className="text-[10px] font-bold tracking-widest px-2 py-0.5 flex-shrink-0"
+              style={{ background: s.bg, color: s.text, fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              {s.label}
+            </span>
+          </motion.div>
+        );
+      })}
+    </div>
   );
 }
 
-function SeatBar({ seatsLeft, seats, disabled }: { seatsLeft: number; seats: number; disabled?: boolean }) {
-  const pct = Math.max(0, Math.min(100, (seatsLeft / seats) * 100));
-  const color = disabled ? 'bg-gray-300' : pct < 25 ? 'bg-red-500' : pct < 60 ? 'bg-amber-400' : 'bg-emerald-500';
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function ModeTag({ mode }: { mode: string }) {
+  const Icon = mode === 'Online' ? Wifi : MapPin;
   return (
-    <div className="w-full">
-      <div className="flex justify-between text-xs text-gray-500 mb-1">
-        <span>{disabled ? 'Registration not open yet' : `${seatsLeft} seats left`}</span>
-        <span>{seats} total</span>
-      </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all duration-500 ${color}`}
-          style={{ width: disabled ? '100%' : `${pct}%` }}
-        />
-      </div>
-    </div>
+    <span
+      className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wide px-2 py-0.5 border border-[#14141A]/70 text-[#14141A] uppercase"
+      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+    >
+      <Icon className="w-3 h-3" />
+      {mode}
+    </span>
   );
 }
 
@@ -330,6 +356,7 @@ function SeatBar({ seatsLeft, seats, disabled }: { seatsLeft: number; seats: num
 function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () => void }) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const accent = TRACK_STYLE[workshop.category];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -343,7 +370,7 @@ function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () =>
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60"
       onClick={onClose}
     >
       <motion.div
@@ -352,21 +379,20 @@ function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () =>
         exit={{ scale: 0.95, opacity: 0 }}
         transition={{ duration: 0.2 }}
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md"
+        className="bg-[#F5F5F2] border-2 border-[#14141A] p-8 w-full max-w-md"
       >
         {!submitted ? (
           <>
-            <div className="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center mb-4">
-              <Bell className="w-6 h-6 text-indigo-600" />
+            <div className="h-2 w-14 mb-6" style={{ background: accent.bg }} />
+            <div className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mb-4">
+              <Bell className="w-5 h-5 text-[#14141A]" />
             </div>
-            <h3 className="text-xl font-extrabold text-gray-900 mb-1">Get Notified</h3>
-            <p className="text-sm text-gray-500 mb-1">
-              <span className="font-semibold text-gray-700">{workshop.title}</span>
-            </p>
-            <p className="text-xs text-gray-400 mb-5">
-              Registration opens on{' '}
-              <span className="font-semibold text-indigo-600">{workshop.opensOn}</span>.
-              We'll email you the moment seats open.
+            <h3 className="text-xl font-extrabold text-[#14141A] mb-1" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              GET NOTIFIED
+            </h3>
+            <p className="text-sm text-[#14141A]/80 mb-1 font-semibold">{workshop.title}</p>
+            <p className="text-xs text-[#14141A]/50 mb-5">
+              Registration opens on <span className="font-bold text-[#14141A]">{workshop.opensOn}</span>. We'll email you the moment seats open.
             </p>
             <form onSubmit={handleSubmit} className="space-y-3">
               <input
@@ -375,33 +401,34 @@ function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () =>
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-2 focus:ring-indigo-50 outline-none transition-all"
+                className="w-full px-4 py-3 border-2 border-[#14141A]/20 text-sm bg-white focus:border-[#14141A] outline-none transition-colors"
               />
               <button
                 type="submit"
-                className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-xl transition-colors"
+                className="w-full py-3 bg-[#14141A] hover:bg-black text-white text-sm font-bold tracking-wide transition-colors"
               >
-                Notify Me When Open
+                NOTIFY ME WHEN OPEN
               </button>
               <button type="button" onClick={onClose}
-                className="w-full py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors">
+                className="w-full py-2 text-xs text-[#14141A]/50 hover:text-[#14141A] transition-colors">
                 Cancel
               </button>
             </form>
           </>
         ) : (
           <div className="text-center py-4">
-            <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="w-7 h-7 text-green-500" />
+            <div className="w-14 h-14 border-2 border-[#14141A] mx-auto mb-4 flex items-center justify-center" style={{ background: '#C6FF3D' }}>
+              <CheckCircle className="w-7 h-7 text-[#14141A]" />
             </div>
-            <h3 className="text-lg font-extrabold text-gray-900 mb-1">You're on the list!</h3>
-            <p className="text-sm text-gray-500 mb-5">
-              We'll notify <span className="font-semibold text-gray-700">{email}</span> when
-              registration opens for this workshop.
+            <h3 className="text-lg font-extrabold text-[#14141A] mb-1" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              YOU'RE ON THE LIST
+            </h3>
+            <p className="text-sm text-[#14141A]/60 mb-5">
+              We'll notify <span className="font-semibold text-[#14141A]">{email}</span> when registration opens for this workshop.
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold rounded-xl transition-colors"
+              className="px-6 py-2.5 bg-[#14141A] text-white text-sm font-bold hover:bg-black transition-colors"
             >
               Done
             </button>
@@ -412,87 +439,80 @@ function NotifyModal({ workshop, onClose }: { workshop: Workshop; onClose: () =>
   );
 }
 
-// ── WorkshopCard ──────────────────────────────────────────────────────────────
+// ── WorkshopCard — "mission brief" ticket ──────────────────────────────────────
 
 function WorkshopCard({ w }: { w: Workshop }) {
-  const [expanded, setExpanded]   = useState(false);
+  const [expanded, setExpanded]     = useState(false);
   const [showNotify, setShowNotify] = useState(false);
 
   const isComingSoon = w.status === 'coming_soon';
-  const isFull       = w.status === 'full';
-
-  // ── Routing logic ──────────────────────────────────────────────────────────
-  // detailPage set  → go to the workshop's own page (e.g. /aws-cloud-foundations)
-  // detailPage not set → fall back to /contact so the user can reach out
-  // To add a new workshop page later, just add detailPage: '/your-slug' to its data object.
-  const ctaHref = w.detailPage ?? '/contact';
+  const isFull        = w.status === 'full';
+  const accent        = TRACK_STYLE[w.category];
+  const status         = STATUS_STYLE[w.status];
+  const ctaHref        = w.detailPage ?? '/contact';
 
   return (
     <>
       <motion.div
         variants={fadeInUp}
-        whileHover={{ y: isComingSoon ? 0 : -6 }}
-        transition={{ duration: 0.3 }}
-        className={`group bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col transition-all duration-300 ${
-          isComingSoon
-            ? 'opacity-90 hover:opacity-100 hover:shadow-xl hover:border-indigo-100'
-            : 'hover:shadow-2xl hover:border-indigo-100'
-        }`}
+        whileHover={{ y: -5 }}
+        transition={{ duration: 0.25 }}
+        className="relative bg-white border-2 border-[#14141A] flex flex-col overflow-hidden"
       >
-        {/* Gradient stripe */}
-        <div className={`h-1.5 bg-gradient-to-r ${w.accent} ${isComingSoon ? 'opacity-50' : ''}`} />
+        {/* Category color edge */}
+        <div className="absolute left-0 top-0 bottom-0 w-2" style={{ background: accent.bg }} />
 
-        {/* Coming Soon banner */}
-        {isComingSoon && (
-          <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border-b border-indigo-100">
-            <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-700">
-              <Bell className="w-3.5 h-3.5" />
-              Coming Soon
-            </span>
-            {w.opensOn && (
-              <span className="text-xs text-indigo-500 ml-auto">
-                Registration opens {w.opensOn}
-              </span>
-            )}
+        {/* Status ribbon — only call out Coming Soon / Full, not Open */}
+        {!w.status.startsWith('open') && (
+          <div
+            className="absolute -right-11 top-4 w-40 py-1 text-center text-[10px] font-bold tracking-widest rotate-45 select-none"
+            style={{ background: status.bg, color: status.text, fontFamily: "'Space Grotesk', sans-serif" }}
+          >
+            {isComingSoon ? 'COMING SOON' : 'SEATS FULL'}
           </div>
         )}
 
-        <div className="p-7 flex flex-col flex-1">
+        <div className="pl-8 pr-7 pt-7 pb-6 flex flex-col flex-1">
 
-          {/* Top row */}
-          <div className="flex items-start justify-between gap-3 mb-4">
-            <div className="flex flex-wrap gap-2">
-              <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${w.tagColor}`}>
-                <Tag className="w-3 h-3 inline mr-1" />
-                {w.tag}
-              </span>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-600">
-                {w.category}
-              </span>
+          {/* Top row: tag + category, mode */}
+          <div className="flex items-start justify-between gap-3 mb-5">
+            <div className="flex flex-wrap items-center gap-2">
+              {!isComingSoon && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold tracking-wide px-2 py-0.5 bg-[#14141A] text-white uppercase" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  <Tag className="w-3 h-3" />
+                  {w.tag}
+                </span>
+              )}
+              <ModeTag mode={w.mode as string} />
             </div>
-            <ModeBadge mode={w.mode as string} />
           </div>
 
+          {/* Category label */}
+          <p className="text-[11px] font-bold tracking-widest uppercase mb-2" style={{ color: accent.bg, fontFamily: "'Space Grotesk', sans-serif" }}>
+            {w.category}
+          </p>
+
           {/* Title */}
-          <h3 className={`text-lg font-bold text-gray-900 mb-1 transition-colors duration-300 leading-snug ${
-            isComingSoon ? '' : 'group-hover:text-indigo-700'
-          }`}>
-            {w.title}
+          <h3 className="text-xl font-extrabold text-[#14141A] mb-3 leading-tight" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+            {w.title.toUpperCase()}
           </h3>
 
           {/* Host */}
-          <div className="flex items-center gap-2 mb-4">
-            <div className={`w-7 h-7 rounded-full bg-gradient-to-br ${w.accent} flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${isComingSoon ? 'opacity-70' : ''}`}>
+          <div className="flex items-center gap-2.5 mb-4">
+            <div
+              className="w-8 h-8 flex items-center justify-center text-xs font-bold flex-shrink-0 border-2 border-[#14141A]"
+              style={{ background: accent.bg, color: accent.text }}
+            >
               {w.host.split(' ').map((n) => n[0]).join('')}
             </div>
-            <div className="text-xs text-gray-500 leading-tight">
-              <span className="font-semibold text-gray-700">{w.host}</span>
+            <div className="text-xs text-[#14141A]/60 leading-tight">
+              <span className="font-bold text-[#14141A]">{w.host}</span>
               <br />
               {w.hostRole}
             </div>
           </div>
 
-          <p className="text-sm text-gray-500 leading-relaxed mb-5">{w.description}</p>
+          <p className="text-sm text-[#14141A]/70 leading-relaxed mb-5">{w.description}</p>
 
           {/* Expandable agenda */}
           <AnimatePresence initial={false}>
@@ -506,8 +526,8 @@ function WorkshopCard({ w }: { w: Workshop }) {
                 className="space-y-2 mb-5 overflow-hidden"
               >
                 {w.agenda.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                  <li key={item} className="flex items-start gap-2 text-sm text-[#14141A]/80">
+                    <CheckCircle2 className="w-4 h-4 text-[#14141A] flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -517,71 +537,64 @@ function WorkshopCard({ w }: { w: Workshop }) {
 
           <button
             onClick={() => setExpanded((p) => !p)}
-            className="text-xs text-indigo-600 font-semibold mb-5 text-left hover:underline"
+            className="text-xs font-bold tracking-wide mb-5 text-left hover:underline"
+            style={{ color: '#14141A', fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            {expanded ? '▲ Hide agenda' : '▼ View agenda'}
+            {expanded ? '− HIDE AGENDA' : '+ VIEW AGENDA'}
           </button>
 
           {/* Meta */}
-          <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm text-gray-600 mb-5">
+          <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-xs text-[#14141A]/60 mb-6 font-semibold">
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <Calendar className="w-3.5 h-3.5 text-[#14141A]/40 flex-shrink-0" />
               <span>{w.date}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-indigo-400 flex-shrink-0" />
+              <Clock className="w-3.5 h-3.5 text-[#14141A]/40 flex-shrink-0" />
               <span>{w.time}</span>
             </div>
-          </div>
-
-          {/* Seat bar */}
-          <div className="mb-6">
-            <SeatBar seatsLeft={w.seatsLeft} seats={w.seats} disabled={isComingSoon} />
           </div>
 
           {/* Price + CTA */}
           <div className="flex items-center justify-between gap-3 mt-auto">
             <div>
-              <span className={`text-xl font-bold ${w.isFree ? 'text-emerald-600' : isComingSoon ? 'text-gray-400' : 'text-gray-900'}`}>
-                {w.price}
-              </span>
-              {!w.isFree && (
-                <span className="ml-2 text-xs text-gray-400">one-time</span>
+              {!isComingSoon && (
+                <span
+                  className="text-xl font-bold"
+                  style={{ fontFamily: "'Space Grotesk', sans-serif", color: w.isFree ? '#14141A' : '#14141A' }}
+                >
+                  {w.price}
+                  {!w.isFree && <span className="ml-1.5 text-[10px] font-semibold text-[#14141A]/40 tracking-wide">ONE-TIME</span>}
+                </span>
               )}
             </div>
 
-            {/* ── CTA logic ──────────────────────────────────────────────────
-                coming_soon → "Notify Me" button (opens modal)
-                full        → disabled "Seats Full" label
-                open        → Link to detailPage if set, otherwise /contact
-            ──────────────────────────────────────────────────────────────── */}
             {isComingSoon ? (
               <button
                 type="button"
                 onClick={() => setShowNotify(true)}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors whitespace-nowrap"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold tracking-wide text-white bg-[#14141A] hover:bg-black transition-colors whitespace-nowrap"
               >
                 <Bell className="w-4 h-4" />
-                Notify Me
+                NOTIFY ME
               </button>
             ) : isFull ? (
-              <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-gray-400 bg-gray-100 border border-gray-200 cursor-not-allowed whitespace-nowrap">
-                Seats Full
+              <span className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold tracking-wide text-[#14141A]/40 border-2 border-[#14141A]/20 cursor-not-allowed whitespace-nowrap">
+                SEATS FULL
               </span>
             ) : (
               <Link
                 href={ctaHref}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${w.accent} hover:opacity-90 transition-opacity duration-300 shadow-md whitespace-nowrap`}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold tracking-wide bg-[#C6FF3D] text-[#14141A] hover:brightness-95 transition-all whitespace-nowrap group/btn"
               >
-                {w.isFree ? 'Register Free' : 'Register Now'}
-                <ArrowRight className="w-4 h-4" />
+                {w.isFree ? 'REGISTER FREE' : 'REGISTER NOW'}
+                <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
               </Link>
             )}
           </div>
         </div>
       </motion.div>
 
-      {/* Notify Me modal */}
       <AnimatePresence>
         {showNotify && (
           <NotifyModal workshop={w} onClose={() => setShowNotify(false)} />
@@ -594,6 +607,8 @@ function WorkshopCard({ w }: { w: Workshop }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function WorkshopsPage() {
+  useAcceleratorFonts();
+
   const [search,        setSearch]        = useState('');
   const [mode,          setMode]          = useState<Mode>('All');
   const [category,      setCategory]      = useState<WCategory>('All');
@@ -610,73 +625,93 @@ export default function WorkshopsPage() {
     return matchSearch && matchMode && matchCategory && matchFree && matchComingSoon;
   });
 
-  const freeCount        = workshops.filter((w) => w.isFree).length;
-  const comingSoonCount  = workshops.filter((w) => w.status === 'coming_soon').length;
+  const freeCount       = workshops.filter((w) => w.isFree).length;
+  const comingSoonCount = workshops.filter((w) => w.status === 'coming_soon').length;
 
   return (
-    <>
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-rose-700 via-red-600 to-orange-500 text-white py-24 lg:py-28">
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
+    <div style={{ fontFamily: "'Inter', sans-serif" }}>
 
-        <div className="container mx-auto px-6 lg:px-8 relative z-10">
-          <motion.div initial="hidden" animate="visible" variants={containerVariants} className="text-center max-w-4xl mx-auto">
-            <motion.span variants={fadeInUp} className="inline-block text-xs font-bold uppercase tracking-widest bg-white/20 px-4 py-1.5 rounded-full mb-6">
-              Live Events
-            </motion.span>
-            <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Workshops That{' '}
-              <span className="text-yellow-300">Accelerate Careers</span>
-            </motion.h1>
-            <motion.p variants={fadeInUp} className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">
-              Focused live sessions led by industry practitioners. Learn, build, and network — many are completely free.
-            </motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-8 text-sm">
-              {[
-                { icon: Mic,   label: `${workshops.length} Workshops` },
-                { icon: Users, label: 'Expert-Led Sessions' },
-                { icon: Star,  label: `${freeCount} Free Workshops` },
-                { icon: Bell,  label: `${comingSoonCount} Coming Soon` },
-                { icon: Zap,   label: 'Hands-On Learning' },
-              ].map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 opacity-90">
-                  <Icon className="w-4 h-4" />
-                  <span>{label}</span>
-                </div>
-              ))}
+      {/* ── Hero ── */}
+      <section className="relative overflow-hidden bg-[#F5F5F2] pt-20 pb-14 lg:pt-28 lg:pb-20 px-6">
+        <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-[#14141A]/15 hidden md:block" />
+        <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-[#14141A]/15 hidden md:block" />
+
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="grid lg:grid-cols-2 gap-14 items-center">
+
+            {/* Left: copy */}
+            <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+              <motion.span
+                variants={fadeInUp}
+                className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                Live Events
+              </motion.span>
+
+              <motion.h1
+                variants={fadeInUp}
+                className="text-[12vw] sm:text-5xl md:text-6xl leading-[0.95] text-[#14141A] mb-6"
+                style={{ fontFamily: "'Archivo Black', sans-serif" }}
+              >
+                WORKSHOPS THAT<br />
+                <span className="bg-[#C6FF3D] px-2">ACCELERATE</span> CAREERS
+              </motion.h1>
+
+              <motion.p variants={fadeInUp} className="text-base md:text-lg text-[#14141A]/60 mb-9 max-w-lg">
+                Focused live sessions led by industry practitioners. Learn, build, and network — many are completely free.
+              </motion.p>
+
+              <motion.div variants={fadeInUp} className="grid grid-cols-3 max-w-lg border-2 border-[#14141A] divide-x-2 divide-[#14141A]">
+                {[
+                  { value: String(workshops.length).padStart(2, '0'), label: 'WORKSHOPS' },
+                  { value: String(freeCount).padStart(2, '0'),        label: 'FREE' },
+                  { value: String(comingSoonCount).padStart(2, '0'),  label: 'COMING SOON' },
+                ].map((s) => (
+                  <div key={s.label} className="px-4 py-3 text-center">
+                    <p className="text-2xl sm:text-3xl font-bold text-[#14141A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{s.value}</p>
+                    <p className="text-[10px] font-bold tracking-widest text-[#14141A]/50 mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </motion.div>
             </motion.div>
-          </motion.div>
+
+            {/* Right: signature — live session board */}
+            <motion.div initial="hidden" whileInView="visible" variants={fadeInUp} viewport={{ once: true }}>
+              <SessionBoard />
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── Sticky filter bar ── */}
-      <section className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm py-4 px-6">
-        <div className="container mx-auto max-w-7xl">
+      <section className="sticky top-0 z-30 bg-[#F5F5F2] border-y-2 border-[#14141A] py-4 px-6">
+        <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center flex-wrap">
 
             {/* Search */}
             <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14141A]/40" />
               <input
                 type="text"
                 placeholder="Search workshops..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:border-transparent bg-gray-50"
+                className="w-full pl-10 pr-4 py-2.5 text-sm text-[#14141A] placeholder-[#14141A]/40 border-2 border-[#14141A]/20 focus:outline-none focus:border-[#14141A] bg-white transition-colors"
               />
             </div>
 
             {/* Category */}
             <div className="flex items-center gap-2 flex-wrap">
-              <Filter className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              <Filter className="w-4 h-4 text-[#14141A]/40 flex-shrink-0" />
               {WCATEGORIES.map((c) => (
                 <button key={c} onClick={() => setCategory(c)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    category === c ? 'bg-rose-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}>
-                  {c}
+                  className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 border-[#14141A] transition-colors duration-150 ${
+                    category === c ? 'bg-[#14141A] text-white' : 'bg-white text-[#14141A] hover:bg-[#14141A]/5'
+                  }`}
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  {c.toUpperCase()}
                 </button>
               ))}
             </div>
@@ -685,56 +720,62 @@ export default function WorkshopsPage() {
             <div className="flex items-center gap-2 flex-wrap">
               {MODES.map((m) => (
                 <button key={m} onClick={() => setMode(m)}
-                  className={`text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 ${
-                    mode === m ? 'bg-indigo-600 text-white shadow' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                  }`}>
-                  {m}
+                  className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
+                    mode === m ? 'bg-[#3D5AFF] text-white border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
+                  }`}
+                  style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                >
+                  {m.toUpperCase()}
                 </button>
               ))}
             </div>
 
             {/* Free only */}
             <button onClick={() => setFreeOnly(!freeOnly)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-all duration-200 ${
-                freeOnly ? 'bg-emerald-500 text-white border-emerald-500 shadow' : 'border-emerald-400 text-emerald-600 hover:bg-emerald-50'
-              }`}>
-              Free Only
+              className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
+                freeOnly ? 'bg-[#C6FF3D] text-[#14141A] border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
+              }`}
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              FREE ONLY
             </button>
 
             {/* Coming soon toggle */}
             <button onClick={() => setComingSoonOnly(!comingSoonOnly)}
-              className={`inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border-2 transition-all duration-200 ${
-                comingSoonOnly ? 'bg-indigo-600 text-white border-indigo-600 shadow' : 'border-indigo-400 text-indigo-600 hover:bg-indigo-50'
-              }`}>
+              className={`inline-flex items-center gap-1.5 text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
+                comingSoonOnly ? 'bg-[#14141A] text-white border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
+              }`}
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
               <Bell className="w-3 h-3" />
-              Coming Soon
+              COMING SOON
             </button>
           </div>
         </div>
       </section>
 
       {/* ── Cards grid ── */}
-      <section className="py-16 px-6 bg-gray-50 min-h-[60vh]">
-        <div className="container mx-auto max-w-7xl">
+      <section className="py-16 px-6 bg-[#F5F5F2] min-h-[60vh]">
+        <div className="container mx-auto max-w-6xl">
           <div className="mb-8 flex items-center justify-between flex-wrap gap-2">
-            <p className="text-sm text-gray-500">
-              Showing <span className="font-semibold text-gray-800">{filtered.length}</span> of {workshops.length} workshops
+            <p className="text-sm text-[#14141A]/60">
+              Showing <span className="font-bold text-[#14141A]">{filtered.length}</span> of {workshops.length} workshops
             </p>
             {filtered.some((w) => w.status === 'coming_soon') && (
-              <p className="text-xs text-indigo-600 font-semibold flex items-center gap-1">
+              <p className="text-xs text-[#14141A] font-bold flex items-center gap-1.5 tracking-wide">
                 <Bell className="w-3.5 h-3.5" />
-                Some workshops aren't open yet — click "Notify Me" to get an alert.
+                SOME AREN'T OPEN YET — CLICK "NOTIFY ME"
               </p>
             )}
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-24 text-gray-400">
-              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <div className="text-center py-24 text-[#14141A]/40">
+              <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-40" />
               <p className="text-lg font-medium">No workshops match your filters.</p>
               <button
                 onClick={() => { setSearch(''); setMode('All'); setCategory('All'); setFreeOnly(false); setComingSoonOnly(false); }}
-                className="mt-4 text-rose-600 text-sm font-semibold hover:underline"
+                className="mt-4 text-[#14141A] text-sm font-bold hover:underline"
               >
                 Clear all filters
               </button>
@@ -745,7 +786,7 @@ export default function WorkshopsPage() {
               initial="hidden"
               animate="visible"
               variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
             >
               {filtered.map((w) => (
                 <WorkshopCard key={w.id} w={w} />
@@ -756,30 +797,31 @@ export default function WorkshopsPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="py-20 px-6 bg-gradient-to-br from-red-900 to-red-700 text-white">
-        <div className="container mx-auto max-w-3xl text-center">
+      <section className="py-20 px-6 bg-[#14141A] text-white relative overflow-hidden">
+        <div className="absolute top-10 right-10 w-24 h-24 border-t-2 border-r-2 border-white/10 hidden md:block" />
+        <div className="container mx-auto max-w-3xl text-center relative z-10">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
-              Want a Deeper Dive?
+            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl mb-5" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              WANT A DEEPER DIVE?
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-lg opacity-90 mb-8">
+            <motion.p variants={fadeInUp} className="text-base md:text-lg text-white/60 mb-9 max-w-lg mx-auto">
               Explore our full training programs for structured, mentor-led learning with placement support.
             </motion.p>
             <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/trainings"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold bg-white text-[#8B0000] rounded-xl hover:bg-gray-100 transition-all duration-300 shadow-xl">
-                Explore Training Programs
-                <ArrowRight className="w-5 h-5" />
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 text-sm font-bold tracking-wide bg-[#C6FF3D] text-[#14141A] hover:brightness-95 transition-all">
+                EXPLORE TRAINING PROGRAMS
+                <ArrowRight className="w-4 h-4" />
               </Link>
               <Link href="/contact"
-                className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold border-2 border-white rounded-xl hover:bg-white/10 transition-all duration-300">
-                Book Free Counselling
-                <ArrowRight className="w-5 h-5" />
+                className="inline-flex items-center justify-center gap-3 px-8 py-4 text-sm font-bold tracking-wide border-2 border-white hover:bg-white/10 transition-all">
+                BOOK FREE COUNSELLING
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
           </motion.div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
