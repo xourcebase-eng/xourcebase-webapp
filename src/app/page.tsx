@@ -8,7 +8,7 @@ import {
   Calendar, Wifi, Tag, ChevronRight, CheckCircle2,
   TrendingUp, ShieldCheck, Briefcase, GraduationCap,
   BadgeCheck, Lightbulb, HeartHandshake, BarChart2,
-  Quote,
+  Quote, Bell,
 } from 'lucide-react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
@@ -122,63 +122,66 @@ const testimonials = [
 const upcomingWorkshops = [
   {
     id: 1,
-    title: 'AWS Cloud Foundations Bootcamp',
+    title: 'Introduction to Git & GitHub for Beginners',
     date: 'May 18, 2025',
     time: '10:00 AM – 1:00 PM IST',
     mode: 'Online',
-    seats: 12,
     tag: 'Free',
     tagColor: 'bg-emerald-100 text-emerald-700',
     accent: 'from-indigo-500 to-purple-600',
-    description: 'Kickstart your cloud journey. Covers IAM, EC2, S3, and VPC fundamentals with live demos and Q&A.',
+    description: 'A hands-on introduction to version control with Git and collaboration on GitHub — commits, branching, merging, and pull requests.',
     isFree: true,
-    slug: 'aws-cloud-foundations'   // Added for dynamic linking
+    status: 'open',
+    slug: 'introduction-to-git-and-github',
   },
   {
-    id: 2, title: 'DevOps CI/CD Pipeline Workshop',
-    date: 'May 24, 2025', time: '11:00 AM – 2:00 PM IST', mode: 'Online', seats: 7,
+    id: 2,
+    title: 'DevOps CI/CD Pipeline Workshop',
+    date: 'May 24, 2025', time: '11:00 AM – 2:00 PM IST', mode: 'Online',
     tag: '₹299', tagColor: 'bg-amber-100 text-amber-700',
     accent: 'from-orange-500 to-rose-600',
     description: 'Build a full CI/CD pipeline with GitHub Actions, Docker, and Kubernetes. Hands-on project included.',
     isFree: false,
+    status: 'coming_soon',
+    opensOn: 'May 10, 2025',
   },
   {
-    id: 3, title: 'Communication & Interview Masterclass',
-    date: 'June 1, 2025', time: '3:00 PM – 5:00 PM IST', mode: 'Hybrid', seats: 25,
+    id: 3,
+    title: 'Communication & Interview Masterclass',
+    date: 'June 1, 2025', time: '3:00 PM – 5:00 PM IST', mode: 'Hybrid',
     tag: 'Free', tagColor: 'bg-emerald-100 text-emerald-700',
     accent: 'from-teal-500 to-green-600',
     description: 'Master the STAR method, voice modulation, and body language. Live mock interview at the end.',
     isFree: true,
+    status: 'coming_soon',
+    opensOn: 'May 15, 2025',
   },
 ];
 
 const upcomingTrainings = [
   {
     id: 1, title: 'Cloud & DevOps Career Accelerator',
-    duration: '12 Weeks', level: 'Intermediate', enrolled: 128,
-    tag: 'Bestseller', tagColor: 'bg-amber-100 text-amber-700',
+    duration: '12 Weeks', level: 'Intermediate',
     accent: 'from-indigo-500 to-purple-600',
     description: 'AWS, Azure, Kubernetes, Terraform, and CI/CD with real-world capstone projects and placement support.',
     topics: ['AWS / Azure', 'Kubernetes', 'Terraform', 'CI/CD', 'Docker'],
-    price: '₹24,999', originalPrice: '₹39,999',
+    opensOn: 'June 15, 2025',
   },
   {
     id: 2, title: 'BPO & Communication Excellence',
-    duration: '6 Weeks', level: 'Beginner', enrolled: 214,
-    tag: 'New Batch', tagColor: 'bg-emerald-100 text-emerald-700',
+    duration: '6 Weeks', level: 'Beginner',
     accent: 'from-teal-500 to-green-600',
     description: 'Voice & non-voice training, soft skills, and personality development to launch your BPO career.',
     topics: ['Voice Support', 'Email Etiquette', 'Soft Skills', 'Mock Interviews'],
-    price: '₹8,999', originalPrice: '₹14,999',
+    opensOn: 'June 20, 2025',
   },
   {
     id: 3, title: 'Data Engineering Foundations',
-    duration: '8 Weeks', level: 'Intermediate', enrolled: 76,
-    tag: 'Upcoming', tagColor: 'bg-rose-100 text-rose-700',
+    duration: '8 Weeks', level: 'Intermediate',
     accent: 'from-rose-500 to-orange-500',
     description: 'Learn SQL, Python, Spark, and cloud data pipelines. Build a portfolio-ready project on AWS Redshift.',
     topics: ['Python', 'SQL', 'Apache Spark', 'AWS Redshift', 'ETL'],
-    price: '₹18,999', originalPrice: '₹29,999',
+    opensOn: 'July 1, 2025',
   },
 ];
 
@@ -211,23 +214,40 @@ function SectionHeader({ badge, badgeClass, title, subtitle }: {
 
 // ─── Workshop Card ────────────────────────────────────────────────────────────
 function WorkshopPreviewCard({ w }: { w: typeof upcomingWorkshops[0] }) {
-  const pctLeft = Math.min(100, (w.seats / 50) * 100);
-  const barColor = pctLeft < 20 ? 'bg-red-500' : pctLeft < 50 ? 'bg-amber-400' : 'bg-emerald-500';
+  const isComingSoon = w.status === 'coming_soon';
 
   return (
     <motion.div
       variants={cardVariants}
-      whileHover={{ y: -6, scale: 1.02 }}
+      whileHover={{ y: isComingSoon ? 0 : -6, scale: isComingSoon ? 1 : 1.02 }}
       transition={{ duration: 0.3 }}
-      className="group bg-white rounded-2xl shadow-md hover:shadow-xl border border-gray-100 hover:border-indigo-100 overflow-hidden flex flex-col transition-all duration-300"
+      className={`group bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col transition-all duration-300 ${
+        isComingSoon ? 'opacity-90 hover:opacity-100 hover:shadow-xl hover:border-indigo-100' : 'hover:shadow-xl hover:border-indigo-100'
+      }`}
     >
-      <div className={`h-1.5 bg-gradient-to-r ${w.accent}`} />
+      <div className={`h-1.5 bg-gradient-to-r ${w.accent} ${isComingSoon ? 'opacity-50' : ''}`} />
+
+      {/* Coming Soon banner */}
+      {isComingSoon && (
+        <div className="flex items-center gap-2 px-4 py-2.5 bg-indigo-50 border-b border-indigo-100">
+          <span className="flex items-center gap-1.5 text-xs font-bold text-indigo-700">
+            <Bell className="w-3.5 h-3.5" />
+            Coming Soon
+          </span>
+          {w.opensOn && (
+            <span className="text-xs text-indigo-500 ml-auto">Opens {w.opensOn}</span>
+          )}
+        </div>
+      )}
+
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-3">
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 ${w.tagColor}`}>
-            <Tag className="w-3 h-3" />{w.tag}
-          </span>
-          <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${w.mode === 'Online' ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'}`}>
+          {!isComingSoon && (
+            <span className={`text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 ${w.tagColor}`}>
+              <Tag className="w-3 h-3" />{w.tag}
+            </span>
+          )}
+          <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ml-auto ${w.mode === 'Online' ? 'bg-sky-100 text-sky-700' : 'bg-violet-100 text-violet-700'}`}>
             <Wifi className="w-3 h-3" />{w.mode}
           </span>
         </div>
@@ -237,27 +257,26 @@ function WorkshopPreviewCard({ w }: { w: typeof upcomingWorkshops[0] }) {
         </h3>
         <p className="text-sm text-gray-500 leading-relaxed mb-4 flex-1">{w.description}</p>
 
-        <div className="space-y-1.5 mb-4 text-xs text-gray-500">
+        <div className="space-y-1.5 mb-5 text-xs text-gray-500">
           <div className="flex items-center gap-2"><Calendar className="w-3.5 h-3.5 text-indigo-400" />{w.date}</div>
           <div className="flex items-center gap-2"><Clock className="w-3.5 h-3.5 text-indigo-400" />{w.time}</div>
         </div>
 
-        <div className="mb-4">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>{w.seats} seats left</span>
-            <span>50 total</span>
-          </div>
-          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pctLeft}%` }} />
-          </div>
-        </div>
-
-        <Link
-          href={w.slug ? `/workshops/${w.slug}` : '/workshops'}
-          className={`inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${w.accent} hover:opacity-90 transition-all shadow-md`}
-        >
-          {w.isFree ? 'Register Free' : 'Register Now'} <ArrowRight className="w-4 h-4" />
-        </Link>
+        {isComingSoon ? (
+          <Link
+            href="/workshops"
+            className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 transition-colors"
+          >
+            <Bell className="w-4 h-4" /> Notify Me
+          </Link>
+        ) : (
+          <Link
+            href={w.slug ? `/workshops/${w.slug}` : '/workshops'}
+            className={`inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${w.accent} hover:opacity-90 transition-all shadow-md`}
+          >
+            {w.isFree ? 'Register Free' : 'Register Now'} <ArrowRight className="w-4 h-4" />
+          </Link>
+        )}
       </div>
     </motion.div>
   );
@@ -270,22 +289,30 @@ function TrainingPreviewCard({ t }: { t: typeof upcomingTrainings[0] }) {
     Intermediate: 'bg-amber-100 text-amber-700',
     Advanced: 'bg-red-100 text-red-700',
   };
-  const priceNum = parseInt(t.price.replace(/[^\d]/g, ''));
-  const origNum  = parseInt(t.originalPrice.replace(/[^\d]/g, ''));
-  const discount = Math.round((1 - priceNum / origNum) * 100);
 
   return (
     <motion.div
       variants={cardVariants}
-      whileHover={{ y: -6, scale: 1.015 }}
+      whileHover={{ y: 0 }}
       transition={{ duration: 0.3 }}
-      className="group bg-white rounded-2xl shadow-md hover:shadow-2xl border border-gray-100 hover:border-teal-100 overflow-hidden flex flex-col transition-all duration-300"
+      className="group bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden flex flex-col transition-all duration-300 opacity-90 hover:opacity-100 hover:shadow-xl hover:border-teal-100"
     >
-      <div className={`h-1.5 bg-gradient-to-r ${t.accent}`} />
+      <div className={`h-1.5 bg-gradient-to-r ${t.accent} opacity-50`} />
+
+      {/* Coming Soon banner */}
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-teal-50 border-b border-teal-100">
+        <span className="flex items-center gap-1.5 text-xs font-bold text-teal-700">
+          <Bell className="w-3.5 h-3.5" />
+          Coming Soon
+        </span>
+        {t.opensOn && (
+          <span className="text-xs text-teal-500 ml-auto">Opens {t.opensOn}</span>
+        )}
+      </div>
+
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-3">
-          <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.tagColor}`}>{t.tag}</span>
-          <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ${levelColors[t.level]}`}>
+          <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full ml-auto ${levelColors[t.level]}`}>
             <Zap className="w-3 h-3" />{t.level}
           </span>
         </div>
@@ -297,18 +324,15 @@ function TrainingPreviewCard({ t }: { t: typeof upcomingTrainings[0] }) {
           ))}
           {t.topics.length > 4 && <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-md">+{t.topics.length - 4}</span>}
         </div>
-        <div className="flex items-center gap-4 text-xs text-gray-500 mb-5">
+        <div className="flex items-center gap-4 text-xs text-gray-500 mb-6">
           <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-teal-400" />{t.duration}</span>
-          <span className="flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-teal-400" />{t.enrolled.toLocaleString()} enrolled</span>
         </div>
-        <div className="flex items-center justify-between gap-2 mt-auto">
-          <div className="flex items-baseline gap-2">
-            <span className="text-xl font-extrabold text-gray-900">{t.price}</span>
-            <span className="text-xs text-gray-400 line-through">{t.originalPrice}</span>
-            <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">{discount}% off</span>
-          </div>
-          <Link href="/trainings" className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r ${t.accent} hover:opacity-90 active:scale-95 transition-all duration-200 shadow-md whitespace-nowrap`}>
-            Enrol Now <ArrowRight className="w-3.5 h-3.5" />
+        <div className="mt-auto">
+          <Link
+            href="/trainings"
+            className="inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-bold text-teal-700 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors"
+          >
+            <Bell className="w-4 h-4" /> Notify Me
           </Link>
         </div>
       </div>
@@ -415,9 +439,9 @@ export default function HomePage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={containerVariants}>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 gap-4">
               <div>
-                <motion.span variants={fadeInUp} className="inline-block text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-3">Structured Programs</motion.span>
-                <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold text-gray-900">Training Programs</motion.h2>
-                <motion.p variants={fadeInUp} className="mt-2 text-base text-gray-500 max-w-xl">Multi-week cohort programs with mentorship, capstone projects, and placement support.</motion.p>
+                <motion.span variants={fadeInUp} className="inline-block text-xs font-bold uppercase tracking-widest text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-3">Coming Soon</motion.span>
+                <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold text-gray-900">Upcoming Training Programs</motion.h2>
+                <motion.p variants={fadeInUp} className="mt-2 text-base text-gray-500 max-w-xl">Multi-week cohort programs with mentorship, capstone projects, and placement support — opening soon.</motion.p>
               </div>
               <motion.div variants={fadeInUp} className="hidden sm:block">
                 <Link href="/trainings" className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold border-2 border-teal-600 text-teal-600 rounded-xl hover:bg-teal-600 hover:text-white transition-all duration-300 whitespace-nowrap">
