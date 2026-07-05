@@ -1,4 +1,6 @@
 // src/components/Footer.tsx
+// Same "Career Accelerator" visual system as the rest of the redesigned pages.
+// Ink background instead of gray-950, hard 2px edges, Space Grotesk headings.
 
 import Link from 'next/link';
 import { Twitter, Linkedin, Instagram, Facebook, Youtube, ArrowUpRight } from 'lucide-react';
@@ -47,7 +49,7 @@ const SOCIALS = [
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 text-gray-400">
+    <footer className="bg-[#14141A] text-white/50" style={{ fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── Main content ── */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-14 pb-10">
@@ -57,7 +59,7 @@ export default function Footer() {
           <Link href="/" className="inline-block mb-3">
             <img src={logo.src} alt="XourceBase" className="h-8 w-auto" />
           </Link>
-          <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
+          <p className="text-sm text-white/40 max-w-xs leading-relaxed">
             Learn in-demand skills from expert instructors — at your own pace, on any device.
           </p>
         </div>
@@ -70,7 +72,10 @@ export default function Footer() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {FOOTER_COLS.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-white text-xs font-bold uppercase tracking-widest mb-5">
+              <h3
+                className="text-white text-xs font-bold uppercase tracking-[0.15em] mb-5"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
                 {col.heading}
               </h3>
               <ul className="space-y-3">
@@ -78,7 +83,7 @@ export default function Footer() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="group inline-flex items-center gap-1 text-sm text-gray-500 hover:text-white transition-colors"
+                      className="group inline-flex items-center gap-1 text-sm text-white/50 hover:text-[#C6FF3D] transition-colors"
                     >
                       {label}
                       <ArrowUpRight className="w-3 h-3 opacity-0 -translate-y-0.5 group-hover:opacity-100 group-hover:translate-y-0 transition-all" />
@@ -91,17 +96,17 @@ export default function Footer() {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-800 mb-8" />
+        <div className="border-t-2 border-white/10 mb-8" />
 
         {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-5">
 
-          <p className="text-xs text-gray-600 order-2 sm:order-1">
+          <p className="text-xs text-white/30 order-2 sm:order-1">
             © {new Date().getFullYear()} XourceBase, Inc. All rights reserved.
           </p>
 
           {/* Social icons with proper tap targets */}
-          <div className="flex items-center gap-1 order-1 sm:order-2">
+          <div className="flex items-center gap-2 order-1 sm:order-2">
             {SOCIALS.map(({ icon: Icon, href, label }) => (
               <a
                 key={label}
@@ -109,9 +114,9 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="w-9 h-9 flex items-center justify-center rounded-xl text-gray-500 hover:text-white hover:bg-gray-800 transition-all"
+                className="w-9 h-9 flex items-center justify-center border-2 border-white/15 text-white/50 hover:text-[#C6FF3D] hover:border-[#C6FF3D] transition-all"
               >
-                <Icon size={17} />
+                <Icon size={16} />
               </a>
             ))}
           </div>

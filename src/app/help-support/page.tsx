@@ -1,22 +1,24 @@
 'use client';
 
 // src/app/help-support/page.tsx
+// Fully reskinned to match "Career Accelerator" design
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import {
   MessageCircle, Mail, BookOpen, Users, ChevronDown,
-  Phone, Search, LifeBuoy,
+  Phone, Search, LifeBuoy, CheckCircle2,
 } from 'lucide-react';
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.07, duration: 0.45, ease: 'easeOut' as const },
-  }),
+const fadeInUp = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.09 } },
 };
 
 const SUPPORT_CARDS = [
@@ -26,7 +28,7 @@ const SUPPORT_CARDS = [
     description: 'Get personalized help from our team — we reply within 24 hours.',
     action: 'Contact Us',
     path: '/contact',
-    color: 'bg-red-50 text-[#8B0000]',
+    accent: '#FF3D57',
   },
   {
     icon: BookOpen,
@@ -34,7 +36,7 @@ const SUPPORT_CARDS = [
     description: 'Step-by-step guides, FAQs, and setup tutorials for every feature.',
     action: 'Browse Docs',
     path: '/docs',
-    color: 'bg-blue-50 text-blue-700',
+    accent: '#3D5AFF',
   },
   {
     icon: Users,
@@ -42,7 +44,7 @@ const SUPPORT_CARDS = [
     description: 'Ask questions and get answers from thousands of fellow learners.',
     action: 'Join Forum',
     path: '/community-forum',
-    color: 'bg-emerald-50 text-emerald-700',
+    accent: '#C6FF3D',
   },
 ];
 
@@ -92,105 +94,146 @@ export default function HelpAndSupportPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="bg-[#F5F5F2] text-[#14141A]">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-20 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">
-              <LifeBuoy className="w-3.5 h-3.5" />
-              We're here to help
-            </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">Help & Support</h1>
-            <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto mb-8">
-              Browse our FAQ, explore docs, or reach out — we'll get you sorted.
-            </p>
-            {/* Search bar */}
-            <div className="relative max-w-md mx-auto">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search FAQs…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B0000]/20 focus:border-[#8B0000] shadow-sm transition"
-              />
-            </div>
+      <section className="relative bg-[#F5F5F2] pt-20 pb-14 lg:pt-28 lg:pb-20 px-6 border-b-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl">
+          <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+            <motion.span
+              variants={fadeInUp}
+              className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <LifeBuoy className="inline w-3.5 h-3.5 mr-1" /> WE'RE HERE TO HELP
+            </motion.span>
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              style={{ fontFamily: "'Archivo Black', sans-serif" }}
+            >
+              HELP &amp;<br />SUPPORT
+            </motion.h1>
+
+            <motion.p variants={fadeInUp} className="text-base md:text-lg text-[#14141A]/60 max-w-xl">
+              Get fast answers, expert guidance, and everything you need to succeed in your learning journey.
+            </motion.p>
           </motion.div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-14 lg:py-16 space-y-20">
-
-        {/* ── Support Cards ── */}
-        <section>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">How Can We Help?</h2>
+      {/* ── Support Cards ── */}
+      <section className="py-16 px-6 bg-[#F5F5F2]">
+        <div className="container mx-auto max-w-6xl">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={containerVariants}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-extrabold" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              HOW CAN WE HELP YOU?
+            </h2>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {SUPPORT_CARDS.map((card, i) => (
               <motion.div
-                key={card.title}
-                custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8 flex flex-col items-center text-center"
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -6 }}
+                className="relative bg-white border-2 border-[#14141A] flex flex-col p-8 group overflow-hidden"
               >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ${card.color}`}>
-                  <card.icon className="w-5 h-5" />
+                {/* Left accent bar */}
+                <div className="absolute left-0 top-0 bottom-0 w-2" style={{ background: card.accent }} />
+
+                <div
+                  className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mb-6"
+                  style={{ background: card.accent === '#C6FF3D' ? '#C6FF3D' : 'white' }}
+                >
+                  <card.icon className="w-6 h-6" style={{ color: card.accent === '#C6FF3D' ? '#14141A' : '#14141A' }} />
                 </div>
-                <h3 className="text-lg font-extrabold text-gray-900 mb-2">{card.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">{card.description}</p>
+
+                <h3 className="text-xl font-extrabold mb-3" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+                  {card.title.toUpperCase()}
+                </h3>
+
+                <p className="text-sm text-[#14141A]/70 flex-1 mb-8">{card.description}</p>
+
                 <Link
                   href={card.path}
-                  className="inline-flex items-center gap-1.5 text-sm font-bold text-[#8B0000] hover:underline transition-colors"
+                  className="mt-auto inline-flex items-center gap-2 text-sm font-bold tracking-wide border-2 border-[#14141A] hover:bg-[#14141A] hover:text-white px-6 py-3 transition-all"
                 >
                   {card.action} →
                 </Link>
               </motion.div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* ── FAQ ── */}
-        <section>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-2">FAQ</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">Frequently Asked Questions</h2>
-          </motion.div>
+      {/* ── FAQ Section ── */}
+      <section className="py-16 px-6 bg-white border-t-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col md:flex-row gap-8 items-end mb-12">
+            <div>
+              <p className="text-[#FF3D57] font-bold tracking-widest text-xs mb-2">FAQ</p>
+              <h2 className="text-4xl md:text-5xl font-extrabold" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+                FREQUENTLY ASKED QUESTIONS
+              </h2>
+            </div>
+
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14141A]/40" />
+                <input
+                  type="text"
+                  placeholder="Search FAQs..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-11 pr-4 py-3 border-2 border-[#14141A] bg-white focus:outline-none text-sm placeholder:text-[#14141A]/40"
+                />
+              </div>
+            </div>
+          </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
-              <Search className="w-8 h-8 mx-auto mb-3 opacity-40" />
-              <p className="text-sm">No results for "{search}"</p>
+            <div className="text-center py-20 text-[#14141A]/40">
+              <Search className="w-12 h-12 mx-auto mb-4" />
+              <p>No matching questions found.</p>
             </div>
           ) : (
-            <div className="max-w-3xl mx-auto space-y-3">
+            <div className="max-w-3xl mx-auto space-y-4">
               {filtered.map((faq, i) => (
                 <motion.div
                   key={i}
-                  custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-                  className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  className="border-2 border-[#14141A] bg-white"
                 >
                   <button
                     onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                    className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-[#F5F5F2] transition-colors"
                   >
-                    <span className="text-sm font-bold text-gray-900 pr-4">{faq.question}</span>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-300 ${openIndex === i ? 'rotate-180' : ''}`} />
+                    <span className="font-bold pr-6 text-left">{faq.question}</span>
+                    <ChevronDown className={`w-5 h-5 transition-transform ${openIndex === i ? 'rotate-180' : ''}`} />
                   </button>
+
                   <AnimatePresence initial={false}>
                     {openIndex === i && (
                       <motion.div
-                        key="content"
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25, ease: 'easeInOut' as const }}
-                        className="overflow-hidden"
+                        transition={{ duration: 0.3 }}
+                        className="overflow-hidden border-t border-[#14141A]"
                       >
-                        <div className="px-6 pb-5 border-t border-gray-50">
-                          <p className="text-sm text-gray-500 leading-relaxed pt-4">{faq.answer}</p>
+                        <div className="px-6 py-6 text-[#14141A]/80 leading-relaxed">
+                          {faq.answer}
                         </div>
                       </motion.div>
                     )}
@@ -199,38 +242,40 @@ export default function HelpAndSupportPage() {
               ))}
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-        {/* ── Still need help CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="bg-[#8B0000] rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
-        >
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full" />
-          <div className="relative z-10">
-            <h3 className="text-2xl md:text-3xl font-extrabold text-white mb-3">Still need help?</h3>
-            <p className="text-red-200 text-sm mb-8 max-w-sm mx-auto">Our support team replies within 24 business hours. Don't hesitate to reach out.</p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      {/* ── Bottom CTA ── */}
+      <section className="py-20 px-6 bg-[#14141A] text-white">
+        <div className="container mx-auto max-w-3xl text-center">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              STILL NEED HELP?
+            </h2>
+            <p className="text-white/70 text-lg mb-10 max-w-md mx-auto">
+              Our support team usually replies within 24 business hours.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-white text-[#8B0000] font-bold px-7 py-3.5 rounded-2xl text-sm hover:bg-red-50 active:scale-[0.97] transition-all"
+                className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] font-bold px-8 py-4 text-sm tracking-wide hover:brightness-110 transition-all"
               >
                 <MessageCircle className="w-4 h-4" />
-                Contact Us
+                CONTACT SUPPORT
               </Link>
+
               <a
                 href="tel:+918767765307"
-                className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white font-bold px-7 py-3.5 rounded-2xl text-sm hover:bg-white/20 active:scale-[0.97] transition-all"
+                className="inline-flex items-center gap-2 border-2 border-white/70 hover:bg-white/10 font-bold px-8 py-4 text-sm tracking-wide transition-all"
               >
                 <Phone className="w-4 h-4" />
-                Call Us
+                CALL US
               </a>
             </div>
-          </div>
-        </motion.div>
-
-      </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }

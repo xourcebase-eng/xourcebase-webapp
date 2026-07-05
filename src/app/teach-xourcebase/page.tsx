@@ -1,21 +1,23 @@
 'use client';
 
 // src/app/teach-xourcebase/page.tsx
+// Reskinned to match "Career Accelerator" design
 
 import { motion } from 'framer-motion';
-import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import {
   Users, DollarSign, Calendar, Mail, CheckCircle2,
   GraduationCap, Zap, Star, ArrowRight,
 } from 'lucide-react';
 
-const fadeUp: Variants = {
+const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: 'easeOut' as const },
-  }),
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const WHY = [
@@ -35,156 +37,204 @@ const STEPS = [
 ];
 
 const STATS = [
-  { value: '70%',   label: 'Revenue share' },
-  { value: '50K+',  label: 'Active learners' },
-  { value: '4.9★',  label: 'Avg instructor rating' },
-  { value: '₹0',    label: 'Platform fee to join' },
+  { value: '70%', label: 'REVENUE SHARE' },
+  { value: '50K+', label: 'ACTIVE LEARNERS' },
+  { value: '4.9★', label: 'AVG RATING' },
+  { value: '₹0', label: 'JOINING FEE' },
 ];
 
 export default function TeachOnXourceBasePage() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="bg-[#F5F5F2] text-[#14141A]">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-24">
-          <div className="max-w-3xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <span className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Become an Instructor
-              </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                Share your expertise.<br />
-                <span className="text-[#8B0000]">Earn while you teach.</span>
-              </h1>
-              <p className="text-gray-500 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-                Join XourceBase as an instructor and help shape the next generation of Cloud & DevOps engineers. Reach thousands, earn competitively, and build your brand.
-              </p>
+      <section className="relative bg-[#F5F5F2] pt-20 pb-14 lg:pt-28 lg:pb-20 px-6 overflow-hidden border-b-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+            <motion.span
+              variants={fadeInUp}
+              className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <GraduationCap className="inline w-3.5 h-3.5 mr-1" /> BECOME AN INSTRUCTOR
+            </motion.span>
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6 max-w-5xl"
+              style={{ fontFamily: "'Archivo Black', sans-serif" }}
+            >
+              SHARE YOUR EXPERTISE.<br />
+              <span className="bg-[#C6FF3D] px-2">EARN WHILE YOU TEACH.</span>
+            </motion.h1>
+
+            <motion.p variants={fadeInUp} className="text-base md:text-lg text-[#14141A]/70 max-w-2xl mb-10">
+              Join XourceBase as an instructor and help shape the next generation of Cloud & DevOps professionals.
+            </motion.p>
+
+            <motion.div variants={fadeInUp}>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#8B0000] hover:bg-[#700000] text-white font-bold px-8 py-4 rounded-2xl text-sm active:scale-[0.97] transition-all shadow-sm shadow-red-900/20"
+                className="inline-flex items-center gap-3 bg-[#14141A] hover:bg-black text-white font-bold px-8 py-4 text-sm tracking-wide transition-all"
               >
-                Apply to Teach
+                APPLY TO TEACH NOW
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Stats Scoreboard ── */}
+      <section className="py-12 px-6 bg-[#F5F5F2] border-b-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 border-2 border-[#14141A] divide-x-2 divide-[#14141A]">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="px-6 py-8 text-center"
+              >
+                <p className="text-4xl font-bold text-[#14141A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {stat.value}
+                </p>
+                <p className="text-[11px] font-bold tracking-widest text-[#14141A]/60 mt-1 uppercase">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-14 lg:py-20 space-y-20">
+      <div className="container mx-auto max-w-6xl px-6 py-16 space-y-20">
 
-        {/* ── Stats ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-        >
-          {STATS.map(({ value, label }) => (
-            <div key={label} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center">
-              <p className="text-3xl font-extrabold text-[#8B0000] mb-1">{value}</p>
-              <p className="text-xs text-gray-500 font-medium">{label}</p>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* ── Why teach + Who can apply ── */}
-        <section className="grid lg:grid-cols-2 gap-8">
-
-          {/* Why */}
+        {/* Why Teach + Eligibility */}
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Why Teach */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
-            className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="bg-white border-2 border-[#14141A] p-8 flex flex-col"
           >
-            <div className="w-11 h-11 bg-red-50 rounded-2xl flex items-center justify-center mb-5">
-              <DollarSign className="w-5 h-5 text-[#8B0000]" />
+            <div className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mb-6" style={{ background: '#C6FF3D' }}>
+              <DollarSign className="w-6 h-6 text-[#14141A]" />
             </div>
-            <p className="text-[#8B0000] font-bold text-xs uppercase tracking-widest mb-2">Benefits</p>
-            <h2 className="text-xl font-extrabold text-gray-900 mb-6">Why teach with us?</h2>
-            <ul className="space-y-3">
-              {WHY.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-600">{item}</span>
+            <p className="text-xs font-bold tracking-widest text-[#C6FF3D] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              BENEFITS
+            </p>
+            <h2 className="text-3xl font-extrabold mb-8" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              WHY TEACH WITH US?
+            </h2>
+
+            <ul className="space-y-4 flex-1">
+              {WHY.map((item, i) => (
+                <li key={i} className="flex gap-3 text-sm">
+                  <CheckCircle2 className="w-5 h-5 text-[#C6FF3D] flex-shrink-0 mt-0.5" />
+                  <span>{item}</span>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Who */}
+          {/* Who Can Apply */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
-            className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="bg-white border-2 border-[#14141A] p-8 flex flex-col"
           >
-            <div className="w-11 h-11 bg-red-50 rounded-2xl flex items-center justify-center mb-5">
-              <Users className="w-5 h-5 text-[#8B0000]" />
+            <div className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mb-6">
+              <Users className="w-6 h-6" />
             </div>
-            <p className="text-[#8B0000] font-bold text-xs uppercase tracking-widest mb-2">Eligibility</p>
-            <h2 className="text-xl font-extrabold text-gray-900 mb-4">Who can apply?</h2>
-            <p className="text-sm text-gray-500 leading-relaxed mb-6">
-              We're looking for professionals with real-world experience who are passionate about teaching. You don't need to be a full-time trainer — industry practitioners make the best instructors.
+            <p className="text-xs font-bold tracking-widest text-[#FF3D57] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              ELIGIBILITY
             </p>
-            <div className="space-y-3">
+            <h2 className="text-3xl font-extrabold mb-6" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              WHO CAN APPLY?
+            </h2>
+
+            <p className="text-[#14141A]/70 mb-8">
+              Industry professionals with real-world experience who are passionate about teaching.
+            </p>
+
+            <div className="space-y-4">
               {[
-                '3+ years in Cloud, DevOps, or related tech domains',
-                'Strong working knowledge of AWS, Azure, GCP, Kubernetes, or Terraform',
-                'Ability to explain complex concepts clearly and practically',
-                'Professional certification is a plus but not mandatory',
-              ].map((req) => (
-                <div key={req} className="flex items-start gap-3">
-                  <Star className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-600">{req}</span>
+                '3+ years in Cloud, DevOps, or related domains',
+                'Strong working knowledge of AWS, Azure, Kubernetes, Terraform etc.',
+                'Ability to explain complex topics clearly',
+                'Professional certification is a plus',
+              ].map((req, i) => (
+                <div key={i} className="flex gap-3 text-sm">
+                  <Star className="w-5 h-5 text-[#FFB800] flex-shrink-0 mt-0.5" />
+                  <span>{req}</span>
                 </div>
               ))}
             </div>
           </motion.div>
-        </section>
+        </div>
 
-        {/* ── How to get started ── */}
+        {/* How to Get Started */}
         <section>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-2">Process</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">How to get started</h2>
-          </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="text-center mb-12">
+            <p className="text-[#FF3D57] font-bold text-xs tracking-widest mb-3">PROCESS</p>
+            <h2 className="text-4xl font-extrabold" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              HOW TO GET STARTED
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {STEPS.map((s, i) => (
               <motion.div
-                key={s.step}
-                custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 relative"
+                key={i}
+                variants={fadeInUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="relative bg-white border-2 border-[#14141A] p-8 h-full flex flex-col"
               >
-                <span className="text-5xl font-extrabold text-gray-100 absolute top-5 right-6 select-none">{s.step}</span>
-                <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center mb-4">
-                  <Calendar className="w-4 h-4 text-[#8B0000]" />
+                <span className="absolute top-6 right-6 text-6xl font-bold text-[#14141A]/10" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {s.step}
+                </span>
+
+                <div className="w-10 h-10 border-2 border-[#14141A] flex items-center justify-center mb-6">
+                  <Calendar className="w-5 h-5" />
                 </div>
-                <h3 className="font-extrabold text-gray-900 mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+
+                <h3 className="text-xl font-extrabold mb-3" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+                  {s.title}
+                </h3>
+                <p className="text-sm text-[#14141A]/70 flex-1">{s.desc}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* ── CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="bg-[#8B0000] rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
-        >
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full" />
-          <div className="relative z-10">
-            <Zap className="w-8 h-8 text-red-300 mx-auto mb-4" />
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3">Ready to start teaching?</h2>
-            <p className="text-red-200 text-sm mb-8 max-w-sm mx-auto">Drop us a message and our instructor success team will guide you through the application.</p>
+        {/* Final CTA */}
+        <section className="bg-[#14141A] text-white rounded-none py-20 px-6 text-center border-t-4 border-[#C6FF3D]">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <Zap className="w-10 h-10 text-[#C6FF3D] mx-auto mb-6" />
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              READY TO START TEACHING?
+            </h2>
+            <p className="text-white/70 max-w-md mx-auto mb-10">
+              Our instructor success team will guide you through the entire application process.
+            </p>
+
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-[#8B0000] font-bold px-8 py-3.5 rounded-2xl text-sm hover:bg-red-50 active:scale-[0.97] transition-all"
+              className="inline-flex items-center gap-3 bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 hover:brightness-110 transition-all text-sm tracking-wide"
             >
               <Mail className="w-4 h-4" />
-              Get in Touch
+              APPLY NOW — GET IN TOUCH
             </Link>
-          </div>
-        </motion.div>
-
+          </motion.div>
+        </section>
       </div>
     </div>
   );
