@@ -1,11 +1,32 @@
 'use client';
 
 // src/app/about-us/page.tsx
+// Reskinned to match the "Career Accelerator" design system.
 
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { Users, Heart, Lightbulb, Award, BookOpen, Target, ArrowRight } from 'lucide-react';
+
+// ─── Design tokens ─────────────────────────────────────────────────────────────
+// paper #F5F5F2 · ink #14141A · lime #C6FF3D · coral #FF3D57 · azure #3D5AFF · gold #FFB800
+
+function useAcceleratorFonts() {
+  useEffect(() => {
+    const id = 'accelerator-fonts';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
+}
+
+const DISPLAY = "'Archivo Black', sans-serif";
+const MONO    = "'Space Grotesk', sans-serif";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
@@ -16,44 +37,49 @@ const fadeUp: Variants = {
 };
 
 const VALUES = [
-  { icon: Heart,      title: 'Empathy First',       desc: 'We listen to every learner and support their unique journey without judgement.' },
-  { icon: Lightbulb,  title: 'Innovation Driven',    desc: 'Fresh ideas meet practical skills to create real, lasting impact.' },
-  { icon: Users,      title: 'Community Powered',    desc: 'Grow alongside peers and mentors who become lifelong allies.' },
-  { icon: Award,      title: 'Results Oriented',     desc: 'Measurable growth — from interview prep to landing dream jobs.' },
+  { icon: Heart,      title: 'Empathy First',       desc: 'We listen to every learner and support their unique journey without judgement.', accentBg: '#FF3D57' },
+  { icon: Lightbulb,  title: 'Innovation Driven',    desc: 'Fresh ideas meet practical skills to create real, lasting impact.', accentBg: '#FFB800' },
+  { icon: Users,      title: 'Community Powered',    desc: 'Grow alongside peers and mentors who become lifelong allies.', accentBg: '#3D5AFF' },
+  { icon: Award,      title: 'Results Oriented',     desc: 'Measurable growth — from interview prep to landing dream jobs.', accentBg: '#C6FF3D' },
 ];
 
 // Initials used as avatar placeholders — replace src with real images when available
 const TEAM = [
-  { name: 'Abhijeet Vishwakarma', role: 'Lead Mentor',    initials: 'AV', color: 'from-[#8B0000] to-red-400' },
-  { name: 'Satyam Mishra',        role: 'Lead Mentor',    initials: 'SM', color: 'from-indigo-600 to-indigo-400' },
-  { name: 'Rehan Khan',           role: 'Lead Mentor',    initials: 'RK', color: 'from-emerald-700 to-emerald-400' },
-  { name: 'Priyanshu Prajapati',  role: 'Lead Mentor',    initials: 'PP', color: 'from-amber-600 to-amber-400' },
+  { name: 'Abhijeet Vishwakarma', role: 'Lead Mentor', initials: 'AV', accentBg: '#FF3D57' },
+  { name: 'Satyam Mishra',        role: 'Lead Mentor', initials: 'SM', accentBg: '#3D5AFF' },
+  { name: 'Rehan Khan',           role: 'Lead Mentor', initials: 'RK', accentBg: '#C6FF3D' },
+  { name: 'Priyanshu Prajapati',  role: 'Lead Mentor', initials: 'PP', accentBg: '#FFB800' },
 ];
 
 const STATS = [
-  { value: '50K+',  label: 'Learners Trained' },
-  { value: '200+',  label: 'Workshops Delivered' },
-  { value: '4.9★',  label: 'Average Rating' },
-  { value: '95%',   label: 'Placement Rate' },
+  { value: '50K+',  label: 'LEARNERS TRAINED' },
+  { value: '200+',  label: 'WORKSHOPS DELIVERED' },
+  { value: '4.9★',  label: 'AVERAGE RATING' },
+  { value: '95%',   label: 'PLACEMENT RATE' },
 ];
 
 export default function AboutPage() {
+  useAcceleratorFonts();
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F5F2] text-[#14141A] antialiased">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-24">
+      <div className="relative overflow-hidden bg-[#14141A] text-white border-b-2 border-[#14141A]">
+        <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-white/10 hidden md:block" />
+        <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-white/10 hidden md:block" />
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-24 relative z-10">
           <div className="max-w-3xl">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <span className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
+              <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>
                 Our Story
               </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                We're building the future of{' '}
-                <span className="text-[#8B0000]">tech careers.</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[0.98] mb-6" style={{ fontFamily: DISPLAY }}>
+                WE&apos;RE BUILDING THE<br />
+                FUTURE OF <span className="bg-[#C6FF3D] text-[#14141A] px-2">TECH CAREERS</span>
               </h1>
-              <p className="text-gray-500 text-base md:text-lg leading-relaxed">
+              <p className="text-white/70 text-base md:text-lg leading-relaxed max-w-2xl">
                 XourceBase is a next-generation career acceleration platform bridging the gap between education and employability — through industry-aligned training, hands-on learning, and personalized mentorship.
               </p>
             </motion.div>
@@ -66,12 +92,12 @@ export default function AboutPage() {
         {/* ── Stats strip ── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
+          className="grid grid-cols-2 sm:grid-cols-4 border-2 border-[#14141A] divide-x-2 divide-y-2 sm:divide-y-0 divide-[#14141A]"
         >
           {STATS.map(({ value, label }) => (
-            <div key={label} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center">
-              <p className="text-3xl font-extrabold text-[#8B0000] mb-1">{value}</p>
-              <p className="text-xs text-gray-500 font-medium">{label}</p>
+            <div key={label} className="bg-white p-6 text-center">
+              <p className="text-3xl font-bold text-[#14141A] mb-1" style={{ fontFamily: MONO }}>{value}</p>
+              <p className="text-[10px] text-[#14141A]/50 font-bold tracking-widest">{label}</p>
             </div>
           ))}
         </motion.div>
@@ -79,14 +105,14 @@ export default function AboutPage() {
         {/* ── Story ── */}
         <section className="grid lg:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-3">Who We Are</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-5">From classroom to career — we close the gap.</h2>
-            <div className="space-y-4 text-gray-500 text-sm leading-relaxed">
+            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#C6FF3D] text-[#14141A] px-3 py-1.5 mb-4" style={{ fontFamily: MONO }}>Who We Are</span>
+            <h2 className="text-2xl md:text-3xl mb-5" style={{ fontFamily: DISPLAY }}>FROM CLASSROOM TO CAREER — WE CLOSE THE GAP.</h2>
+            <div className="space-y-4 text-[#14141A]/60 text-sm leading-relaxed">
               <p>
                 At XourceBase, we believe true growth begins with practical exposure. Our programs blend real-world projects, mock interviews, and expert-led sessions designed by experienced professionals from the tech and business world.
               </p>
               <p>
-                Whether you're a student preparing for your first interview, a professional looking to upskill, or an organization seeking workforce readiness programs — XourceBase is your trusted partner in building a career that stands out.
+                Whether you&apos;re a student preparing for your first interview, a professional looking to upskill, or an organization seeking workforce readiness programs — XourceBase is your trusted partner in building a career that stands out.
               </p>
             </div>
           </motion.div>
@@ -95,16 +121,17 @@ export default function AboutPage() {
             className="grid grid-cols-2 gap-4"
           >
             {[
-              { icon: Target,   label: 'Industry-aligned curriculum' },
-              { icon: Users,    label: 'Expert-led live sessions' },
-              { icon: Award,    label: 'Recognised certifications' },
-              { icon: BookOpen, label: 'Lifetime resource access' },
-            ].map(({ icon: Icon, label }) => (
-              <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col items-start gap-3">
-                <div className="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center">
-                  <Icon className="w-4 h-4 text-[#8B0000]" />
+              { icon: Target,   label: 'Industry-aligned curriculum', accentBg: '#FF3D57' },
+              { icon: Users,    label: 'Expert-led live sessions', accentBg: '#3D5AFF' },
+              { icon: Award,    label: 'Recognised certifications', accentBg: '#FFB800' },
+              { icon: BookOpen, label: 'Lifetime resource access', accentBg: '#C6FF3D' },
+            ].map(({ icon: Icon, label, accentBg }) => (
+              <div key={label} className="relative bg-white border-2 border-[#14141A] p-5 flex flex-col items-start gap-3 overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: accentBg }} />
+                <div className="w-9 h-9 border-2 border-[#14141A] flex items-center justify-center" style={{ background: accentBg }}>
+                  <Icon className="w-4 h-4 text-[#14141A]" />
                 </div>
-                <p className="text-xs font-semibold text-gray-700 leading-snug">{label}</p>
+                <p className="text-xs font-bold text-[#14141A] leading-snug">{label}</p>
               </div>
             ))}
           </motion.div>
@@ -114,26 +141,27 @@ export default function AboutPage() {
         <section className="grid md:grid-cols-2 gap-6">
           {[
             {
-              icon: BookOpen, accent: 'text-[#8B0000]', bg: 'bg-red-50',
+              icon: BookOpen, accentBg: '#C6FF3D',
               label: 'Our Mission',
               text: 'To transform learning into an empowering journey that builds confidence, competence, and career success for every individual.',
             },
             {
-              icon: Award, accent: 'text-indigo-700', bg: 'bg-indigo-50',
+              icon: Award, accentBg: '#3D5AFF',
               label: 'Our Vision',
               text: 'To become the most trusted platform for job readiness and professional growth, connecting talent with opportunity through innovation, skill, and mentorship.',
             },
-          ].map(({ icon: Icon, accent, bg, label, text }, i) => (
+          ].map(({ icon: Icon, accentBg, label, text }, i) => (
             <motion.div
               key={label}
               custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-              className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+              className="relative bg-white border-2 border-[#14141A] p-8 overflow-hidden"
             >
-              <div className={`w-11 h-11 ${bg} rounded-2xl flex items-center justify-center mb-5`}>
-                <Icon className={`w-5 h-5 ${accent}`} />
+              <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: accentBg }} />
+              <div className="w-11 h-11 border-2 border-[#14141A] flex items-center justify-center mb-5" style={{ background: accentBg }}>
+                <Icon className="w-5 h-5 text-[#14141A]" />
               </div>
-              <p className={`text-xs font-bold uppercase tracking-widest mb-2 ${accent}`}>{label}</p>
-              <p className="text-gray-600 text-sm leading-relaxed">{text}</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest mb-2 text-[#14141A]/60" style={{ fontFamily: MONO }}>{label}</p>
+              <p className="text-[#14141A]/70 text-sm leading-relaxed">{text}</p>
             </motion.div>
           ))}
         </section>
@@ -141,8 +169,8 @@ export default function AboutPage() {
         {/* ── Values ── */}
         <section>
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-2">What We Stand For</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">Our Core Values</h2>
+            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-4" style={{ fontFamily: MONO }}>What We Stand For</span>
+            <h2 className="text-2xl md:text-3xl text-[#14141A]" style={{ fontFamily: DISPLAY }}>OUR CORE VALUES</h2>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {VALUES.map((v, i) => (
@@ -150,13 +178,14 @@ export default function AboutPage() {
                 key={v.title}
                 custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
                 whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 text-center"
+                className="relative bg-white border-2 border-[#14141A] p-7 text-center overflow-hidden"
               >
-                <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <v.icon className="w-5 h-5 text-[#8B0000]" />
+                <div className="absolute left-0 top-0 w-full h-1.5" style={{ background: v.accentBg }} />
+                <div className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mx-auto mb-4 mt-1" style={{ background: v.accentBg }}>
+                  <v.icon className="w-5 h-5 text-[#14141A]" />
                 </div>
-                <h3 className="font-extrabold text-gray-900 mb-2 text-base">{v.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{v.desc}</p>
+                <h3 className="font-extrabold text-[#14141A] mb-2 text-base" style={{ fontFamily: MONO }}>{v.title.toUpperCase()}</h3>
+                <p className="text-[#14141A]/60 text-sm leading-relaxed">{v.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -165,43 +194,44 @@ export default function AboutPage() {
         {/* ── Team ── */}
         <section>
           <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-2">The People</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">Meet the Team</h2>
+            <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#3D5AFF] text-white px-3 py-1.5 mb-4" style={{ fontFamily: MONO }}>The People</span>
+            <h2 className="text-2xl md:text-3xl text-[#14141A]" style={{ fontFamily: DISPLAY }}>MEET THE TEAM</h2>
           </motion.div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {TEAM.map((member, i) => (
               <motion.div
                 key={member.name}
                 custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center"
+                className="bg-white border-2 border-[#14141A] p-6 text-center"
               >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${member.color} flex items-center justify-center text-white text-xl font-extrabold mx-auto mb-4 shadow-sm`}>
+                <div className="w-16 h-16 border-2 border-[#14141A] flex items-center justify-center text-[#14141A] text-xl font-extrabold mx-auto mb-4" style={{ background: member.accentBg, fontFamily: MONO }}>
                   {member.initials}
                 </div>
-                <h3 className="font-extrabold text-gray-900 text-sm leading-snug mb-1">{member.name}</h3>
-                <p className="text-xs text-[#8B0000] font-semibold">{member.role}</p>
+                <h3 className="font-extrabold text-[#14141A] text-sm leading-snug mb-1">{member.name}</h3>
+                <p className="text-xs text-[#14141A]/60 font-bold tracking-wide" style={{ fontFamily: MONO }}>{member.role.toUpperCase()}</p>
               </motion.div>
             ))}
           </div>
-          <p className="text-center text-xs text-gray-400 mt-4">Profile photos coming soon.</p>
+          <p className="text-center text-xs text-[#14141A]/40 mt-4 font-semibold">Profile photos coming soon.</p>
         </section>
 
         {/* ── CTA ── */}
         <motion.div
           initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="bg-[#8B0000] rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
+          className="bg-[#14141A] p-10 sm:p-14 text-center relative overflow-hidden border-2 border-[#14141A]"
         >
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full" />
+          <div className="absolute top-10 right-10 w-24 h-24 border-t-2 border-r-2 border-white/10 hidden md:block" />
+          <div className="absolute bottom-10 left-10 w-24 h-24 border-b-2 border-l-2 border-white/10 hidden md:block" />
           <div className="relative z-10">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3">Ready to unlock your potential?</h2>
-            <p className="text-red-200 text-sm mb-8 max-w-sm mx-auto">Join thousands of learners building future-ready careers with XourceBase.</p>
+            <h2 className="text-2xl md:text-3xl text-white mb-3" style={{ fontFamily: DISPLAY }}>READY TO UNLOCK YOUR POTENTIAL?</h2>
+            <p className="text-white/60 text-sm mb-8 max-w-sm mx-auto">Join thousands of learners building future-ready careers with XourceBase.</p>
             <Link
               href="/workshops"
-              className="inline-flex items-center gap-2 bg-white text-[#8B0000] font-bold px-8 py-3.5 rounded-2xl text-sm hover:bg-red-50 active:scale-[0.97] transition-all"
+              className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] font-bold px-8 py-3.5 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
+              style={{ fontFamily: MONO }}
             >
               <BookOpen className="w-4 h-4" />
-              Browse Workshops
+              BROWSE WORKSHOPS
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

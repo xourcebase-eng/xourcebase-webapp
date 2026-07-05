@@ -1,21 +1,23 @@
 'use client';
 
 // src/app/xourcebase-business/page.tsx
+// Fully reskinned to match "Career Accelerator" design
 
 import { motion } from 'framer-motion';
-import type { Variants } from 'framer-motion';
 import Link from 'next/link';
 import {
   Building2, Users, TrendingUp, Shield, Mail,
   CheckCircle2, ArrowRight, Briefcase,
 } from 'lucide-react';
 
-const fadeUp: Variants = {
+const fadeInUp = {
   hidden: { opacity: 0, y: 24 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.08, duration: 0.5, ease: 'easeOut' as const },
-  }),
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const BENEFITS = [
@@ -23,25 +25,25 @@ const BENEFITS = [
     icon: Users,
     title: 'Talent Pipeline Development',
     desc: 'Build a steady stream of skilled, job-ready professionals trained specifically for your industry needs.',
-    color: 'bg-red-50 text-[#8B0000]',
+    accent: '#C6FF3D',
   },
   {
     icon: TrendingUp,
     title: 'Custom Upskilling Programs',
     desc: 'Tailored training modules designed with your team for Cloud, DevOps, and emerging technologies.',
-    color: 'bg-blue-50 text-blue-700',
+    accent: '#3D5AFF',
   },
   {
     icon: Shield,
     title: 'Certified & Verified Talent',
     desc: 'Access pre-vetted candidates with industry-recognised certifications and real project experience.',
-    color: 'bg-emerald-50 text-emerald-700',
+    accent: '#FF3D57',
   },
   {
     icon: Building2,
     title: 'Reduced Hiring Cost',
     desc: 'Cut recruitment costs by up to 40% with direct access to trained, motivated professionals.',
-    color: 'bg-amber-50 text-amber-700',
+    accent: '#FFB800',
   },
 ];
 
@@ -60,116 +62,143 @@ const TRAINING_POINTS = [
 ];
 
 const STATS = [
-  { value: '40%',  label: 'Avg cost reduction' },
-  { value: '200+', label: 'Corporate clients' },
-  { value: '95%',  label: 'Satisfaction rate' },
-  { value: '2 wk', label: 'Avg time to hire' },
+  { value: '40%', label: 'AVG COST REDUCTION' },
+  { value: '200+', label: 'CORPORATE CLIENTS' },
+  { value: '95%', label: 'SATISFACTION RATE' },
+  { value: '2 WK', label: 'AVG TIME TO HIRE' },
 ];
 
 export default function XourceBaseForBusinessPage() {
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="bg-[#F5F5F2] text-[#14141A]">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-24">
-          <div className="max-w-3xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <span className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6">
-                <Briefcase className="w-3.5 h-3.5" />
-                Enterprise Solutions
-              </span>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                Build your future-ready<br />
-                <span className="text-[#8B0000]">workforce.</span>
-              </h1>
-              <p className="text-gray-500 text-base md:text-lg leading-relaxed mb-8 max-w-2xl">
-                Partner with XourceBase to access top Cloud & DevOps talent, customise training for your teams, and accelerate your organisation's digital transformation.
-              </p>
+      <section className="relative bg-[#F5F5F2] pt-20 pb-14 lg:pt-28 lg:pb-20 px-6 border-b-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl">
+          <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+            <motion.span
+              variants={fadeInUp}
+              className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              <Briefcase className="inline w-3.5 h-3.5 mr-1" /> ENTERPRISE SOLUTIONS
+            </motion.span>
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              style={{ fontFamily: "'Archivo Black', sans-serif" }}
+            >
+              BUILD YOUR<br />FUTURE-READY<br />
+              <span className="bg-[#C6FF3D] px-2">WORKFORCE</span>
+            </motion.h1>
+
+            <motion.p variants={fadeInUp} className="text-base md:text-lg text-[#14141A]/70 max-w-2xl">
+              Partner with XourceBase to access top Cloud & DevOps talent, custom training programs, and accelerate your digital transformation.
+            </motion.p>
+
+            <motion.div variants={fadeInUp} className="mt-8">
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-[#8B0000] hover:bg-[#700000] text-white font-bold px-8 py-4 rounded-2xl text-sm active:scale-[0.97] transition-all shadow-sm shadow-red-900/20"
+                className="inline-flex items-center gap-3 bg-[#14141A] hover:bg-black text-white font-bold px-8 py-4 text-sm tracking-wide transition-all"
               >
-                <Building2 className="w-4 h-4" />
-                Partner with Us
+                PARTNER WITH US
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── Stats Scoreboard ── */}
+      <section className="py-12 px-6 bg-[#F5F5F2] border-b-2 border-[#14141A]">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-2 sm:grid-cols-4 border-2 border-[#14141A] divide-x-2 divide-[#14141A]">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="px-6 py-8 text-center"
+              >
+                <p className="text-4xl font-bold text-[#14141A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  {stat.value}
+                </p>
+                <p className="text-[11px] font-bold tracking-widest text-[#14141A]/60 mt-1 uppercase">
+                  {stat.label}
+                </p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-14 lg:py-20 space-y-20">
+      <div className="container mx-auto max-w-6xl px-6 py-16 space-y-20">
 
-        {/* ── Stats ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4"
-        >
-          {STATS.map(({ value, label }) => (
-            <div key={label} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-center">
-              <p className="text-3xl font-extrabold text-[#8B0000] mb-1">{value}</p>
-              <p className="text-xs text-gray-500 font-medium">{label}</p>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* ── Benefits cards ── */}
+        {/* Benefits */}
         <section>
-          <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="text-center mb-10">
-            <p className="text-[#8B0000] font-semibold text-xs uppercase tracking-widest mb-2">Why XourceBase</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">What we bring to your organisation</h2>
+          <motion.div initial="hidden" whileInView="visible" variants={containerVariants} viewport={{ once: true }} className="text-center mb-12">
+            <p className="text-[#FF3D57] text-xs font-bold tracking-widest mb-2">WHY PARTNER WITH US</p>
+            <h2 className="text-4xl font-extrabold" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              WHAT WE BRING TO YOUR ORGANISATION
+            </h2>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {BENEFITS.map((b, i) => (
               <motion.div
-                key={b.title}
-                custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-                whileHover={{ y: -4 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7"
+                key={i}
+                variants={fadeInUp}
+                whileHover={{ y: -6 }}
+                className="bg-white border-2 border-[#14141A] p-8 relative flex flex-col"
               >
-                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-5 ${b.color}`}>
-                  <b.icon className="w-5 h-5" />
-                </div>
-                <h3 className="font-extrabold text-gray-900 mb-2 text-base leading-snug">{b.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{b.desc}</p>
+                <div className="absolute left-0 top-0 bottom-0 w-2" style={{ background: b.accent }} />
+                <b.icon className="w-10 h-10 mb-6" style={{ color: b.accent }} />
+                <h3 className="text-xl font-extrabold mb-3" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+                  {b.title}
+                </h3>
+                <p className="text-sm text-[#14141A]/70 flex-1">{b.desc}</p>
               </motion.div>
             ))}
           </div>
         </section>
 
-        {/* ── Hire talent + Corporate training ── */}
+        {/* Hire Talent + Corporate Training */}
         <section className="grid md:grid-cols-2 gap-8">
           {[
             {
-              icon: Users, color: 'bg-red-50 text-[#8B0000]',
-              label: 'Hire Talent', title: 'Connect with certified graduates',
-              desc: 'Our graduates complete rigorous, project-based training and are ready to contribute from day one.',
+              title: 'HIRE TALENT',
+              desc: 'Connect with certified, job-ready graduates',
               points: HIRE_POINTS,
+              accent: '#FF3D57',
             },
             {
-              icon: TrendingUp, color: 'bg-blue-50 text-blue-700',
-              label: 'Corporate Training', title: 'Upskill your existing teams',
-              desc: 'Customised programs delivered by industry experts — from beginner workshops to advanced certifications.',
+              title: 'CORPORATE TRAINING',
+              desc: 'Upskill your existing teams with custom programs',
               points: TRAINING_POINTS,
+              accent: '#3D5AFF',
             },
-          ].map(({ icon: Icon, color, label, title, desc, points }, i) => (
+          ].map((item, i) => (
             <motion.div
-              key={label}
-              custom={i} initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}
-              className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8"
+              key={i}
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="bg-white border-2 border-[#14141A] p-8"
             >
-              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-5 ${color}`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">{label}</p>
-              <h3 className="text-xl font-extrabold text-gray-900 mb-3">{title}</h3>
-              <p className="text-sm text-gray-500 leading-relaxed mb-6">{desc}</p>
+              <div className="w-12 h-12 border-2 border-[#14141A] mb-6" style={{ background: item.accent }} />
+              <h3 className="text-2xl font-extrabold mb-2" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+                {item.title}
+              </h3>
+              <p className="text-[#14141A]/70 mb-6">{item.desc}</p>
+
               <ul className="space-y-3">
-                {points.map((p) => (
-                  <li key={p} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-gray-600">{p}</span>
+                {item.points.map((point, idx) => (
+                  <li key={idx} className="flex items-start gap-3 text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-[#C6FF3D] flex-shrink-0 mt-0.5" />
+                    {point}
                   </li>
                 ))}
               </ul>
@@ -177,27 +206,31 @@ export default function XourceBaseForBusinessPage() {
           ))}
         </section>
 
-        {/* ── Final CTA ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="bg-[#8B0000] rounded-3xl p-10 sm:p-14 text-center relative overflow-hidden"
+        {/* Final CTA */}
+        <motion.section
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="bg-[#14141A] text-white py-20 px-6 text-center"
         >
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-black/10 rounded-full" />
-          <div className="relative z-10">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-white mb-3">Ready to transform your workforce?</h2>
-            <p className="text-red-200 text-sm mb-8 max-w-sm mx-auto">Let's talk about how XourceBase can support your talent and training goals.</p>
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
+              READY TO TRANSFORM YOUR WORKFORCE?
+            </h2>
+            <p className="text-white/70 mb-10">
+              Let’s discuss how XourceBase can support your hiring and training goals.
+            </p>
+
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-[#8B0000] font-bold px-8 py-3.5 rounded-2xl text-sm hover:bg-red-50 active:scale-[0.97] transition-all"
+              className="inline-flex items-center gap-3 bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 hover:brightness-110 transition-all text-sm tracking-wide"
             >
               <Mail className="w-4 h-4" />
-              Get in Touch
+              GET IN TOUCH TODAY
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
-        </motion.div>
-
+        </motion.section>
       </div>
     </div>
   );

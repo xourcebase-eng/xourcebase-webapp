@@ -1,10 +1,30 @@
 'use client';
 
 // src/app/blog/page.tsx
+// Reskinned to match the "Career Accelerator" design system.
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Newspaper, Rss, Bell } from 'lucide-react';
+
+// ─── Design tokens ─────────────────────────────────────────────────────────────
+// paper #F5F5F2 · ink #14141A · lime #C6FF3D · coral #FF3D57 · azure #3D5AFF · gold #FFB800
+
+function useAcceleratorFonts() {
+  useEffect(() => {
+    const id = 'accelerator-fonts';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
+}
+
+const DISPLAY = "'Archivo Black', sans-serif";
+const MONO    = "'Space Grotesk', sans-serif";
 
 // ── When you have real posts, replace this with your fetch logic ──
 // type Post = { id: string; title: string; excerpt: string; date: string; tag: string; readTime: string; }
@@ -12,6 +32,7 @@ import { Newspaper, Rss, Bell } from 'lucide-react';
 
 export default function BlogPage() {
   const [loading, setLoading] = useState(true);
+  useAcceleratorFonts();
 
   useEffect(() => {
     // Replace with real data fetch — remove timeout
@@ -20,20 +41,23 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F5F2] text-[#14141A] antialiased">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-20 text-center">
+      <div className="relative overflow-hidden bg-[#14141A] text-white border-b-2 border-[#14141A]">
+        <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-white/10 hidden md:block" />
+        <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-white/10 hidden md:block" />
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-16 lg:py-20 text-center relative z-10">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <div className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">
+            <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] bg-[#C6FF3D] text-[#14141A] px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>
               <Rss className="w-3.5 h-3.5" />
               XourceBase Blog
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
-              Insights, tips & stories
+            <h1 className="text-4xl md:text-5xl mb-4 leading-[0.98]" style={{ fontFamily: DISPLAY }}>
+              INSIGHTS, TIPS<br />&amp; <span className="bg-[#FF3D57] px-2">STORIES</span>
             </h1>
-            <p className="text-gray-500 text-base md:text-lg max-w-xl mx-auto">
+            <p className="text-white/70 text-base md:text-lg max-w-xl mx-auto">
               Career advice, cloud tutorials, and behind-the-scenes updates from the XourceBase team.
             </p>
           </motion.div>
@@ -49,15 +73,15 @@ export default function BlogPage() {
                 key={i}
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+                className="bg-white border-2 border-[#14141A] overflow-hidden"
               >
-                <div className="h-44 bg-gray-100 animate-pulse" />
+                <div className="h-44 bg-[#F5F5F2] border-b-2 border-[#14141A] animate-pulse" />
                 <div className="p-6 space-y-3">
-                  <div className="h-3 bg-gray-100 rounded-full w-1/4 animate-pulse" />
-                  <div className="h-5 bg-gray-100 rounded-full w-3/4 animate-pulse" />
-                  <div className="h-3 bg-gray-100 rounded-full w-full animate-pulse" />
-                  <div className="h-3 bg-gray-100 rounded-full w-5/6 animate-pulse" />
-                  <div className="pt-2 h-3 bg-gray-100 rounded-full w-1/3 animate-pulse" />
+                  <div className="h-3 bg-[#F5F5F2] w-1/4 animate-pulse" />
+                  <div className="h-5 bg-[#F5F5F2] w-3/4 animate-pulse" />
+                  <div className="h-3 bg-[#F5F5F2] w-full animate-pulse" />
+                  <div className="h-3 bg-[#F5F5F2] w-5/6 animate-pulse" />
+                  <div className="pt-2 h-3 bg-[#F5F5F2] w-1/3 animate-pulse" />
                 </div>
               </motion.div>
             ))}
@@ -70,31 +94,32 @@ export default function BlogPage() {
             transition={{ duration: 0.4 }}
             className="max-w-md mx-auto text-center py-24"
           >
-            <div className="w-20 h-20 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <Newspaper className="w-9 h-9 text-gray-400" />
+            <div className="w-20 h-20 border-2 border-[#14141A]/20 flex items-center justify-center mx-auto mb-6">
+              <Newspaper className="w-9 h-9 text-[#14141A]/40" />
             </div>
-            <h2 className="text-2xl font-extrabold text-gray-900 mb-3">No posts yet</h2>
-            <p className="text-gray-500 text-sm leading-relaxed mb-8">
+            <h2 className="text-2xl font-extrabold text-[#14141A] mb-3" style={{ fontFamily: DISPLAY }}>NO POSTS YET</h2>
+            <p className="text-[#14141A]/60 text-sm leading-relaxed mb-8">
               We're working on some great content — career tips, cloud tutorials, and team stories. Check back soon!
             </p>
 
             {/* Notify me strip */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-white border-2 border-[#14141A] p-6">
               <div className="flex items-center gap-2 justify-center mb-3">
-                <Bell className="w-4 h-4 text-[#8B0000]" />
-                <p className="text-sm font-bold text-gray-900">Get notified when we publish</p>
+                <Bell className="w-4 h-4 text-[#FF3D57]" />
+                <p className="text-sm font-bold text-[#14141A]">Get notified when we publish</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-0">
                 <input
                   type="email"
                   placeholder="your@email.com"
-                  className="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8B0000]/20 focus:border-[#8B0000] transition"
+                  className="flex-1 px-4 py-2.5 bg-[#F5F5F2] border-2 border-[#14141A] border-r-0 text-sm text-[#14141A] placeholder-[#14141A]/30 focus:outline-none focus:bg-white transition"
                 />
                 <button
                   type="button"
-                  className="flex-shrink-0 bg-[#8B0000] hover:bg-[#700000] text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-all active:scale-95"
+                  className="flex-shrink-0 bg-[#14141A] hover:bg-black text-white font-bold px-5 py-2.5 text-sm tracking-wide transition-all active:scale-95"
+                  style={{ fontFamily: MONO }}
                 >
-                  Notify Me
+                  NOTIFY ME
                 </button>
               </div>
             </div>
