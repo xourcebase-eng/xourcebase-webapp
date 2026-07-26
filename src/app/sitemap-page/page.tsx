@@ -1,10 +1,12 @@
 'use client';
 
 // src/app/sitemap/page.tsx
+// Reskinned to match the "Career Accelerator" design system.
 
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import {
   MapPinned,
   Home,
@@ -23,6 +25,25 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
+// ─── Design tokens ─────────────────────────────────────────────────────────────
+// paper #F5F5F2 · ink #14141A · lime #C6FF3D · coral #FF3D57 · azure #3D5AFF · gold #FFB800
+
+function useAcceleratorFonts() {
+  useEffect(() => {
+    const id = 'accelerator-fonts';
+    if (!document.getElementById(id)) {
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      link.href = 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700;800&display=swap';
+      document.head.appendChild(link);
+    }
+  }, []);
+}
+
+const DISPLAY = "'Archivo Black', sans-serif";
+const MONO    = "'Space Grotesk', sans-serif";
+
 /* ── Variants ── */
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -39,6 +60,7 @@ const CATEGORIES = [
     id: 'main',
     label: 'Main Pages',
     description: 'Core navigation across XourceBase',
+    accentBg: '#C6FF3D',
     pages: [
       { name: 'Home', path: '/', icon: Home, desc: 'Landing page & highlights' },
       { name: 'About Us', path: '/about-us', icon: Info, desc: 'Our story and mission' },
@@ -51,6 +73,7 @@ const CATEGORIES = [
     id: 'resources',
     label: 'Resources',
     description: 'Tools and support for learners',
+    accentBg: '#3D5AFF',
     pages: [
       { name: 'Blog', path: '/blog', icon: BookOpen, desc: 'Articles, tips & insights' },
       { name: 'Help & Support', path: '/help-support', icon: LifeBuoy, desc: 'FAQs and assistance' },
@@ -61,6 +84,7 @@ const CATEGORIES = [
     id: 'company',
     label: 'Company',
     description: 'Legal, business, and careers',
+    accentBg: '#FF3D57',
     pages: [
       { name: 'Careers', path: '/careers', icon: Briefcase, desc: 'Join our growing team' },
       { name: 'XourceBase for Business', path: '/xourcebase-business', icon: Building2, desc: 'Team & enterprise plans' },
@@ -71,25 +95,30 @@ const CATEGORIES = [
 ];
 
 export default function SitemapPage() {
+  useAcceleratorFonts();
+
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 antialiased">
+    <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F5F2] text-[#14141A] antialiased">
 
       {/* ── Hero ── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-14 lg:py-18">
+      <div className="relative overflow-hidden bg-[#14141A] text-white border-b-2 border-[#14141A]">
+        <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-white/10 hidden md:block" />
+        <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-white/10 hidden md:block" />
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl py-14 lg:py-18 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="inline-flex items-center gap-2 bg-red-50 text-[#8B0000] border border-red-100 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5">
+            <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] bg-[#C6FF3D] text-[#14141A] px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>
               <MapPinned className="w-3.5 h-3.5" />
               Navigation
             </div>
-            <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-3">
-              Sitemap
+            <h1 className="text-3xl md:text-5xl mb-3" style={{ fontFamily: DISPLAY }}>
+              SITEMAP
             </h1>
-            <p className="text-gray-500 text-sm md:text-base max-w-xl leading-relaxed">
+            <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed">
               A complete overview of every page on XourceBase — find exactly what you're looking for, fast.
             </p>
           </motion.div>
@@ -108,12 +137,14 @@ export default function SitemapPage() {
               whileInView="visible"
               variants={fadeUp}
               viewport={{ once: true }}
-              className="bg-white rounded-3xl border border-gray-100 shadow-sm p-7 scroll-mt-24"
+              className="relative bg-white border-2 border-[#14141A] p-7 scroll-mt-24 overflow-hidden"
             >
+              <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: cat.accentBg }} />
+
               {/* Category header */}
               <div className="mb-6">
-                <h2 className="text-lg font-extrabold text-gray-900">{cat.label}</h2>
-                <p className="text-xs text-gray-400 mt-0.5">{cat.description}</p>
+                <h2 className="text-lg font-extrabold text-[#14141A]" style={{ fontFamily: MONO }}>{cat.label.toUpperCase()}</h2>
+                <p className="text-xs text-[#14141A]/50 mt-0.5">{cat.description}</p>
               </div>
 
               {/* Page links grid */}
@@ -122,23 +153,23 @@ export default function SitemapPage() {
                   <Link
                     key={path}
                     href={path}
-                    className="group flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-red-200 hover:bg-red-50 transition-all duration-200"
+                    className="group flex items-center gap-3 p-4 bg-[#F5F5F2] border-2 border-[#14141A]/10 hover:border-[#14141A] transition-all duration-200"
                   >
                     {/* Icon */}
-                    <div className="w-8 h-8 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm group-hover:bg-red-50 transition-colors">
-                      <Icon className="w-4 h-4 text-[#8B0000]" />
+                    <div className="w-8 h-8 border-2 border-[#14141A]/20 group-hover:border-[#14141A] flex items-center justify-center flex-shrink-0 bg-white transition-colors">
+                      <Icon className="w-4 h-4 text-[#14141A]" />
                     </div>
 
                     {/* Text */}
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-gray-800 group-hover:text-[#8B0000] transition-colors truncate">
+                      <p className="text-sm font-bold text-[#14141A] truncate">
                         {name}
                       </p>
-                      <p className="text-xs text-gray-400 truncate">{desc}</p>
+                      <p className="text-xs text-[#14141A]/50 truncate">{desc}</p>
                     </div>
 
                     {/* Arrow */}
-                    <ChevronRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-[#8B0000] flex-shrink-0 transition-colors -translate-x-1 group-hover:translate-x-0 duration-200" />
+                    <ChevronRight className="w-3.5 h-3.5 text-[#14141A]/30 group-hover:text-[#14141A] flex-shrink-0 transition-colors -translate-x-1 group-hover:translate-x-0 duration-200" />
                   </Link>
                 ))}
               </div>
@@ -153,11 +184,11 @@ export default function SitemapPage() {
           whileInView="visible"
           variants={fadeUp}
           viewport={{ once: true }}
-          className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-3xl border border-gray-100 shadow-sm px-7 py-5"
+          className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white border-2 border-[#14141A] px-7 py-5"
         >
           <div>
-            <p className="text-sm font-bold text-gray-800">Looking for the XML sitemap?</p>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-sm font-bold text-[#14141A]">Looking for the XML sitemap?</p>
+            <p className="text-xs text-[#14141A]/50 mt-0.5">
               For search engines and crawlers — available at the link below.
             </p>
           </div>
@@ -165,15 +196,16 @@ export default function SitemapPage() {
             href="/sitemap.xml"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#8B0000] text-white text-xs font-bold rounded-xl hover:bg-[#6d0000] active:scale-95 transition-all flex-shrink-0"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#14141A] text-white text-xs font-bold tracking-wide hover:bg-black active:scale-95 transition-all flex-shrink-0"
+            style={{ fontFamily: MONO }}
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            sitemap.xml
+            SITEMAP.XML
           </a>
         </motion.div>
 
         {/* Bottom note */}
-        <p className="text-center text-xs text-gray-400 pt-8">
+        <p className="text-center text-xs text-[#14141A]/40 pt-8">
           © {new Date().getFullYear()} XourceBase, Inc. · Mumbai, India
         </p>
       </div>

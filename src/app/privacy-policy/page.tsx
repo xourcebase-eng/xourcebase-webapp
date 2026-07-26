@@ -184,8 +184,8 @@ export default function PrivacyPolicyPage() {
                   {s.isContact && (
                     <div className="mt-6 p-6 border border-[#14141A] bg-[#F5F5F2]">
                       <p className="font-bold mb-1">Privacy Team</p>
-                      <a href="mailto:privacy@xourcebase.com" className="text-[#FF3D57] hover:underline">
-                        privacy@xourcebase.com
+                      <a href="mailto:contact@xourcebase.com" className="text-[#FF3D57] hover:underline">
+                        contact@xourcebase.com
                       </a>
                     </div>
                   )}

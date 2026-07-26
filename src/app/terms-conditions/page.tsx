@@ -183,8 +183,8 @@ export default function TermsAndConditionsPage() {
                   {s.contact && (
                     <div className="mt-6 p-6 border border-[#14141A] bg-[#F5F5F2]">
                       <p className="font-bold">Email</p>
-                      <a href="mailto:legal@xourcebase.com" className="text-[#FF3D57] hover:underline">
-                        legal@xourcebase.com
+                      <a href="mailto:contact@xourcebase.com" className="text-[#FF3D57] hover:underline">
+                        contact@xourcebase.com
                       </a>
                     </div>
                   )}

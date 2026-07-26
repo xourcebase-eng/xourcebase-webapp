@@ -4,6 +4,15 @@
 // Same "Career Accelerator" visual system as /workshops and /trainings.
 // Signature element: a "Direct Lines" signal panel — a color-coded list of
 // contact channels, echoing the Session Board's list format from /workshops.
+//
+// Mobile-responsiveness pass:
+// - Hero headline switched from a raw `vw` unit to fixed breakpoint sizes
+//   (matches the pattern used on the other Career Accelerator pages) so it
+//   can no longer out-grow its line-box and get clipped by the section's
+//   `overflow-hidden`.
+// - Social icon grid now starts at 3 columns on phones and only goes to 5
+//   once there's room, so labels aren't squeezed into invisibility.
+// - Contact values wrap instead of silently truncating on narrow screens.
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -106,7 +115,7 @@ function Field({
       </label>
       {children}
       {error
-        ? <p className="mt-1.5 text-xs text-[#FF3D57] font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3" />{error}</p>
+        ? <p className="mt-1.5 text-xs text-[#FF3D57] font-semibold flex items-center gap-1"><AlertCircle className="w-3 h-3 flex-shrink-0" />{error}</p>
         : hint
         ? <p className="mt-1.5 text-xs text-[#14141A]/40">{hint}</p>
         : null}
@@ -137,11 +146,14 @@ function DirectLines() {
             >
               <Icon className="w-4 h-4" />
             </div>
-            <div className="min-w-0">
+            {/* min-w-0 lets this column shrink properly inside the flex row;
+                whitespace-normal + break-words replaces the old truncate so
+                the full value wraps onto a second line instead of vanishing. */}
+            <div className="min-w-0 flex-1">
               <p className="text-[10px] font-bold tracking-widest text-[#14141A]/40" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 {item.label}
               </p>
-              <p className="text-sm font-bold text-[#14141A] truncate">{item.value}</p>
+              <p className="text-sm font-bold text-[#14141A] break-words">{item.value}</p>
             </div>
           </>
         );
@@ -221,12 +233,12 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[#F5F5F2] text-[#14141A] antialiased" style={{ fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden pt-20 pb-14 lg:pt-24 lg:pb-16 px-6">
+      <section className="relative overflow-hidden pt-20 pb-14 lg:pt-24 lg:pb-16 px-4 sm:px-6">
         <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-[#14141A]/15 hidden md:block" />
         <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-[#14141A]/15 hidden md:block" />
 
         <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 
             {/* Left: copy */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -236,12 +248,19 @@ export default function ContactPage() {
               >
                 Get In Touch
               </span>
+              {/*
+                Fixed-breakpoint sizes instead of `text-[11vw]`. The old vw-based
+                size scaled unpredictably on phones and, combined with the tight
+                leading and the section's `overflow-hidden`, could clip the tops
+                and bottoms of letters — the "text not visible" issue on mobile.
+                `leading-[1.05]` gives just enough room for ascenders/descenders.
+              */}
               <h1
-                className="text-[11vw] sm:text-5xl md:text-6xl leading-[0.95] text-[#14141A] mb-6"
+                className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-[#14141A] mb-6 break-words"
                 style={{ fontFamily: "'Archivo Black', sans-serif" }}
               >
-                LET'S START A<br />
-                <span className="bg-[#C6FF3D] px-2">CONVERSATION</span>
+                LET&apos;S START A<br />
+                <span className="inline-block bg-[#C6FF3D] px-2">CONVERSATION</span>
               </h1>
               <p className="text-base md:text-lg text-[#14141A]/60 max-w-lg">
                 Have questions about our workshops, trainings, or partnerships? We'd love to hear from you — and we respond within 24 business hours.
@@ -265,7 +284,7 @@ export default function ContactPage() {
             className="lg:col-span-3"
             initial="hidden" animate="visible" variants={slideIn}
           >
-            <div className="bg-white border-2 border-[#14141A] p-7 sm:p-10">
+            <div className="bg-white border-2 border-[#14141A] p-5 sm:p-7 md:p-10">
               <h2 className="text-xl mb-1" style={{ fontFamily: "'Archivo Black', sans-serif" }}>SEND US A MESSAGE</h2>
               <p className="text-sm text-[#14141A]/40 mb-8">All fields marked with * are required.</p>
 
@@ -290,7 +309,7 @@ export default function ContactPage() {
                   <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Something went wrong.</p>
-                    <p className="mt-0.5">Please try again or email us directly at contact@xourcebase.com</p>
+                    <p className="mt-0.5 break-words">Please try again or email us directly at contact@xourcebase.com</p>
                   </div>
                 </motion.div>
               )}
@@ -381,10 +400,17 @@ export default function ContactPage() {
           >
 
             {/* Follow us */}
-            <div className="bg-white border-2 border-[#14141A] p-7">
+            <div className="bg-white border-2 border-[#14141A] p-5 sm:p-7">
               <h3 className="text-base mb-1" style={{ fontFamily: "'Archivo Black', sans-serif" }}>FOLLOW US</h3>
               <p className="text-xs text-[#14141A]/40 mb-5">Stay updated on workshops and announcements.</p>
-              <div className="grid grid-cols-5 gap-2">
+              {/*
+                Was a flat `grid-cols-5` at every width. On a ~375px phone that
+                gives each icon+label column only ~65px, and labels like
+                "INSTAGRAM" at tracking-wide simply don't fit — they'd overflow
+                or get crushed, reading as "missing" text. Starting at 3 columns
+                on phones and expanding to 5 once there's room fixes this.
+              */}
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {SOCIALS.map(({ icon: Icon, url, label }) => (
                   <motion.a
                     key={label}
@@ -394,10 +420,10 @@ export default function ContactPage() {
                     aria-label={label}
                     whileHover={{ y: -3 }}
                     whileTap={{ scale: 0.93 }}
-                    className="flex flex-col items-center gap-1.5 p-3 border-2 border-[#14141A]/15 hover:border-[#14141A] hover:bg-[#F5F5F2] transition-all group"
+                    className="flex flex-col items-center gap-1.5 p-2.5 sm:p-3 border-2 border-[#14141A]/15 hover:border-[#14141A] hover:bg-[#F5F5F2] transition-all group"
                   >
-                    <Icon className="w-5 h-5 text-[#14141A]/60 group-hover:text-[#14141A] transition-colors" />
-                    <span className="text-[9px] text-[#14141A]/40 group-hover:text-[#14141A] font-bold tracking-wide transition-colors leading-none">
+                    <Icon className="w-5 h-5 text-[#14141A]/60 group-hover:text-[#14141A] transition-colors flex-shrink-0" />
+                    <span className="text-[8px] sm:text-[9px] text-[#14141A]/40 group-hover:text-[#14141A] font-bold tracking-wide transition-colors leading-none text-center break-words">
                       {label.toUpperCase()}
                     </span>
                   </motion.a>
@@ -406,12 +432,12 @@ export default function ContactPage() {
             </div>
 
             {/* Quick note */}
-            <div className="bg-[#14141A] p-7 relative overflow-hidden">
+            <div className="bg-[#14141A] p-5 sm:p-7 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2" style={{ background: '#C6FF3D' }} />
               <p className="text-[#C6FF3D] text-[11px] font-bold uppercase tracking-widest mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Quick Note
               </p>
-              <p className="text-white text-sm leading-relaxed">
+              <p className="text-white text-sm leading-relaxed break-words">
                 For urgent workshop registrations, WhatsApp us directly at{' '}
                 <a
                   href="https://wa.me/918767765307"
