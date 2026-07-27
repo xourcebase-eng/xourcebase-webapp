@@ -2,6 +2,18 @@
 
 // src/app/workshops/introduction-to-git-and-github/page.tsx
 // Reskinned to match the "Career Accelerator" design system (trainings/page.tsx, homepage page.tsx).
+//
+// Mobile-hardening pass (this file already avoided the main vw+overflow-hidden
+// clipping bug found on other pages — headline already used fixed breakpoint
+// sizes). Remaining small fixes:
+// - Section padding standardized to px-4 sm:px-6 (was flat px-6) so content
+//   doesn't sit flush against the edge on narrow phones.
+// - Meta stat grid (DATE/TIME/DURATION/PRICE) given tighter mobile padding
+//   and smaller mobile text so values don't awkwardly wrap in a small box.
+// - Countdown strip in the modal now allows wrapping instead of squeezing
+//   "SEATS CONFIRM ON A FIRST-COME BASIS" + timer into one tight row.
+// - Modal's Role/Experience row stacks on the smallest screens instead of
+//   staying 2-column at every width.
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
@@ -95,28 +107,28 @@ function TerminalDemo() {
   const current = TERMINAL_LINES[lineIdx];
 
   return (
-    <div className="bg-[#14141A] border-2 border-[#14141A] overflow-hidden font-mono text-[13px] leading-relaxed">
+    <div className="bg-[#14141A] border-2 border-[#14141A] overflow-hidden font-mono text-[12px] sm:text-[13px] leading-relaxed">
       <div className="flex items-center gap-1.5 px-4 py-3 border-b-2 border-white/10">
-        <span className="w-2.5 h-2.5 bg-[#FF3D57]" />
-        <span className="w-2.5 h-2.5 bg-[#FFB800]" />
-        <span className="w-2.5 h-2.5 bg-[#C6FF3D]" />
-        <span className="ml-3 text-white/40 text-xs" style={{ fontFamily: MONO }}>bash — git-workshop</span>
+        <span className="w-2.5 h-2.5 bg-[#FF3D57] flex-shrink-0" />
+        <span className="w-2.5 h-2.5 bg-[#FFB800] flex-shrink-0" />
+        <span className="w-2.5 h-2.5 bg-[#C6FF3D] flex-shrink-0" />
+        <span className="ml-3 text-white/40 text-xs truncate" style={{ fontFamily: MONO }}>bash — git-workshop</span>
       </div>
-      <div className="p-5 min-h-[220px] text-white/90">
+      <div className="p-4 sm:p-5 min-h-[220px] text-white/90 break-words">
         {done.map((l, i) => (
           <div key={i} className="mb-2">
-            <p><span className="text-[#C6FF3D]">➜ </span><span className="text-[#3D5AFF]">~/project</span> <span className="text-white/90">git {l.prompt.replace(/^git /, '')}</span></p>
-            {l.output && <p className="text-white/40 pl-4">{l.output}</p>}
+            <p className="break-words"><span className="text-[#C6FF3D]">➜ </span><span className="text-[#3D5AFF]">~/project</span> <span className="text-white/90">git {l.prompt.replace(/^git /, '')}</span></p>
+            {l.output && <p className="text-white/40 pl-4 break-words">{l.output}</p>}
           </div>
         ))}
-        <p>
+        <p className="break-words">
           <span className="text-[#C6FF3D]">➜ </span>
           <span className="text-[#3D5AFF]">~/project</span>{' '}
           <span className="text-white/90">git {current.prompt.replace(/^git /, '').slice(0, Math.max(0, charIdx))}</span>
           <span className="inline-block w-[7px] h-[15px] bg-[#C6FF3D] align-middle ml-0.5 animate-pulse" />
         </p>
         {showOutput && current.output && (
-          <p className="text-white/40 pl-4 mt-1">{current.output}</p>
+          <p className="text-white/40 pl-4 mt-1 break-words">{current.output}</p>
         )}
       </div>
     </div>
@@ -309,51 +321,56 @@ export default function IntroToGitGithubPage() {
     <div style={{ fontFamily: "'Inter', sans-serif" }} className="text-[#14141A] antialiased">
 
       {/* ── Back ── */}
-      <div className="bg-[#F5F5F2] border-b-2 border-[#14141A] px-6 py-4">
+      <div className="bg-[#F5F5F2] border-b-2 border-[#14141A] px-4 sm:px-6 py-4">
         <div className="container mx-auto max-w-6xl">
           <Link href="/workshops" className="inline-flex items-center gap-2 text-sm font-bold tracking-wide text-[#14141A] hover:text-[#14141A]/70 transition-colors group" style={{ fontFamily: MONO }}>
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform flex-shrink-0" />
             BACK TO WORKSHOPS
           </Link>
         </div>
       </div>
 
       {/* ── Hero ── */}
-      <section className="relative bg-[#14141A] text-white py-20 lg:py-28 overflow-hidden">
+      <section className="relative bg-[#14141A] text-white py-16 sm:py-20 lg:py-28 overflow-hidden">
         <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-white/10 hidden md:block" />
         <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-white/10 hidden md:block" />
 
-        <div className="container mx-auto px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 items-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
 
             {/* Left: copy */}
             <div>
               <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
                 <span className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] text-[11px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#14141A] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#14141A] animate-pulse flex-shrink-0" />
                   Free Live Workshop
                 </span>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[0.98] mb-5" style={{ fontFamily: DISPLAY }}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5 break-words" style={{ fontFamily: DISPLAY }}>
                   INTRODUCTION TO<br />
-                  <span className="bg-[#3D5AFF] px-2">GIT &amp; GITHUB</span>
+                  <span className="inline-block bg-[#3D5AFF] px-2">GIT &amp; GITHUB</span>
                 </h1>
-                <p className="text-lg text-white/70 mb-10 max-w-lg">
-                  Go from your first <code className="text-[#C6FF3D] font-mono text-base">git init</code> to opening real pull requests — a hands-on, beginner-friendly session on how teams actually ship code.
+                <p className="text-base sm:text-lg text-white/70 mb-10 max-w-lg break-words">
+                  Go from your first <code className="text-[#C6FF3D] font-mono text-sm sm:text-base">git init</code> to opening real pull requests — a hands-on, beginner-friendly session on how teams actually ship code.
                 </p>
               </motion.div>
 
-              <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+              {/*
+                Meta stat grid — tightened for mobile: smaller padding, smaller
+                text at the base breakpoint, so "10:00 AM IST" etc. sit on one
+                line instead of awkwardly wrapping inside a cramped 2-column box.
+              */}
+              <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-10">
                 {[
                   { icon: <Calendar className="w-4 h-4" />, label: 'DATE',     value: 'MAY 18, 2025' },
                   { icon: <Clock className="w-4 h-4" />,    label: 'TIME',     value: '10:00 AM IST' },
                   { icon: <Users className="w-4 h-4" />,    label: 'DURATION', value: '3 HOURS' },
                   { icon: <Award className="w-4 h-4" />,    label: 'PRICE',    value: 'FREE', highlight: true },
                 ].map((m, i) => (
-                  <motion.div key={i} variants={fadeUp} className="flex items-center gap-3 bg-white/5 px-3 py-3 border-2 border-white/10">
-                    <div className="text-[#C6FF3D]">{m.icon}</div>
-                    <div>
-                      <p className="text-[10px] text-white/50 font-bold tracking-widest" style={{ fontFamily: MONO }}>{m.label}</p>
-                      <p className={`text-sm font-bold ${m.highlight ? 'text-[#C6FF3D]' : 'text-white'}`} style={{ fontFamily: MONO }}>{m.value}</p>
+                  <motion.div key={i} variants={fadeUp} className="flex items-center gap-2 sm:gap-3 bg-white/5 px-2.5 sm:px-3 py-2.5 sm:py-3 border-2 border-white/10 min-w-0">
+                    <div className="text-[#C6FF3D] flex-shrink-0">{m.icon}</div>
+                    <div className="min-w-0">
+                      <p className="text-[9px] sm:text-[10px] text-white/50 font-bold tracking-widest truncate" style={{ fontFamily: MONO }}>{m.label}</p>
+                      <p className={`text-xs sm:text-sm font-bold truncate ${m.highlight ? 'text-[#C6FF3D]' : 'text-white'}`} style={{ fontFamily: MONO }}>{m.value}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -361,9 +378,9 @@ export default function IntroToGitGithubPage() {
 
               <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
                 <button type="button" onClick={openModal}
-                  className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] font-bold text-sm tracking-wide px-8 py-4 hover:brightness-95 active:scale-[0.97] transition-all"
+                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold text-sm tracking-wide px-8 py-4 hover:brightness-95 active:scale-[0.97] transition-all"
                   style={{ fontFamily: MONO }}>
-                  <GitCommit className="w-4 h-4" />
+                  <GitCommit className="w-4 h-4 flex-shrink-0" />
                   RESERVE MY FREE SPOT
                 </button>
               </motion.div>
@@ -372,7 +389,7 @@ export default function IntroToGitGithubPage() {
             {/* Right: signature — mission console terminal + branch graph */}
             <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="space-y-5">
               <TerminalDemo />
-              <div className="bg-white border-2 border-[#14141A] px-5 py-4">
+              <div className="bg-white border-2 border-[#14141A] px-4 sm:px-5 py-4">
                 <p className="text-xs text-[#14141A]/50 font-bold tracking-wide mb-2" style={{ fontFamily: MONO }}>FEATURE BRANCH → MERGED TO MAIN</p>
                 <BranchGraph />
               </div>
@@ -382,11 +399,11 @@ export default function IntroToGitGithubPage() {
       </section>
 
       {/* ── What You'll Learn ── */}
-      <section className="py-20 px-6 bg-[#F5F5F2]">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-[#F5F5F2]">
         <div className="container mx-auto max-w-5xl">
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="text-center mb-12">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#C6FF3D] text-[#14141A] px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>Curriculum</span>
-            <h2 className="text-3xl md:text-4xl text-[#14141A]" style={{ fontFamily: DISPLAY }}>WHAT YOU WILL LEARN</h2>
+            <h2 className="text-3xl md:text-4xl text-[#14141A] break-words" style={{ fontFamily: DISPLAY }}>WHAT YOU WILL LEARN</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid md:grid-cols-2 gap-4">
             {topics.map((item, i) => (
@@ -394,7 +411,7 @@ export default function IntroToGitGithubPage() {
                 <div className="w-9 h-9 flex-shrink-0 bg-[#14141A] text-white flex items-center justify-center font-bold text-xs" style={{ fontFamily: MONO }}>
                   {String(i + 1).padStart(2, '0')}
                 </div>
-                <p className="text-[#14141A] font-medium">{item}</p>
+                <p className="text-[#14141A] font-medium min-w-0 break-words">{item}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -402,21 +419,21 @@ export default function IntroToGitGithubPage() {
       </section>
 
       {/* ── Workshop Includes ── */}
-      <section className="py-20 px-6 bg-white border-y-2 border-[#14141A]">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-white border-y-2 border-[#14141A]">
         <div className="container mx-auto max-w-5xl">
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="text-center mb-12">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>What's Included</span>
-            <h2 className="text-3xl md:text-4xl text-[#14141A]" style={{ fontFamily: DISPLAY }}>EVERYTHING YOU GET — FOR FREE</h2>
+            <h2 className="text-3xl md:text-4xl text-[#14141A] break-words" style={{ fontFamily: DISPLAY }}>EVERYTHING YOU GET — FOR FREE</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {includes.map((item, i) => (
-              <motion.div key={i} variants={fadeUp} whileHover={{ y: -4 }} className="relative bg-[#F5F5F2] p-7 border-2 border-[#14141A] overflow-hidden transition-all">
+              <motion.div key={i} variants={fadeUp} whileHover={{ y: -4 }} className="relative bg-[#F5F5F2] p-6 sm:p-7 border-2 border-[#14141A] overflow-hidden transition-all">
                 <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: item.accentBg }} />
                 <div className="w-11 h-11 border-2 border-[#14141A] flex items-center justify-center mb-4" style={{ background: item.accentBg }}>
                   {item.icon}
                 </div>
-                <h3 className="font-extrabold text-[#14141A] text-lg mb-1" style={{ fontFamily: MONO }}>{item.title}</h3>
-                <p className="text-[#14141A]/60 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="font-extrabold text-[#14141A] text-lg mb-1 break-words" style={{ fontFamily: MONO }}>{item.title}</h3>
+                <p className="text-[#14141A]/60 text-sm leading-relaxed break-words">{item.desc}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -424,26 +441,26 @@ export default function IntroToGitGithubPage() {
       </section>
 
       {/* ── Instructor ── */}
-      <section className="py-20 px-6 bg-[#F5F5F2]">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-[#F5F5F2]">
         <div className="container mx-auto max-w-4xl">
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="text-center mb-12">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#3D5AFF] text-white px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>Your Guide</span>
             <h2 className="text-3xl md:text-4xl text-[#14141A]" style={{ fontFamily: DISPLAY }}>MEET YOUR INSTRUCTOR</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
-            <div className="relative bg-white border-2 border-[#14141A] p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
+            <div className="relative bg-white border-2 border-[#14141A] p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center gap-6 sm:gap-8 overflow-hidden">
               <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#C6FF3D]" />
-              <div className="w-28 h-28 flex-shrink-0 border-2 border-[#14141A] flex items-center justify-center text-[#14141A] text-3xl font-extrabold" style={{ background: '#C6FF3D', fontFamily: MONO }}>
+              <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 border-2 border-[#14141A] flex items-center justify-center text-[#14141A] text-2xl sm:text-3xl font-extrabold" style={{ background: '#C6FF3D', fontFamily: MONO }}>
                 RS
               </div>
-              <div>
-                <h3 className="text-2xl font-extrabold text-[#14141A] mb-1" style={{ fontFamily: DISPLAY }}>RAHUL SHARMA</h3>
+              <div className="min-w-0 text-center md:text-left">
+                <h3 className="text-2xl font-extrabold text-[#14141A] mb-1 break-words" style={{ fontFamily: DISPLAY }}>RAHUL SHARMA</h3>
                 <p className="text-[#14141A]/70 font-bold text-sm mb-2" style={{ fontFamily: MONO }}>Senior Software Engineer at Infosys</p>
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#FFB800] text-[#FFB800]" />)}
+                <div className="flex items-center justify-center md:justify-start gap-1 mb-4 flex-wrap">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#FFB800] text-[#FFB800] flex-shrink-0" />)}
                   <span className="text-sm text-[#14141A]/50 ml-1 font-semibold">4.9 · 600+ students trained</span>
                 </div>
-                <p className="text-[#14141A]/70 leading-relaxed text-sm">
+                <p className="text-[#14141A]/70 leading-relaxed text-sm break-words">
                   Rahul has spent years reviewing pull requests and mentoring new engineers on real production
                   codebases. He built this session around the mistakes he sees beginners make most often —
                   and how to avoid them from day one.
@@ -455,7 +472,7 @@ export default function IntroToGitGithubPage() {
       </section>
 
       {/* ── FAQ ── */}
-      <section className="py-20 px-6 bg-white border-t-2 border-[#14141A]">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-white border-t-2 border-[#14141A]">
         <div className="container mx-auto max-w-3xl">
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="text-center mb-12">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FFB800] text-[#14141A] px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>FAQ</span>
@@ -463,11 +480,12 @@ export default function IntroToGitGithubPage() {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="space-y-4">
             {faqs.map(([q, a], i) => (
-              <motion.div key={i} variants={fadeUp} className="bg-[#F5F5F2] border-2 border-[#14141A]/15 hover:border-[#14141A] p-7 transition-colors">
+              <motion.div key={i} variants={fadeUp} className="bg-[#F5F5F2] border-2 border-[#14141A]/15 hover:border-[#14141A] p-5 sm:p-7 transition-colors">
                 <h4 className="font-extrabold text-[#14141A] text-base mb-2 flex items-start gap-3">
-                  <span className="text-[#FF3D57] font-extrabold flex-shrink-0" style={{ fontFamily: MONO }}>Q.</span> {q}
+                  <span className="text-[#FF3D57] font-extrabold flex-shrink-0" style={{ fontFamily: MONO }}>Q.</span>
+                  <span className="min-w-0 break-words">{q}</span>
                 </h4>
-                <p className="text-[#14141A]/60 text-sm leading-relaxed pl-6">{a}</p>
+                <p className="text-[#14141A]/60 text-sm leading-relaxed pl-6 break-words">{a}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -475,17 +493,17 @@ export default function IntroToGitGithubPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="py-20 px-6 bg-[#14141A] text-white text-center relative overflow-hidden">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-[#14141A] text-white text-center relative overflow-hidden">
         <div className="absolute top-10 right-10 w-24 h-24 border-t-2 border-r-2 border-white/10 hidden md:block" />
         <div className="absolute bottom-10 left-10 w-24 h-24 border-b-2 border-l-2 border-white/10 hidden md:block" />
         <div className="relative z-10 max-w-xl mx-auto">
           <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>Limited Seats</span>
-          <h2 className="text-3xl md:text-4xl text-white mb-4" style={{ fontFamily: DISPLAY }}>READY TO COMMIT TO LEARNING GIT?</h2>
+          <h2 className="text-3xl md:text-4xl text-white mb-4 break-words" style={{ fontFamily: DISPLAY }}>READY TO COMMIT TO LEARNING GIT?</h2>
           <p className="text-white/60 mb-8">Join hundreds of learners who picked up Git &amp; GitHub in a single afternoon.</p>
           <button type="button" onClick={openModal}
-            className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
             style={{ fontFamily: MONO }}>
-            <GitPullRequest className="w-4 h-4" />
+            <GitPullRequest className="w-4 h-4 flex-shrink-0" />
             REGISTER FREE FOR THE WORKSHOP
           </button>
         </div>
@@ -511,29 +529,34 @@ export default function IntroToGitGithubPage() {
               {!submitted ? (
                 <>
                   {/* ── Modal header ── */}
-                  <div className="sticky top-0 bg-white z-10 flex justify-between items-center border-b-2 border-[#14141A] px-6 py-5">
-                    <div>
-                      <h3 className="text-xl font-extrabold text-[#14141A]" style={{ fontFamily: DISPLAY }}>REGISTER FOR WORKSHOP</h3>
-                      <p className="text-xs text-[#14141A]/50 mt-0.5 font-semibold">Introduction to Git &amp; GitHub · May 18, 2025</p>
+                  <div className="sticky top-0 bg-white z-10 flex justify-between items-start gap-3 border-b-2 border-[#14141A] px-5 sm:px-6 py-5">
+                    <div className="min-w-0">
+                      <h3 className="text-lg sm:text-xl font-extrabold text-[#14141A] break-words" style={{ fontFamily: DISPLAY }}>REGISTER FOR WORKSHOP</h3>
+                      <p className="text-xs text-[#14141A]/50 mt-0.5 font-semibold break-words">Introduction to Git &amp; GitHub · May 18, 2025</p>
                     </div>
                     <button type="button" onClick={closeModal}
-                      className="w-8 h-8 flex items-center justify-center border-2 border-[#14141A]/20 text-[#14141A]/60 hover:text-[#14141A] hover:border-[#14141A] transition-colors">
+                      className="w-8 h-8 flex items-center justify-center border-2 border-[#14141A]/20 text-[#14141A]/60 hover:text-[#14141A] hover:border-[#14141A] transition-colors flex-shrink-0">
                       <X className="w-5 h-5" />
                     </button>
                   </div>
 
-                  {/* ── Countdown strip ── */}
-                  <div className="bg-[#C6FF3D] border-b-2 border-[#14141A] px-6 py-3 flex items-center justify-between">
+                  {/*
+                    Countdown strip — was a single `justify-between` row where
+                    the long label and the timer could get squeezed together
+                    on a ~320px phone. `flex-wrap` lets it drop to two lines
+                    instead of crowding.
+                  */}
+                  <div className="bg-[#C6FF3D] border-b-2 border-[#14141A] px-5 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs text-[#14141A] font-bold flex items-center gap-1.5" style={{ fontFamily: MONO }}>
-                      <Clock className="w-3.5 h-3.5" />
+                      <Clock className="w-3.5 h-3.5 flex-shrink-0" />
                       SEATS CONFIRM ON A FIRST-COME BASIS
                     </span>
-                    <span className="text-sm font-extrabold text-[#14141A] tabular-nums" style={{ fontFamily: MONO }}>
+                    <span className="text-sm font-extrabold text-[#14141A] tabular-nums flex-shrink-0" style={{ fontFamily: MONO }}>
                       {formatTime(timeLeft)}
                     </span>
                   </div>
 
-                  <div className="p-6 space-y-4">
+                  <div className="p-5 sm:p-6 space-y-4">
 
                     {/* Full Name */}
                     <div>
@@ -546,7 +569,7 @@ export default function IntroToGitGithubPage() {
                           errors.fullName ? 'border-[#FF3D57]' : 'border-[#14141A]/20 focus:border-[#14141A]'
                         }`}
                       />
-                      {errors.fullName && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3" />{errors.fullName}</p>}
+                      {errors.fullName && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.fullName}</p>}
                     </div>
 
                     {/* Email */}
@@ -563,7 +586,7 @@ export default function IntroToGitGithubPage() {
                           }`}
                         />
                       </div>
-                      {errors.email && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3" />{errors.email}</p>}
+                      {errors.email && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.email}</p>}
                     </div>
 
                     {/* Phone */}
@@ -577,7 +600,7 @@ export default function IntroToGitGithubPage() {
                           inputProps={{ placeholder: '98765 43210' }}
                         />
                       </div>
-                      {errors.phone && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3" />{errors.phone}</p>}
+                      {errors.phone && <p className="mt-1 text-xs text-[#FF3D57] flex items-center gap-1 font-semibold"><AlertCircle className="w-3 h-3 flex-shrink-0" />{errors.phone}</p>}
                     </div>
 
                     {/* WhatsApp */}
@@ -592,8 +615,11 @@ export default function IntroToGitGithubPage() {
                       />
                     </div>
 
-                    {/* Role + Experience row */}
-                    <div className="grid grid-cols-2 gap-4">
+                    {/*
+                      Role + Experience — stacks on the smallest phones instead
+                      of staying 2-column at every width (was `grid-cols-2`).
+                    */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-bold text-[#14141A] mb-1.5">Current Role</label>
                         <input type="text" name="currentRole"
@@ -616,7 +642,7 @@ export default function IntroToGitGithubPage() {
                     </div>
 
                     {/* Price summary */}
-                    <div className="bg-[#F5F5F2] border-2 border-[#14141A] px-5 py-4 flex items-center justify-between">
+                    <div className="bg-[#F5F5F2] border-2 border-[#14141A] px-4 sm:px-5 py-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-xs text-[#14141A]/50 font-bold tracking-wide" style={{ fontFamily: MONO }}>TOTAL DUE TODAY</p>
                         <p className="text-2xl font-extrabold text-[#14141A] mt-0.5" style={{ fontFamily: MONO }}>FREE</p>
@@ -642,7 +668,7 @@ export default function IntroToGitGithubPage() {
                         </>
                       ) : (
                         <>
-                          <GitCommit className="w-4 h-4" />
+                          <GitCommit className="w-4 h-4 flex-shrink-0" />
                           RESERVE MY FREE SPOT →
                         </>
                       )}
@@ -662,14 +688,14 @@ export default function IntroToGitGithubPage() {
                 </>
               ) : (
                 /* ── Success state ── */
-                <div className="p-10 text-center">
+                <div className="p-8 sm:p-10 text-center">
                   <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
                     <div className="w-20 h-20 mx-auto border-2 border-[#14141A] flex items-center justify-center mb-6" style={{ background: '#C6FF3D' }}>
                       <CheckCircle2 className="w-10 h-10 text-[#14141A]" />
                     </div>
                   </motion.div>
                   <h3 className="text-2xl font-extrabold text-[#14141A] mb-2" style={{ fontFamily: DISPLAY }}>YOU'RE REGISTERED!</h3>
-                  <p className="text-[#14141A]/60 text-sm mb-8 leading-relaxed">
+                  <p className="text-[#14141A]/60 text-sm mb-8 leading-relaxed break-words">
                     Check your inbox at <span className="font-bold text-[#14141A]">{form.email}</span> for a confirmation email with the joining link and pre-read resources.
                   </p>
                   <button onClick={closeModal}

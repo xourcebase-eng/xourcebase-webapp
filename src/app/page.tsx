@@ -2,6 +2,15 @@
 
 // src/app/page.tsx
 // Reskinned to match trainings/page.tsx's "Career Accelerator" design system.
+//
+// Changes in this pass:
+// 1. Removed the "VIEW PROGRAM" CTA from Upcoming Training Program cards.
+// 2. Removed descriptions from Why XourceBase / Value You Get / Interview
+//    Success System cards — title + icon only now.
+// 3. Responsiveness: the hero headline used `text-[13vw]` inside an
+//    `overflow-hidden` section, which (same as other pages in this project)
+//    could clip letters on some phone widths. Swapped to fixed breakpoint
+//    sizes with a slightly looser line-height.
 
 import { motion, useInView } from 'framer-motion';
 import Link from 'next/link';
@@ -69,8 +78,8 @@ function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: str
   );
 }
 
-// ─── Static Feature Card — "mission brief" tile ───────────────────────────────
-function StaticFeatureCard({ icon: Icon, title, desc, accentBg = '#C6FF3D' }: any) {
+// ─── Static Feature Card — "mission brief" tile (title + icon only) ──────────
+function StaticFeatureCard({ icon: Icon, title, accentBg = '#C6FF3D' }: any) {
   return (
     <motion.div
       variants={cardVariants}
@@ -80,18 +89,17 @@ function StaticFeatureCard({ icon: Icon, title, desc, accentBg = '#C6FF3D' }: an
     >
       <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ background: accentBg }} />
       <div
-        className="w-11 h-11 border-2 border-[#14141A] flex items-center justify-center mb-3 shrink-0"
+        className="w-11 h-11 border-2 border-[#14141A] flex items-center justify-center mb-4 shrink-0"
         style={{ background: accentBg }}
       >
         <Icon className="w-5 h-5 text-[#14141A]" />
       </div>
       <h3
-        className="text-[13px] font-extrabold text-[#14141A] leading-tight mb-2 px-1"
+        className="text-sm font-extrabold text-[#14141A] leading-snug px-1"
         style={{ fontFamily: MONO }}
       >
         {title.toUpperCase()}
       </h3>
-      <p className="text-[11.5px] text-[#14141A]/60 leading-relaxed px-1 line-clamp-4">{desc}</p>
     </motion.div>
   );
 }
@@ -106,114 +114,29 @@ const stats = [
 ];
 
 const whyChooseFeatures = [
-  {
-    icon: GraduationCap,
-    title: 'Industry Experts',
-    desc: 'Learn from seasoned professionals actively working in tech and communication roles.',
-    accentBg: '#C6FF3D',
-  },
-  {
-    icon: Rocket,
-    title: 'Hands-On Projects',
-    desc: 'Build real-world projects using tools like AWS, Kubernetes, and Terraform.',
-    accentBg: '#FFB800',
-  },
-  {
-    icon: HeartHandshake,
-    title: '1:1 Mentorship',
-    desc: 'Personal guidance, code reviews, and career advice from industry mentors.',
-    accentBg: '#FF3D57',
-  },
-  {
-    icon: Briefcase,
-    title: 'Career & Placement Support',
-    desc: 'Resume building, mock interviews, and dedicated placement assistance.',
-    accentBg: '#3D5AFF',
-  },
-  {
-    icon: Users,
-    title: 'Strong Learning Community',
-    desc: 'Network with peers, mentors, and alumni through an active learning community.',
-    accentBg: '#C6FF3D',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Job-Ready Outcomes',
-    desc: 'Gain practical, interview-ready skills aligned with current industry needs.',
-    accentBg: '#FFB800',
-  },
+  { icon: GraduationCap,  title: 'Industry Experts', accentBg: '#C6FF3D' },
+  { icon: Rocket,         title: 'Hands-On Projects', accentBg: '#FFB800' },
+  { icon: HeartHandshake, title: '1:1 Mentorship', accentBg: '#FF3D57' },
+  { icon: Briefcase,      title: 'Career & Placement Support', accentBg: '#3D5AFF' },
+  { icon: Users,          title: 'Strong Learning Community', accentBg: '#C6FF3D' },
+  { icon: TrendingUp,     title: 'Job-Ready Outcomes', accentBg: '#FFB800' },
 ];
 
 const valueProps = [
-  {
-    icon: ShieldCheck,
-    title: 'Real Interview Simulations',
-    desc: 'Live mocks that mirror actual company interview panels — format, pressure, and all.',
-    accentBg: '#FF3D57',
-  },
-  {
-    icon: HeartHandshake,
-    title: 'One-on-One Mentorship',
-    desc: 'Dedicated guidance from industry veterans who have been through it themselves.',
-    accentBg: '#3D5AFF',
-  },
-  {
-    icon: FileText,
-    title: 'Resume & LinkedIn Optimization',
-    desc: 'Craft profiles that pass ATS filters and get noticed by top recruiters.',
-    accentBg: '#C6FF3D',
-  },
-  {
-    icon: BarChart2,
-    title: 'Technical & Behavioral Training',
-    desc: 'Balanced prep for both coding rounds and HR/managerial interview stages.',
-    accentBg: '#FFB800',
-  },
-  {
-    icon: Map,
-    title: 'Cloud & DevOps Career Roadmaps',
-    desc: 'Personalized learning paths mapped to your target role and timeline.',
-    accentBg: '#FF3D57',
-  },
-  {
-    icon: Star,
-    title: 'Lifetime Community Access',
-    desc: 'Stay connected with alumni, ask questions, and get support long after you graduate.',
-    accentBg: '#3D5AFF',
-  },
+  { icon: ShieldCheck,    title: 'Real Interview Simulations', accentBg: '#FF3D57' },
+  { icon: HeartHandshake, title: 'One-on-One Mentorship', accentBg: '#3D5AFF' },
+  { icon: FileText,       title: 'Resume & LinkedIn Optimization', accentBg: '#C6FF3D' },
+  { icon: BarChart2,      title: 'Technical & Behavioral Training', accentBg: '#FFB800' },
+  { icon: Map,            title: 'Cloud & DevOps Career Roadmaps', accentBg: '#FF3D57' },
+  { icon: Star,           title: 'Lifetime Community Access', accentBg: '#3D5AFF' },
 ];
 
 const interviewKit = [
-  {
-    icon: Mic,
-    title: 'Mock Interviews',
-    desc: 'Real-time practice with expert feedback to simulate high-stakes interview scenarios.',
-    accentBg: '#C6FF3D',
-  },
-  {
-    icon: Brain,
-    title: 'Technical Assessments',
-    desc: 'Hands-on coding challenges and quizzes calibrated to top IT company standards.',
-    accentBg: '#FFB800',
-  },
-  {
-    icon: Lightbulb,
-    title: 'Communication Mastery',
-    desc: 'Voice modulation, storytelling, and the STAR method for impactful answers.',
-    accentBg: '#FF3D57',
-  },
-  {
-    icon: FileText,
-    title: 'Resume & Portfolio Review',
-    desc: 'Personalized critiques to make your profile ATS-friendly and recruiter-compelling.',
-    accentBg: '#3D5AFF',
-  },
-  {
-    icon: BadgeCheck,
-    title: 'Confidence Coaching',
-    desc: 'Mindset sessions to overcome anxiety and build lasting interview poise.',
-    accentBg: '#C6FF3D',
-  },
+  { icon: Mic,        title: 'Mock Interviews', accentBg: '#C6FF3D' },
+  { icon: Brain,      title: 'Technical Assessments', accentBg: '#FFB800' },
+  { icon: Lightbulb,  title: 'Communication Mastery', accentBg: '#FF3D57' },
+  { icon: FileText,   title: 'Resume & Portfolio Review', accentBg: '#3D5AFF' },
+  { icon: BadgeCheck, title: 'Confidence Coaching', accentBg: '#C6FF3D' },
 ];
 
 const testimonials = [
@@ -424,7 +347,7 @@ function SectionHeader({
       </motion.span>
       <motion.h2
         variants={fadeInUp}
-        className="text-3xl md:text-5xl text-[#14141A] mb-4"
+        className="text-3xl md:text-5xl text-[#14141A] mb-4 break-words"
         style={{ fontFamily: DISPLAY }}
       >
         {title}
@@ -479,7 +402,7 @@ function WorkshopPreviewCard({ w }: { w: (typeof upcomingWorkshops)[0] }) {
         </div>
 
         <h3
-          className="text-lg font-extrabold text-[#14141A] mb-2 leading-snug"
+          className="text-lg font-extrabold text-[#14141A] mb-2 leading-snug break-words"
           style={{ fontFamily: DISPLAY }}
         >
           {w.title.toUpperCase()}
@@ -488,12 +411,12 @@ function WorkshopPreviewCard({ w }: { w: (typeof upcomingWorkshops)[0] }) {
 
         <div className="space-y-1.5 mb-6 text-xs text-[#14141A]/60 font-semibold">
           <div className="flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5" />
-            {w.date}
+            <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="truncate">{w.date}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5" />
-            {w.time}
+            <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="truncate">{w.time}</span>
           </div>
         </div>
 
@@ -508,7 +431,7 @@ function WorkshopPreviewCard({ w }: { w: (typeof upcomingWorkshops)[0] }) {
             style={{ background: w.accentBg }}
           >
             {w.isFree ? 'REGISTER FREE' : 'REGISTER NOW'}{' '}
-            <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+            <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform flex-shrink-0" />
           </Link>
         )}
       </div>
@@ -516,7 +439,7 @@ function WorkshopPreviewCard({ w }: { w: (typeof upcomingWorkshops)[0] }) {
   );
 }
 
-// ─── Training Card — "mission brief" ticket ───────────────────────────────────
+// ─── Training Card — "mission brief" ticket (no CTA button) ──────────────────
 function TrainingPreviewCard({ t }: { t: (typeof upcomingTrainings)[0] }) {
   return (
     <motion.div
@@ -552,14 +475,14 @@ function TrainingPreviewCard({ t }: { t: (typeof upcomingTrainings)[0] }) {
         </div>
 
         <h3
-          className="text-lg font-extrabold text-[#14141A] mb-2 leading-snug"
+          className="text-lg font-extrabold text-[#14141A] mb-2 leading-snug break-words"
           style={{ fontFamily: DISPLAY }}
         >
           {t.title.toUpperCase()}
         </h3>
         <p className="text-sm text-[#14141A]/60 leading-relaxed mb-5 flex-1">{t.description}</p>
 
-        <div className="flex flex-wrap gap-1.5 mb-6">
+        <div className="flex flex-wrap gap-1.5">
           {t.topics.slice(0, 4).map((topic) => (
             <span
               key={topic}
@@ -574,16 +497,7 @@ function TrainingPreviewCard({ t }: { t: (typeof upcomingTrainings)[0] }) {
             </span>
           )}
         </div>
-
-        <div className="mt-auto">
-          <Link
-            href="/trainings"
-            className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 text-sm font-bold tracking-wide text-white bg-[#14141A] hover:bg-black transition-colors group/btn"
-          >
-            VIEW PROGRAM{' '}
-            <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-          </Link>
-        </div>
+        {/* CTA button intentionally removed — card ends after the topic tags. */}
       </div>
     </motion.div>
   );
@@ -596,7 +510,7 @@ export default function HomePage() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-[#14141A] text-white pt-24 pb-20 lg:pt-32 lg:pb-28 px-6">
+      <section className="relative overflow-hidden bg-[#14141A] text-white pt-24 pb-20 lg:pt-32 lg:pb-28 px-4 sm:px-6">
         <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-white/10 hidden md:block" />
         <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-white/10 hidden md:block" />
 
@@ -610,14 +524,20 @@ export default function HomePage() {
               Workshops & Professional Trainings
             </motion.span>
 
+            {/*
+              Fixed breakpoint sizes instead of `text-[13vw]`. On phones, a vw-based
+              size combined with tight `leading-[0.95]` inside this `overflow-hidden`
+              section could clip the tops/bottoms of letters — swapped to a safer
+              fixed scale + slightly looser leading, same visual weight.
+            */}
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] mb-6 max-w-4xl"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[1.05] mb-6 max-w-4xl break-words"
               style={{ fontFamily: DISPLAY }}
             >
               LAND HIGH-PAYING
               <br />
-              <span className="bg-[#C6FF3D] text-[#14141A] px-2">JOBS FASTER</span>
+              <span className="inline-block bg-[#C6FF3D] text-[#14141A] px-2">JOBS FASTER</span>
             </motion.h1>
 
             <motion.p variants={fadeInUp} className="text-base md:text-lg text-white/60 mb-10 max-w-xl">
@@ -651,7 +571,7 @@ export default function HomePage() {
               {['Industry Mentors', 'Real Projects', 'Placement Support', 'Limited Seats'].map(
                 (label) => (
                   <div key={label} className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#C6FF3D]" />
+                    <CheckCircle2 className="w-4 h-4 text-[#C6FF3D] flex-shrink-0" />
                     <span>{label}</span>
                   </div>
                 )
@@ -662,7 +582,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Scoreboard Stats ── */}
-      <section className="bg-[#F5F5F2] border-b-2 border-[#14141A] py-10 px-6">
+      <section className="bg-[#F5F5F2] border-b-2 border-[#14141A] py-10 px-4 sm:px-6">
         <div className="container mx-auto max-w-5xl">
           <motion.div
             initial="hidden"
@@ -672,14 +592,14 @@ export default function HomePage() {
             className="grid grid-cols-2 md:grid-cols-4 border-2 border-[#14141A] divide-x-2 md:divide-x-2 divide-y-2 md:divide-y-0 divide-[#14141A]"
           >
             {stats.map((s, i) => (
-              <motion.div key={i} variants={fadeInUp} className="flex flex-col items-center px-4 py-6">
+              <motion.div key={i} variants={fadeInUp} className="flex flex-col items-center px-2 sm:px-4 py-6">
                 <span
-                  className="text-3xl md:text-4xl font-bold text-[#14141A] leading-none"
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#14141A] leading-none"
                   style={{ fontFamily: MONO }}
                 >
                   <AnimatedCounter target={s.value} suffix={s.suffix} />
                 </span>
-                <span className="text-[10px] font-bold tracking-widest text-[#14141A]/50 mt-2">
+                <span className="text-[9px] sm:text-[10px] font-bold tracking-widest text-[#14141A]/50 mt-2 text-center">
                   {s.label}
                 </span>
               </motion.div>
@@ -689,7 +609,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Upcoming Workshops ── */}
-      <section className="py-20 px-6 bg-[#F5F5F2]">
+      <section className="py-20 px-4 sm:px-6 bg-[#F5F5F2]">
         <div className="container mx-auto max-w-7xl">
           <motion.div
             initial="hidden"
@@ -755,7 +675,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Training Programs ── */}
-      <section className="py-20 px-6 bg-white border-y-2 border-[#14141A]">
+      <section className="py-20 px-4 sm:px-6 bg-white border-y-2 border-[#14141A]">
         <div className="container mx-auto max-w-7xl">
           <motion.div
             initial="hidden"
@@ -821,7 +741,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Why Choose XourceBase ── */}
-      <section className="py-20 px-6 bg-[#F5F5F2]">
+      <section className="py-20 px-4 sm:px-6 bg-[#F5F5F2]">
         <div className="container mx-auto max-w-7xl">
           <SectionHeader
             badge="Why XourceBase"
@@ -834,7 +754,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={containerVariants}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 justify-items-center"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 justify-items-center"
           >
             {whyChooseFeatures.map((item, i) => (
               <StaticFeatureCard key={i} {...item} />
@@ -844,7 +764,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Everything You Need ── */}
-      <section className="py-20 px-6 bg-white border-y-2 border-[#14141A]">
+      <section className="py-20 px-4 sm:px-6 bg-white border-y-2 border-[#14141A]">
         <div className="container mx-auto max-w-7xl">
           <SectionHeader
             badge="Value You Get"
@@ -858,7 +778,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={containerVariants}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5 justify-items-center"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5 justify-items-center"
           >
             {valueProps.map((item, i) => (
               <StaticFeatureCard key={i} {...item} />
@@ -868,7 +788,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Interview Mastery Kit ── */}
-      <section className="py-20 px-6 bg-[#F5F5F2]">
+      <section className="py-20 px-4 sm:px-6 bg-[#F5F5F2]">
         <div className="container mx-auto max-w-7xl">
           <SectionHeader
             badge="Interview Success System"
@@ -882,7 +802,7 @@ export default function HomePage() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={containerVariants}
-            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5 justify-items-center max-w-5xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5 justify-items-center max-w-5xl mx-auto"
           >
             {interviewKit.map((item, i) => (
               <StaticFeatureCard key={i} {...item} />
@@ -892,7 +812,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Success Stories ── */}
-      <section className="py-24 px-6 bg-[#14141A] overflow-hidden relative border-y-2 border-[#14141A]">
+      <section className="py-24 px-4 sm:px-6 bg-[#14141A] overflow-hidden relative border-y-2 border-[#14141A]">
         <div className="container mx-auto max-w-7xl relative z-10">
           <motion.div
             initial="hidden"
@@ -1011,7 +931,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="relative py-24 px-6 bg-[#F5F5F2] overflow-hidden">
+      <section className="relative py-24 px-4 sm:px-6 bg-[#F5F5F2] overflow-hidden">
         <div className="absolute top-10 right-10 w-24 h-24 border-t-2 border-r-2 border-[#14141A]/15 hidden md:block" />
         <div className="absolute bottom-10 left-10 w-24 h-24 border-b-2 border-l-2 border-[#14141A]/15 hidden md:block" />
 
@@ -1031,7 +951,7 @@ export default function HomePage() {
             </motion.span>
             <motion.h2
               variants={fadeInUp}
-              className="text-3xl md:text-6xl text-[#14141A] mb-5 leading-tight"
+              className="text-3xl sm:text-5xl md:text-6xl text-[#14141A] mb-5 leading-tight break-words"
               style={{ fontFamily: DISPLAY }}
             >
               YOUR DREAM CAREER
@@ -1072,13 +992,13 @@ export default function HomePage() {
               className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-[#14141A]/50 font-semibold"
             >
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> No upfront commitment
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> No upfront commitment
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> Free workshops available
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> Free workshops available
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> Placement-guaranteed programs
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> Placement-guaranteed programs
               </span>
             </motion.div>
           </motion.div>
