@@ -36,13 +36,6 @@ const STEPS = [
   { step: '04', title: 'Launch', desc: 'Publish your first workshop and start reaching thousands of motivated learners.' },
 ];
 
-const STATS = [
-  { value: '70%', label: 'REVENUE SHARE' },
-  { value: '50K+', label: 'ACTIVE LEARNERS' },
-  { value: '4.9★', label: 'AVG RATING' },
-  { value: '₹0', label: 'JOINING FEE' },
-];
-
 export default function TeachOnXourceBasePage() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }} className="bg-[#F5F5F2] text-[#14141A]">
@@ -84,31 +77,7 @@ export default function TeachOnXourceBasePage() {
           </motion.div>
         </div>
       </section>
-
-      {/* ── Stats Scoreboard ── */}
-      <section className="py-12 px-6 bg-[#F5F5F2] border-b-2 border-[#14141A]">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-2 sm:grid-cols-4 border-2 border-[#14141A] divide-x-2 divide-[#14141A]">
-            {STATS.map((stat, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="px-6 py-8 text-center"
-              >
-                <p className="text-4xl font-bold text-[#14141A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {stat.value}
-                </p>
-                <p className="text-[11px] font-bold tracking-widest text-[#14141A]/60 mt-1 uppercase">
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       <div className="container mx-auto max-w-6xl px-6 py-16 space-y-20">
 
         {/* Why Teach + Eligibility */}

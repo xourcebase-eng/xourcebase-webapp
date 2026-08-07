@@ -107,10 +107,10 @@ function StaticFeatureCard({ icon: Icon, title, accentBg = '#C6FF3D' }: any) {
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const stats = [
-  { value: 1200, suffix: '+', label: 'STUDENTS TRAINED' },
+  { value: 50, suffix: '+', label: 'STUDENTS TRAINED' },
   { value: 94, suffix: '%', label: 'PLACEMENT RATE' },
-  { value: 40, suffix: '+', label: 'INDUSTRY MENTORS' },
-  { value: 180, suffix: '%', label: 'AVG. SALARY HIKE' },
+  { value: 10, suffix: '+', label: 'INDUSTRY MENTORS' },
+  { value: 100, suffix: '%', label: 'AVG. SALARY HIKE' },
 ];
 
 const whyChooseFeatures = [

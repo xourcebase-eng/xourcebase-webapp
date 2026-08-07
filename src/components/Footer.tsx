@@ -60,7 +60,7 @@ export default function Footer() {
             <img src={logo.src} alt="XourceBase" className="h-8 w-auto" />
           </Link>
           <p className="text-sm text-white/40 max-w-xs leading-relaxed">
-            Learn in-demand skills from expert instructors — at your own pace, on any device.
+            Learn in-demand skills from expert instructors at your own pace, on any device.
           </p>
         </div>
 

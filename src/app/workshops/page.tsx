@@ -2,20 +2,15 @@
 
 // src/app/workshops/page.tsx
 // Same "Career Accelerator" visual system as /trainings — bold, color-blocked, hard-edged.
-// Signature element here is a live "Session Board" (departure-board style) since workshops
-// are single dated events, not multi-week journeys like the trainings' Sprint Track.
 //
-// Mobile-responsiveness + filter-UX pass:
-// - Hero headline switched from `vw` units to fixed breakpoint sizes (was clipping on
-//   some phone widths because it sat inside an `overflow-hidden` section).
-// - Session Board title now has `min-w-0` so `truncate` actually works in the flex row,
-//   instead of silently overflowing and getting clipped.
-// - Card price + CTA row now stacks vertically on narrow phones instead of overflowing
-//   horizontally and being clipped by the card's `overflow-hidden` (the actual cause of
-//   "text disappearing" on small screens).
-// - Filter bar: collapses into a "Filters" toggle with an active-count badge on mobile,
-//   full inline bar returns on desktop. Added a sort control and removable active-filter
-//   chips so applied filters are visible and easy to clear.
+// This pass:
+// 1. Removed the "Session Board" (NEXT SESSIONS / LIVE SCHEDULE) hero panel entirely —
+//    the hero is now a single centered column instead of a 2-column layout.
+// 2. Full responsiveness pass across every section (hero, filter bar, cards, CTA).
+// 3. Filter bar rebuilt: category and mode are now horizontally-scrollable chip rows
+//    (no more tall vertical wrapping stacks on mobile), toggles + sort live in their
+//    own row, and the whole thing collapses behind a "Filters" button on mobile with
+//    an active-count badge. Active filters show as removable chips below the bar.
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -319,66 +314,6 @@ function useAcceleratorFonts() {
   }, []);
 }
 
-// ─── Session Board (hero signature element) ───────────────────────────────────
-
-function SessionBoard() {
-  const upcoming = workshops.slice(0, 4);
-  return (
-    <div className="border-2 border-[#14141A] bg-white">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#14141A] text-white">
-        <span
-          className="text-[11px] font-bold tracking-widest"
-          style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-        >
-          NEXT SESSIONS
-        </span>
-        <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-[#C6FF3D]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C6FF3D] animate-pulse" />
-          LIVE SCHEDULE
-        </span>
-      </div>
-      {upcoming.map((w, i) => {
-        const s = STATUS_STYLE[w.status];
-        return (
-          <motion.div
-            key={w.id}
-            initial={{ opacity: 0, x: -8 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15 + i * 0.09, duration: 0.35 }}
-            className={`flex items-center gap-3 px-4 py-3 ${
-              i !== upcoming.length - 1 ? 'border-b border-[#14141A]/10' : ''
-            }`}
-          >
-            <span
-              className="text-xs font-bold text-[#14141A]/50 w-16 sm:w-20 flex-shrink-0"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              {w.date.replace(', 2025', '').toUpperCase()}
-            </span>
-            {/* min-w-0 is required for `truncate` to work inside a flex row —
-                without it the title can silently overflow and get clipped
-                by the parent's `overflow-hidden`. */}
-            <span className="text-sm text-[#14141A] font-semibold truncate min-w-0 flex-1">
-              {w.title}
-            </span>
-            <span
-              className="text-[10px] font-bold tracking-widest px-2 py-0.5 flex-shrink-0"
-              style={{
-                background: s.bg,
-                color: s.text,
-                fontFamily: "'Space Grotesk', sans-serif",
-              }}
-            >
-              {s.label}
-            </span>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-}
-
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ModeTag({ mode }: { mode: string }) {
@@ -429,7 +364,7 @@ function WorkshopCard({ w }: { w: Workshop }) {
         </div>
       )}
 
-      <div className="pl-8 pr-7 pt-7 pb-6 flex flex-col flex-1">
+      <div className="pl-7 sm:pl-8 pr-6 sm:pr-7 pt-6 sm:pt-7 pb-6 flex flex-col flex-1">
         {/* Top row: tag + mode */}
         <div className="flex items-start justify-between gap-3 mb-5">
           <div className="flex flex-wrap items-center gap-2">
@@ -456,7 +391,7 @@ function WorkshopCard({ w }: { w: Workshop }) {
 
         {/* Title */}
         <h3
-          className="text-xl font-extrabold text-[#14141A] mb-3 leading-tight break-words"
+          className="text-lg sm:text-xl font-extrabold text-[#14141A] mb-3 leading-tight break-words"
           style={{ fontFamily: "'Archivo Black', sans-serif" }}
         >
           {w.title.toUpperCase()}
@@ -480,7 +415,7 @@ function WorkshopCard({ w }: { w: Workshop }) {
           </div>
         </div>
 
-        <p className="text-sm text-[#14141A]/70 leading-relaxed mb-5">{w.description}</p>
+        <p className="text-sm text-[#14141A]/70 leading-relaxed mb-5 break-words">{w.description}</p>
 
         {/* Expandable agenda */}
         <AnimatePresence initial={false}>
@@ -496,7 +431,7 @@ function WorkshopCard({ w }: { w: Workshop }) {
               {w.agenda.map((item) => (
                 <li key={item} className="flex items-start gap-2 text-sm text-[#14141A]/80">
                   <CheckCircle2 className="w-4 h-4 text-[#14141A] flex-shrink-0 mt-0.5" />
-                  <span className="min-w-0">{item}</span>
+                  <span className="min-w-0 break-words">{item}</span>
                 </li>
               ))}
             </motion.ul>
@@ -523,15 +458,8 @@ function WorkshopCard({ w }: { w: Workshop }) {
           </div>
         </div>
 
-        {/*
-          Price + CTA — this was the actual "text disappearing" bug.
-          It used to be a single `flex items-center justify-between` row with a
-          `whitespace-nowrap` CTA button; on phones narrower than ~360px, price
-          + button together didn't fit on one line, overflowed horizontally,
-          and got silently clipped by the card's `overflow-hidden` (needed for
-          the diagonal ribbon). Now it stacks vertically below `sm`, and the
-          CTA becomes full-width so nothing runs off the edge.
-        */}
+        {/* Price + CTA — stacks vertically below `sm` so nothing overflows the
+            card's `overflow-hidden` on narrow phones. */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-auto">
           {!isComingSoon && (
             <span
@@ -576,12 +504,47 @@ function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }
   return (
     <button
       onClick={onRemove}
-      className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide px-3 py-1.5 bg-[#14141A] text-white hover:bg-black transition-colors"
+      className="inline-flex items-center gap-1.5 text-xs font-bold tracking-wide px-3 py-1.5 bg-[#14141A] text-white hover:bg-black transition-colors flex-shrink-0"
       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
     >
       {label}
       <X className="w-3 h-3" />
     </button>
+  );
+}
+
+// ─── Scrollable chip row (category / mode) ─────────────────────────────────────
+// Horizontal scroll instead of wrap — keeps the filter bar a fixed, predictable
+// height on mobile instead of growing into a tall stack of wrapped buttons.
+
+function ChipRow<T extends string>({
+  items, active, onSelect, activeBg,
+}: {
+  items: readonly T[];
+  active: T;
+  onSelect: (v: T) => void;
+  activeBg: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 overflow-x-auto pb-1 -mb-1 scrollbar-thin">
+      {items.map((item) => {
+        const isActive = active === item;
+        return (
+          <button
+            key={item}
+            onClick={() => onSelect(item)}
+            className="text-xs font-bold tracking-wide px-3 py-1.5 border-2 border-[#14141A] transition-colors duration-150 flex-shrink-0 whitespace-nowrap"
+            style={{
+              fontFamily: "'Space Grotesk', sans-serif",
+              background: isActive ? activeBg : '#FFFFFF',
+              color: isActive ? (activeBg === '#14141A' || activeBg === '#3D5AFF' ? '#FFFFFF' : '#14141A') : '#14141A',
+            }}
+          >
+            {item.toUpperCase()}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
@@ -639,45 +602,23 @@ export default function WorkshopsPage() {
   // Reusable filter controls — rendered both in the mobile collapsible panel
   // and inline on desktop, so the logic/markup lives in one place.
   const FilterControls = () => (
-    <>
-      {/* Category */}
-      <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex flex-col gap-3">
+      {/* Category — horizontal scroll */}
+      <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-[#14141A]/40 flex-shrink-0 hidden sm:block" />
-        {WCATEGORIES.map((c) => (
-          <button
-            key={c}
-            onClick={() => setCategory(c)}
-            className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 border-[#14141A] transition-colors duration-150 ${
-              category === c ? 'bg-[#14141A] text-white' : 'bg-white text-[#14141A] hover:bg-[#14141A]/5'
-            }`}
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            {c.toUpperCase()}
-          </button>
-        ))}
+        <ChipRow items={WCATEGORIES} active={category} onSelect={setCategory} activeBg="#14141A" />
       </div>
 
-      {/* Mode */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {MODES.map((m) => (
-          <button
-            key={m}
-            onClick={() => setMode(m)}
-            className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
-              mode === m ? 'bg-[#3D5AFF] text-white border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
-            }`}
-            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-          >
-            {m.toUpperCase()}
-          </button>
-        ))}
+      {/* Mode — horizontal scroll */}
+      <div className="flex items-start gap-2 sm:pl-6">
+        <ChipRow items={MODES} active={mode} onSelect={setMode} activeBg="#3D5AFF" />
       </div>
 
       {/* Toggles + sort */}
-      <div className="flex items-center gap-2 flex-wrap">
+      <div className="flex flex-wrap items-center gap-2 sm:pl-6">
         <button
           onClick={() => setFreeOnly(!freeOnly)}
-          className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
+          className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 flex-shrink-0 ${
             freeOnly ? 'bg-[#C6FF3D] text-[#14141A] border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
           }`}
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -687,7 +628,7 @@ export default function WorkshopsPage() {
 
         <button
           onClick={() => setComingSoonOnly(!comingSoonOnly)}
-          className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 ${
+          className={`text-xs font-bold tracking-wide px-3 py-1.5 border-2 transition-colors duration-150 flex-shrink-0 ${
             comingSoonOnly ? 'bg-[#14141A] text-white border-[#14141A]' : 'bg-white text-[#14141A] border-[#14141A]/20 hover:border-[#14141A]'
           }`}
           style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -695,12 +636,12 @@ export default function WorkshopsPage() {
           COMING SOON
         </button>
 
-        <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+        <div className="flex items-center gap-1.5 flex-1 sm:flex-initial min-w-[160px]">
           <ArrowUpDown className="w-3.5 h-3.5 text-[#14141A]/40 flex-shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortBy)}
-            className="text-xs font-bold tracking-wide px-3 py-1.5 border-2 border-[#14141A]/20 hover:border-[#14141A] bg-white text-[#14141A] focus:outline-none focus:border-[#14141A] cursor-pointer transition-colors"
+            className="w-full text-xs font-bold tracking-wide px-3 py-1.5 border-2 border-[#14141A]/20 hover:border-[#14141A] bg-white text-[#14141A] focus:outline-none focus:border-[#14141A] cursor-pointer transition-colors"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             {SORT_OPTIONS.map((o) => (
@@ -709,86 +650,67 @@ export default function WorkshopsPage() {
           </select>
         </div>
       </div>
-    </>
+    </div>
   );
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden bg-[#F5F5F2] pt-20 pb-14 lg:pt-28 lg:pb-20 px-4 sm:px-6">
+      {/* ── Hero (single centered column — Session Board removed) ── */}
+      <section className="relative overflow-hidden bg-[#F5F5F2] pt-16 sm:pt-20 pb-12 sm:pb-16 lg:pt-24 lg:pb-20 px-4 sm:px-6">
         <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-[#14141A]/15 hidden md:block" />
         <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-[#14141A]/15 hidden md:block" />
 
-        <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-14 items-center">
-            {/* Left: copy */}
-            <motion.div initial="hidden" animate="visible" variants={containerVariants}>
-              <motion.span
-                variants={fadeInUp}
-                className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
-                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-              >
-                Live Events
-              </motion.span>
-
-              {/*
-                Fixed breakpoint sizes instead of `text-[12vw]`. The vw-based size
-                scaled unpredictably on phones and, combined with the tight leading
-                and this section's `overflow-hidden`, could clip letters — the
-                "text not visible" issue on mobile.
-              */}
-              <motion.h1
-                variants={fadeInUp}
-                className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-[#14141A] mb-6 break-words"
-                style={{ fontFamily: "'Archivo Black', sans-serif" }}
-              >
-                WORKSHOPS THAT
-                <br />
-                <span className="inline-block bg-[#C6FF3D] px-2">ACCELERATE</span> CAREERS
-              </motion.h1>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-base md:text-lg text-[#14141A]/60 mb-9 max-w-lg"
-              >
-                Focused live sessions led by industry practitioners. Learn, build, and
-                network — many are completely free.
-              </motion.p>
-
-              <motion.div
-                variants={fadeInUp}
-                className="grid grid-cols-3 max-w-lg border-2 border-[#14141A] divide-x-2 divide-[#14141A]"
-              >
-                {[
-                  { value: String(workshops.length).padStart(2, '0'), label: 'WORKSHOPS' },
-                  { value: String(freeCount).padStart(2, '0'), label: 'FREE' },
-                  { value: String(comingSoonCount).padStart(2, '0'), label: 'SOON' },
-                ].map((s) => (
-                  <div key={s.label} className="px-2 sm:px-4 py-3 text-center">
-                    <p
-                      className="text-xl sm:text-2xl md:text-3xl font-bold text-[#14141A]"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
-                      {s.value}
-                    </p>
-                    <p className="text-[9px] sm:text-[10px] font-bold tracking-widest text-[#14141A]/50 mt-0.5">
-                      {s.label}
-                    </p>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-
-            {/* Right: signature — live session board */}
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
+        <div className="container mx-auto max-w-3xl relative z-10 text-left">
+          <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+            <motion.span
               variants={fadeInUp}
-              viewport={{ once: true }}
+              className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              <SessionBoard />
+              Live Events
+            </motion.span>
+
+            <motion.h1
+              variants={fadeInUp}
+              className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-[#14141A] mb-6 break-words"
+              style={{ fontFamily: "'Archivo Black', sans-serif" }}
+            >
+              WORKSHOPS THAT
+              <br />
+              <span className="inline-block bg-[#C6FF3D] px-2">ACCELERATE</span> CAREERS
+            </motion.h1>
+
+            <motion.p
+              variants={fadeInUp}
+              className="text-base md:text-lg text-[#14141A]/60 mb-9 max-w-lg"
+            >
+              Focused live sessions led by industry practitioners. Learn, build, and
+              network — many are completely free.
+            </motion.p>
+
+            <motion.div
+              variants={fadeInUp}
+              className="grid grid-cols-3 max-w-lg border-2 border-[#14141A] divide-x-2 divide-[#14141A]"
+            >
+              {[
+                { value: String(workshops.length).padStart(2, '0'), label: 'WORKSHOPS' },
+                { value: String(freeCount).padStart(2, '0'), label: 'FREE' },
+                { value: String(comingSoonCount).padStart(2, '0'), label: 'SOON' },
+              ].map((s) => (
+                <div key={s.label} className="px-2 sm:px-4 py-3 text-center">
+                  <p
+                    className="text-xl sm:text-2xl md:text-3xl font-bold text-[#14141A]"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {s.value}
+                  </p>
+                  <p className="text-[9px] sm:text-[10px] font-bold tracking-widest text-[#14141A]/50 mt-0.5">
+                    {s.label}
+                  </p>
+                </div>
+              ))}
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -796,43 +718,55 @@ export default function WorkshopsPage() {
       <section className="sticky top-0 z-30 bg-[#F5F5F2] border-y-2 border-[#14141A] py-3 sm:py-4 px-4 sm:px-6">
         <div className="container mx-auto max-w-6xl">
 
-          {/* Row 1: search + (mobile) filter toggle */}
-          <div className="flex gap-3">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14141A]/40" />
-              <input
-                type="text"
-                placeholder="Search workshops..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 text-sm text-[#14141A] placeholder-[#14141A]/40 border-2 border-[#14141A]/20 focus:outline-none focus:border-[#14141A] bg-white transition-colors"
-              />
+          {/*
+            Row 1: search + (mobile) filter toggle, desktop: search + all controls.
+            `sm:items-start` is required here — without it, the flex row defaults
+            to `align-items: stretch`, which stretches the short search-box column
+            to match the height of the much taller filter-controls column next to
+            it. That stretched the search box's relative wrapper far beyond the
+            input's actual height, so the icon (absolutely centered at `top-1/2`
+            of that wrapper) ended up floating below the input instead of inside
+            it — the misplaced magnifying glass. `items-start` keeps every column
+            sized to its own content.
+          */}
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1 sm:max-w-xs">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14141A]/40 pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Search workshops..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2.5 text-sm text-[#14141A] placeholder-[#14141A]/40 border-2 border-[#14141A]/20 focus:outline-none focus:border-[#14141A] bg-white transition-colors"
+                />
+              </div>
+
+              {/* Mobile-only filter toggle — keeps the sticky bar short by default */}
+              <button
+                onClick={() => setShowFilters((p) => !p)}
+                className={`sm:hidden flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold tracking-wide border-2 border-[#14141A] flex-shrink-0 transition-colors ${
+                  showFilters || activeFilterCount > 0 ? 'bg-[#14141A] text-white' : 'bg-white text-[#14141A]'
+                }`}
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                FILTERS
+                {activeFilterCount > 0 && (
+                  <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] bg-[#C6FF3D] text-[#14141A] rounded-full flex-shrink-0">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
             </div>
 
-            {/* Mobile-only filter toggle — keeps the sticky bar short by default */}
-            <button
-              onClick={() => setShowFilters((p) => !p)}
-              className={`sm:hidden flex items-center gap-1.5 px-4 py-2.5 text-xs font-bold tracking-wide border-2 border-[#14141A] flex-shrink-0 transition-colors ${
-                showFilters || activeFilterCount > 0 ? 'bg-[#14141A] text-white' : 'bg-white text-[#14141A]'
-              }`}
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              FILTERS
-              {activeFilterCount > 0 && (
-                <span className="inline-flex items-center justify-center w-4 h-4 text-[10px] bg-[#C6FF3D] text-[#14141A] rounded-full">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-
-            {/* Desktop: controls stay inline in the same row */}
-            <div className="hidden sm:flex items-center gap-2 flex-wrap flex-1">
+            {/* Desktop: controls stay inline */}
+            <div className="hidden sm:block flex-1 min-w-0">
               <FilterControls />
             </div>
           </div>
 
-          {/* Row 2 (mobile only): collapsible filter panel */}
+          {/* Mobile-only: collapsible filter panel */}
           <AnimatePresence initial={false}>
             {showFilters && (
               <motion.div
@@ -842,7 +776,7 @@ export default function WorkshopsPage() {
                 transition={{ duration: 0.2 }}
                 className="sm:hidden overflow-hidden"
               >
-                <div className="flex flex-col gap-3 pt-3">
+                <div className="pt-3">
                   <FilterControls />
                 </div>
               </motion.div>
@@ -851,8 +785,8 @@ export default function WorkshopsPage() {
 
           {/* Active filter chips */}
           {activeFilterCount > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-[#14141A]/10">
-              <span className="text-[10px] font-bold tracking-widest text-[#14141A]/40" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#14141A]/10 overflow-x-auto">
+              <span className="text-[10px] font-bold tracking-widest text-[#14141A]/40 flex-shrink-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 ACTIVE:
               </span>
               {category !== 'All' && <FilterChip label={category as string} onRemove={() => setCategory('All')} />}
@@ -861,7 +795,7 @@ export default function WorkshopsPage() {
               {comingSoonOnly && <FilterChip label="COMING SOON" onRemove={() => setComingSoonOnly(false)} />}
               <button
                 onClick={clearAll}
-                className="text-[11px] font-bold text-[#14141A]/50 hover:text-[#14141A] underline ml-1"
+                className="text-[11px] font-bold text-[#14141A]/50 hover:text-[#14141A] underline ml-1 flex-shrink-0"
               >
                 Clear all
               </button>
@@ -871,9 +805,9 @@ export default function WorkshopsPage() {
       </section>
 
       {/* ── Cards grid ── */}
-      <section className="py-16 px-4 sm:px-6 bg-[#F5F5F2] min-h-[60vh]">
+      <section className="py-12 sm:py-16 px-4 sm:px-6 bg-[#F5F5F2] min-h-[60vh]">
         <div className="container mx-auto max-w-6xl">
-          <div className="mb-8 flex items-center justify-between flex-wrap gap-2">
+          <div className="mb-6 sm:mb-8 flex items-center justify-between flex-wrap gap-2">
             <p className="text-sm text-[#14141A]/60">
               Showing{' '}
               <span className="font-bold text-[#14141A]">{filtered.length}</span> of{' '}
@@ -898,7 +832,7 @@ export default function WorkshopsPage() {
               initial="hidden"
               animate="visible"
               variants={containerVariants}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start"
             >
               {filtered.map((w) => (
                 <WorkshopCard key={w.id} w={w} />
@@ -909,7 +843,7 @@ export default function WorkshopsPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="py-20 px-4 sm:px-6 bg-[#14141A] text-white relative overflow-hidden">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-[#14141A] text-white relative overflow-hidden">
         <div className="absolute top-10 right-10 w-24 h-24 border-t-2 border-r-2 border-white/10 hidden md:block" />
         <div className="container mx-auto max-w-3xl text-center relative z-10">
           <motion.div
@@ -920,7 +854,7 @@ export default function WorkshopsPage() {
           >
             <motion.h2
               variants={fadeInUp}
-              className="text-3xl md:text-5xl mb-5"
+              className="text-3xl sm:text-4xl md:text-5xl mb-5 break-words"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               WANT A DEEPER DIVE?
@@ -941,14 +875,14 @@ export default function WorkshopsPage() {
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 text-sm font-bold tracking-wide bg-[#C6FF3D] text-[#14141A] hover:brightness-95 transition-all"
               >
                 EXPLORE TRAINING PROGRAMS
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 flex-shrink-0" />
               </Link>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center gap-3 px-8 py-4 text-sm font-bold tracking-wide border-2 border-white hover:bg-white/10 transition-all"
               >
                 BOOK FREE COUNSELLING
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 flex-shrink-0" />
               </Link>
             </motion.div>
           </motion.div>
