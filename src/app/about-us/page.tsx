@@ -51,13 +51,6 @@ const TEAM = [
   { name: 'Priyanshu Prajapati',  role: 'Lead Mentor', initials: 'PP', accentBg: '#FFB800' },
 ];
 
-const STATS = [
-  { value: '50K+',  label: 'LEARNERS TRAINED' },
-  { value: '200+',  label: 'WORKSHOPS DELIVERED' },
-  { value: '4.9★',  label: 'AVERAGE RATING' },
-  { value: '95%',   label: 'PLACEMENT RATE' },
-];
-
 export default function AboutPage() {
   useAcceleratorFonts();
 
@@ -88,19 +81,6 @@ export default function AboutPage() {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-14 lg:py-20 space-y-20">
-
-        {/* ── Stats strip ── */}
-        <motion.div
-          initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }}
-          className="grid grid-cols-2 sm:grid-cols-4 border-2 border-[#14141A] divide-x-2 divide-y-2 sm:divide-y-0 divide-[#14141A]"
-        >
-          {STATS.map(({ value, label }) => (
-            <div key={label} className="bg-white p-6 text-center">
-              <p className="text-3xl font-bold text-[#14141A] mb-1" style={{ fontFamily: MONO }}>{value}</p>
-              <p className="text-[10px] text-[#14141A]/50 font-bold tracking-widest">{label}</p>
-            </div>
-          ))}
-        </motion.div>
 
         {/* ── Story ── */}
         <section className="grid lg:grid-cols-2 gap-12 items-center">
