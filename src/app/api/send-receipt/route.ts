@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { buildWorkshopReceiptPdf } from '@/lib/workshopReceiptPdf';
+import { appendRegistrationRow } from '@/lib/googleSheets';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -19,8 +20,15 @@ export async function POST(request: Request) {
     const {
       fullName,
       email,
+      phone,
+      whatsapp = '',
+      currentRole = '',
+      experience = '',
+      coupon = 'None',
+      paymentId,
       workshop = 'Career Accelerator Workshop',
       workshopDate = 'Saturday, 7th November 2026',
+      amountPaid,
     } = body;
 
     const doc = buildWorkshopReceiptPdf(body);
@@ -46,6 +54,20 @@ export async function POST(request: Request) {
           content: Buffer.from(pdfBuffer),
         },
       ],
+    });
+
+    await appendRegistrationRow({
+      workshop,
+      fullName,
+      email,
+      phone,
+      whatsapp: whatsapp || phone,
+      currentRole,
+      experience,
+      type: 'Paid',
+      amountPaid,
+      paymentId,
+      coupon,
     });
 
     return NextResponse.json({ success: true, message: 'Receipt emailed successfully!' });

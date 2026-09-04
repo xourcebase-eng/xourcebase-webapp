@@ -3,6 +3,7 @@
 // No payment involved — just validates the submission and emails a confirmation.
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { appendRegistrationRow } from '@/lib/googleSheets';
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -27,7 +28,7 @@ interface RegisterWorkshopBody {
 export async function POST(request: Request) {
   try {
     const body: RegisterWorkshopBody = await request.json();
-    const { workshop, fullName, email, phone, currentRole = '', experience = '' } = body;
+    const { workshop, fullName, email, phone, whatsapp = '', currentRole = '', experience = '' } = body;
 
     if (!workshop || !fullName?.trim() || !email?.trim() || !phone?.trim()) {
       return NextResponse.json(
@@ -56,7 +57,16 @@ export async function POST(request: Request) {
       `,
     });
 
-    console.log('Workshop registration:', { workshop, fullName, email, phone, currentRole, experience });
+    await appendRegistrationRow({
+      workshop,
+      fullName,
+      email,
+      phone,
+      whatsapp: whatsapp || phone,
+      currentRole,
+      experience,
+      type: 'Free',
+    });
 
     return NextResponse.json({ success: true, message: 'Registration confirmed' });
   } catch (error) {
