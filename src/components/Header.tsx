@@ -6,11 +6,13 @@
 // Login/signup removed — only authenticated user menu remains.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, LogOut, LayoutDashboard, User, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSession, signOut } from 'next-auth/react';
+import type { Session } from 'next-auth';
 import logo from '@/assets/xourcebase-logo.png';
 
 const NAV_LINKS = [
@@ -45,9 +47,11 @@ function Avatar({ src, name }: { src?: string | null; name?: string | null }) {
         .toUpperCase()
     : '?';
   return src ? (
-    <img
+    <Image
       src={src}
       alt={name ?? 'User'}
+      width={32}
+      height={32}
       className="w-8 h-8 object-cover border-2 border-[#14141A]"
     />
   ) : (
@@ -62,7 +66,7 @@ function Avatar({ src, name }: { src?: string | null; name?: string | null }) {
   );
 }
 
-function UserDropdown({ session }: { session: any }) {
+function UserDropdown({ session }: { session: Session }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -117,13 +121,6 @@ function UserDropdown({ session }: { session: any }) {
               >
                 <LayoutDashboard className="w-4 h-4" /> Dashboard
               </Link>
-              <Link
-                href="/profile"
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[#14141A] hover:bg-[#F5F5F2] transition-colors"
-              >
-                <User className="w-4 h-4" /> Profile
-              </Link>
             </div>
             <div className="border-t-2 border-[#14141A]/10 pt-1">
               <button
@@ -150,9 +147,13 @@ export default function Header() {
   const { data: session, status } = useSession();
   const isLoggedIn = status === 'authenticated';
 
-  useEffect(() => {
+  // Close the mobile menu whenever the route changes, without a setState-in-effect
+  // render waterfall: https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setMenuOpen(false);
-  }, [pathname]);
+  }
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
@@ -181,7 +182,7 @@ export default function Header() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
           <div className="flex h-16 items-center justify-between gap-6">
             <Link href="/" className="flex-shrink-0">
-              <img src={logo.src} alt="XourceBase" className="h-8 w-auto" />
+              <Image src={logo} alt="XourceBase" className="h-8 w-auto" priority />
             </Link>
 
             <nav className="hidden lg:flex items-center gap-1 flex-1">
@@ -257,7 +258,7 @@ export default function Header() {
               {/* Drawer header */}
               <div className="flex items-center justify-between px-5 h-16 border-b-2 border-[#14141A] flex-shrink-0">
                 <Link href="/" onClick={() => setMenuOpen(false)}>
-                  <img src={logo.src} alt="XourceBase" className="h-7 w-auto" />
+                  <Image src={logo} alt="XourceBase" className="h-7 w-auto" />
                 </Link>
                 <button
                   type="button"
@@ -272,9 +273,11 @@ export default function Header() {
               {isLoggedIn && session && (
                 <div className="flex items-center gap-3 px-5 py-4 bg-[#C6FF3D]/15 border-b-2 border-[#14141A] flex-shrink-0">
                   {session.user?.image ? (
-                    <img
+                    <Image
                       src={session.user.image}
                       alt={session.user.name ?? ''}
+                      width={40}
+                      height={40}
                       className="w-10 h-10 object-cover border-2 border-[#14141A] flex-shrink-0"
                     />
                   ) : (
@@ -320,7 +323,7 @@ export default function Header() {
                   </Link>
                 ))}
 
-                {/* Dashboard + Profile links — only when logged in */}
+                {/* Dashboard link — only when logged in */}
                 {isLoggedIn && (
                   <>
                     <div className="h-0.5 bg-[#14141A]/10 my-2" />
@@ -335,18 +338,6 @@ export default function Header() {
                     >
                       <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
                       DASHBOARD
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className={`flex items-center gap-3 px-4 py-3 text-sm font-bold tracking-wide transition-colors ${
-                        isActive('/profile')
-                          ? 'bg-[#14141A] text-white'
-                          : 'text-[#14141A] hover:bg-[#F5F5F2]'
-                      }`}
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
-                      <User className="w-4 h-4 flex-shrink-0" />
-                      PROFILE
                     </Link>
                   </>
                 )}

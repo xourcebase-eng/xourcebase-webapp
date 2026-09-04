@@ -93,7 +93,7 @@ export default function TeachOnXourceBasePage() {
             <div className="w-12 h-12 border-2 border-[#14141A] flex items-center justify-center mb-6" style={{ background: '#C6FF3D' }}>
               <DollarSign className="w-6 h-6 text-[#14141A]" />
             </div>
-            <p className="text-xs font-bold tracking-widest text-[#C6FF3D] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            <p className="text-xs font-bold tracking-widest text-[#3D5AFF] mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               BENEFITS
             </p>
             <h2 className="text-3xl font-extrabold mb-8" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
@@ -103,7 +103,7 @@ export default function TeachOnXourceBasePage() {
             <ul className="space-y-4 flex-1">
               {WHY.map((item, i) => (
                 <li key={i} className="flex gap-3 text-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#C6FF3D] flex-shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-5 h-5 text-[#3D5AFF] flex-shrink-0 mt-0.5" />
                   <span>{item}</span>
                 </li>
               ))}

@@ -5,7 +5,6 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import {
   Shield, Lock, Cookie, UserCheck, Mail, Eye, Database,
 } from 'lucide-react';
@@ -112,7 +111,7 @@ export default function PrivacyPolicyPage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               PRIVACY<br />POLICY
@@ -146,7 +145,7 @@ export default function PrivacyPolicyPage() {
 
           {/* Content */}
           <div className="space-y-8">
-            {SECTIONS.map((s, i) => (
+            {SECTIONS.map((s) => (
               <motion.div
                 key={s.id}
                 id={s.id}

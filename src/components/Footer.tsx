@@ -3,6 +3,7 @@
 // Ink background instead of gray-950, hard 2px edges, Space Grotesk headings.
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Twitter, Linkedin, Instagram, Facebook, Youtube, ArrowUpRight } from 'lucide-react';
 import logo from "@/assets/xourcebase-logo.png";
 
@@ -57,7 +58,7 @@ export default function Footer() {
         {/* Top strip: brand + tagline */}
         <div className="mb-12">
           <Link href="/" className="inline-block mb-3">
-            <img src={logo.src} alt="XourceBase" className="h-8 w-auto" />
+            <Image src={logo} alt="XourceBase" className="h-8 w-auto" />
           </Link>
           <p className="text-sm text-white/40 max-w-xs leading-relaxed">
             Learn in-demand skills from expert instructors at your own pace, on any device.

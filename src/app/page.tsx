@@ -18,6 +18,7 @@ import {
   Rocket, Zap, Users, ArrowRight, BookOpen, FileText,
   Brain, Clock, Star, Map, Mic, ArrowLeft,
   Calendar, Wifi, Tag, ChevronRight, CheckCircle2,
+  type LucideIcon,
   TrendingUp, ShieldCheck, Briefcase, GraduationCap,
   BadgeCheck, Lightbulb, HeartHandshake, BarChart2,
   Quote, ArrowUpRight,
@@ -79,7 +80,15 @@ function AnimatedCounter({ target, suffix = '' }: { target: number; suffix?: str
 }
 
 // ─── Static Feature Card — "mission brief" tile (title + icon only) ──────────
-function StaticFeatureCard({ icon: Icon, title, accentBg = '#C6FF3D' }: any) {
+function StaticFeatureCard({
+  icon: Icon,
+  title,
+  accentBg = '#C6FF3D',
+}: {
+  icon: LucideIcon;
+  title: string;
+  accentBg?: string;
+}) {
   return (
     <motion.div
       variants={cardVariants}
@@ -182,7 +191,7 @@ const upcomingWorkshops = [
   {
     id: 1,
     title: 'Introduction to Git & GitHub for Beginners',
-    date: 'May 18, 2025',
+    date: 'Oct 17, 2026',
     time: '10:00 AM – 1:00 PM IST',
     mode: 'Online',
     tag: 'Free',
@@ -196,7 +205,7 @@ const upcomingWorkshops = [
   {
     id: 2,
     title: 'DevOps CI/CD Pipeline Workshop',
-    date: 'May 24, 2025',
+    date: 'Nov 7, 2026',
     time: '11:00 AM – 2:00 PM IST',
     mode: 'Online',
     tag: '₹299',
@@ -204,8 +213,8 @@ const upcomingWorkshops = [
     description:
       'Build a full CI/CD pipeline with GitHub Actions, Docker, and Kubernetes. Hands-on project included.',
     isFree: false,
-    status: 'coming_soon',
-    opensOn: 'May 10, 2025',
+    status: 'open',
+    slug: 'devops-cicd-pipeline',
   },
   {
     id: 3,
@@ -883,7 +892,7 @@ export default function HomePage() {
                     />
                     <Quote className="w-7 h-7 text-white/20 mb-4 shrink-0" />
                     <p className="text-gray-300 text-[14.5px] leading-relaxed flex-1 mb-5">
-                      "{s.quote}"
+                      &quot;{s.quote}&quot;
                     </p>
                     <span
                       className="self-start text-[11px] font-bold tracking-wide px-2.5 py-1 mb-4 text-[#14141A]"

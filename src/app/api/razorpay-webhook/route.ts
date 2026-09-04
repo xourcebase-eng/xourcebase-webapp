@@ -28,7 +28,6 @@ export async function POST(request: Request) {
   // Handle successful payment
   if (event.event === 'payment.captured' || event.event === 'order.paid') {
     const payment = event.payload.payment?.entity;
-    const order = event.payload.order?.entity;
 
     if (payment && payment.status === 'captured') {
       const paymentId = payment.id;

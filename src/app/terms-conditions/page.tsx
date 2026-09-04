@@ -5,10 +5,9 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import {
   Scale, Shield, Gavel, AlertTriangle,
-  Globe, Mail, XCircle, ChevronRight,
+  Globe, Mail, XCircle,
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -145,7 +144,7 @@ export default function TermsAndConditionsPage() {
 
           {/* Content */}
           <div className="space-y-8">
-            {SECTIONS.map((s, i) => (
+            {SECTIONS.map((s) => (
               <motion.div
                 key={s.id}
                 id={s.id}

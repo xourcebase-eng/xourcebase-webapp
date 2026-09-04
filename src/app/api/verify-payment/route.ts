@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       message: 'Payment verified successfully',
       payment_id: razorpay_payment_id,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Payment verification error:', error);
     return NextResponse.json(
       { success: false, message: 'Internal server error during verification' },

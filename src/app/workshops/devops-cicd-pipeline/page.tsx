@@ -1,26 +1,16 @@
 'use client';
 
-// src/app/workshops/introduction-to-git-and-github/page.tsx
-// Reskinned to match the "Career Accelerator" design system (trainings/page.tsx, homepage page.tsx).
-//
-// Mobile-hardening pass (this file already avoided the main vw+overflow-hidden
-// clipping bug found on other pages — headline already used fixed breakpoint
-// sizes). Remaining small fixes:
-// - Section padding standardized to px-4 sm:px-6 (was flat px-6) so content
-//   doesn't sit flush against the edge on narrow phones.
-// - Meta stat grid (DATE/TIME/DURATION/PRICE) given tighter mobile padding
-//   and smaller mobile text so values don't awkwardly wrap in a small box.
-// - Countdown strip in the modal now allows wrapping instead of squeezing
-//   "SEATS CONFIRM ON A FIRST-COME BASIS" + timer into one tight row.
-// - Modal's Role/Experience row stacks on the smallest screens instead of
-//   staying 2-column at every width.
+// src/app/workshops/devops-cicd-pipeline/page.tsx
+// Same "Career Accelerator" visual system and page structure as
+// /workshops/introduction-to-git-and-github — dedicated detail page + the
+// shared WorkshopRegistrationModal, just wired for a paid workshop.
 
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import {
   Calendar, Clock, Users, Award, ArrowLeft,
   Zap, Video, FileText, MessageCircle, Star,
-  GitCommit, GitPullRequest,
+  Rocket, GitBranch, CheckCircle2, ArrowRight,
 } from 'lucide-react';
 import Link from 'next/link';
 import type { Variants } from 'framer-motion';
@@ -60,29 +50,29 @@ const stagger: Variants = {
   visible: { transition: { staggerChildren: 0.08 } },
 };
 
-// ─── Terminal demo (signature hero element) ──────────────────────────────────
-// Types out a short, realistic git session, one keystroke at a time, then loops.
-// Kept as a hard-edged onyx "mission console" rather than a soft glassy terminal.
+// ─── Pipeline console (signature hero element) ────────────────────────────────
+// Same "mission console" typewriter pattern as the Git workshop's terminal,
+// re-themed with a CI/CD run instead of a git session.
 
-const TERMINAL_LINES: { prompt: string; output?: string }[] = [
-  { prompt: 'git init', output: 'Initialized empty Git repository in ~/project/.git/' },
-  { prompt: 'git add .' },
-  { prompt: 'git commit -m "first commit"', output: '[main a1b2c3d] first commit — 4 files changed' },
-  { prompt: 'git checkout -b feature/navbar', output: "Switched to a new branch 'feature/navbar'" },
-  { prompt: 'git push origin feature/navbar', output: 'Branch published — open a pull request →' },
+const PIPELINE_LINES: { prompt: string; output?: string }[] = [
+  { prompt: 'git push origin main', output: 'Triggered workflow: ci-cd-pipeline.yml' },
+  { prompt: 'docker build -t app:latest .', output: 'Successfully built and tagged app:latest' },
+  { prompt: 'docker push registry/app:latest', output: 'Image pushed — 4 layers, 128MB' },
+  { prompt: 'kubectl apply -f deployment.yaml', output: 'deployment.apps/app configured' },
+  { prompt: 'kubectl rollout status deployment/app', output: 'deployment "app" successfully rolled out ✓' },
 ];
 
-function TerminalDemo() {
-  const [lineIdx, setLineIdx]     = useState(0);
-  const [charIdx, setCharIdx]     = useState(0);
+function PipelineConsole() {
+  const [lineIdx, setLineIdx]       = useState(0);
+  const [charIdx, setCharIdx]       = useState(0);
   const [showOutput, setShowOutput] = useState(false);
-  const [done, setDone]           = useState<{ prompt: string; output?: string }[]>([]);
+  const [done, setDone]             = useState<{ prompt: string; output?: string }[]>([]);
 
   useEffect(() => {
-    const current = TERMINAL_LINES[lineIdx];
+    const current = PIPELINE_LINES[lineIdx];
 
     if (charIdx < current.prompt.length) {
-      const t = setTimeout(() => setCharIdx((c) => c + 1), 38);
+      const t = setTimeout(() => setCharIdx((c) => c + 1), 32);
       return () => clearTimeout(t);
     }
     if (!showOutput && current.output) {
@@ -91,18 +81,18 @@ function TerminalDemo() {
     }
     const t = setTimeout(() => {
       setDone((d) => [...d, current]);
-      if (lineIdx + 1 < TERMINAL_LINES.length) {
+      if (lineIdx + 1 < PIPELINE_LINES.length) {
         setLineIdx((i) => i + 1);
         setCharIdx(0);
         setShowOutput(false);
       } else {
-        setTimeout(() => { setDone([]); setLineIdx(0); setCharIdx(0); setShowOutput(false); }, 1600);
+        setTimeout(() => { setDone([]); setLineIdx(0); setCharIdx(0); setShowOutput(false); }, 1800);
       }
     }, current.output ? 900 : 500);
     return () => clearTimeout(t);
   }, [charIdx, showOutput, lineIdx]);
 
-  const current = TERMINAL_LINES[lineIdx];
+  const current = PIPELINE_LINES[lineIdx];
 
   return (
     <div className="bg-[#14141A] border-2 border-[#14141A] overflow-hidden font-mono text-[12px] sm:text-[13px] leading-relaxed">
@@ -110,19 +100,19 @@ function TerminalDemo() {
         <span className="w-2.5 h-2.5 bg-[#FF3D57] flex-shrink-0" />
         <span className="w-2.5 h-2.5 bg-[#FFB800] flex-shrink-0" />
         <span className="w-2.5 h-2.5 bg-[#C6FF3D] flex-shrink-0" />
-        <span className="ml-3 text-white/40 text-xs truncate" style={{ fontFamily: MONO }}>bash — git-workshop</span>
+        <span className="ml-3 text-white/40 text-xs truncate" style={{ fontFamily: MONO }}>bash — cicd-pipeline</span>
       </div>
       <div className="p-4 sm:p-5 min-h-[220px] text-white/90 break-words">
         {done.map((l, i) => (
           <div key={i} className="mb-2">
-            <p className="break-words"><span className="text-[#C6FF3D]">➜ </span><span className="text-[#3D5AFF]">~/project</span> <span className="text-white/90">git {l.prompt.replace(/^git /, '')}</span></p>
+            <p className="break-words"><span className="text-[#C6FF3D]">➜ </span><span className="text-[#3D5AFF]">~/app</span> <span className="text-white/90">{l.prompt}</span></p>
             {l.output && <p className="text-white/40 pl-4 break-words">{l.output}</p>}
           </div>
         ))}
         <p className="break-words">
           <span className="text-[#C6FF3D]">➜ </span>
-          <span className="text-[#3D5AFF]">~/project</span>{' '}
-          <span className="text-white/90">git {current.prompt.replace(/^git /, '').slice(0, Math.max(0, charIdx))}</span>
+          <span className="text-[#3D5AFF]">~/app</span>{' '}
+          <span className="text-white/90">{current.prompt.slice(0, Math.max(0, charIdx))}</span>
           <span className="inline-block w-[7px] h-[15px] bg-[#C6FF3D] align-middle ml-0.5 animate-pulse" />
         </p>
         {showOutput && current.output && (
@@ -133,30 +123,32 @@ function TerminalDemo() {
   );
 }
 
-// ─── Branch graph (signature hero element, part two) ─────────────────────────
+// ─── Pipeline stages (signature hero element, part two) ───────────────────────
 
-function BranchGraph() {
+function PipelineStages() {
+  const stages = ['BUILD', 'TEST', 'DEPLOY'];
   return (
-    <svg viewBox="0 0 320 90" className="w-full h-auto">
-      <line x1="16" y1="45" x2="304" y2="45" stroke="#3D5AFF" strokeWidth="2.5" />
-      <path d="M 90 45 C 130 45, 130 15, 170 15 L 230 15" fill="none" stroke="#C6FF3D" strokeWidth="2.5" />
-      <path d="M 230 15 C 250 15, 250 45, 270 45" fill="none" stroke="#C6FF3D" strokeWidth="2.5" strokeDasharray="4 4" />
-      {[16, 90, 270, 304].map((x, i) => (
-        <circle key={`m-${i}`} cx={x} cy={45} r="5.5" fill="#3D5AFF" stroke="#14141A" strokeWidth="1" />
+    <div className="flex items-center justify-between gap-2">
+      {stages.map((stage, i) => (
+        <div key={stage} className="flex items-center flex-1 min-w-0">
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <div className="w-9 h-9 border-2 border-[#14141A] bg-[#C6FF3D] flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4 text-[#14141A]" />
+            </div>
+            <p className="text-[10px] font-bold tracking-widest text-[#14141A]" style={{ fontFamily: MONO }}>{stage}</p>
+          </div>
+          {i < stages.length - 1 && (
+            <div className="flex-1 h-0.5 bg-[#14141A]/20 mx-1.5 sm:mx-2 mb-4" />
+          )}
+        </div>
       ))}
-      {[170, 230].map((x, i) => (
-        <circle key={`f-${i}`} cx={x} cy={15} r="5.5" fill="#C6FF3D" stroke="#14141A" strokeWidth="1" />
-      ))}
-      <text x="16" y="68" fill="#14141A" fontSize="10" fontFamily="'Space Grotesk', monospace" fontWeight="700">main</text>
-      <text x="170" y="8" fill="#14141A" fontSize="10" fontFamily="'Space Grotesk', monospace" fontWeight="700">feature/navbar</text>
-      <text x="250" y="68" fill="#14141A" fontSize="10" fontFamily="'Space Grotesk', monospace" fontWeight="700">merge</text>
-    </svg>
+    </div>
   );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function IntroToGitGithubPage() {
+export default function DevOpsCiCdPipelinePage() {
   useAcceleratorFonts();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -166,31 +158,31 @@ export default function IntroToGitGithubPage() {
   // ─── Content data ───────────────────────────────────────────────────────────
 
   const topics = [
-    'Why Version Control? Git vs Other VCS Tools',
-    'Installing & Configuring Git Locally',
-    'Core Commands: init, add, commit, status, log',
-    'Branching Strategies & Resolving Merge Conflicts',
-    'Working with GitHub: Repos, Remotes & Clones',
-    'Pull Requests & the Code Review Workflow',
-    '.gitignore, Undoing Mistakes & Best Practices',
-    'Live Demo: A Real Team Workflow, End to End',
+    'CI/CD Concepts & Pipeline Anatomy',
+    'GitHub Actions: Workflows, Jobs & Triggers',
+    'Dockerising a Node.js Application',
+    'Pushing Images to a Container Registry',
+    'Kubernetes Deployments on AWS EKS',
+    'Rolling Updates & Zero-Downtime Releases',
+    'Monitoring with Prometheus & Grafana',
+    'Live Demo: Push-to-Deploy, End to End',
   ];
 
   const includes = [
-    { icon: <Zap className="w-5 h-5" />,          title: 'Live Interactive Session',       desc: '3 hours of hands-on learning with real repos', accentBg: '#C6FF3D' },
+    { icon: <Zap className="w-5 h-5" />,          title: 'Live Interactive Session',       desc: '3 hours of hands-on learning, building a real pipeline', accentBg: '#C6FF3D' },
     { icon: <Video className="w-5 h-5" />,         title: 'Session Recording',              desc: 'Lifetime access to the full recording', accentBg: '#FFB800' },
-    { icon: <FileText className="w-5 h-5" />,      title: 'Git Command Cheatsheet',         desc: 'A printable reference for everyday use', accentBg: '#FF3D57' },
+    { icon: <FileText className="w-5 h-5" />,      title: 'Pipeline Config Templates',      desc: 'Ready-to-adapt GitHub Actions & Kubernetes YAML', accentBg: '#FF3D57' },
     { icon: <Award className="w-5 h-5" />,         title: 'Certificate of Participation',   desc: 'LinkedIn-shareable digital certificate', accentBg: '#3D5AFF' },
     { icon: <Users className="w-5 h-5" />,         title: 'Community Access',               desc: 'Join our exclusive Discord community', accentBg: '#C6FF3D' },
     { icon: <MessageCircle className="w-5 h-5" />, title: 'Live Doubt Clearing',            desc: 'Direct Q&A with the instructor', accentBg: '#FFB800' },
   ];
 
   const faqs: [string, string][] = [
-    ['Do I need to know how to code?',        'No. This workshop starts from zero — if you can open a terminal and follow along, you can keep up.'],
-    ['Is this workshop beginner-friendly?',   'Yes, it is designed for absolute beginners as well as students and professionals picking up Git for the first time.'],
+    ['Do I need prior DevOps experience?',    'Basic command-line and Git familiarity helps, but the session builds up from CI/CD fundamentals before getting hands-on.'],
+    ['What tools do I need installed?',       'Docker Desktop, kubectl, and a free AWS account — setup instructions are emailed ahead of the session.'],
     ['Will I get a certificate?',             'Yes — every participant receives a Certificate of Participation after the session.'],
     ['Will the recording be available?',      'Yes, the full recording is shared within 24 hours with lifetime access.'],
-    ['What do I need to bring?',              'Just a laptop with Git installed (we will walk through setup together) and a free GitHub account.'],
+    ['Is there a refund policy?',             'Yes — full refund if you’re not satisfied, no questions asked. Just email contact@xourcebase.com.'],
   ];
 
   return (
@@ -217,30 +209,25 @@ export default function IntroToGitGithubPage() {
             {/* Left: copy */}
             <div>
               <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
-                <span className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] text-[11px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>
+                <span className="inline-flex items-center gap-2 bg-[#FFB800] text-[#14141A] text-[11px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>
                   <span className="w-1.5 h-1.5 rounded-full bg-[#14141A] animate-pulse flex-shrink-0" />
-                  Free Live Workshop
+                  Live Workshop
                 </span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl leading-[1.05] mb-5 break-words" style={{ fontFamily: DISPLAY }}>
-                  INTRODUCTION TO<br />
-                  <span className="inline-block bg-[#3D5AFF] px-2">GIT &amp; GITHUB</span>
+                  DEVOPS CI/CD<br />
+                  <span className="inline-block bg-[#3D5AFF] px-2">PIPELINE</span>
                 </h1>
                 <p className="text-base sm:text-lg text-white/70 mb-10 max-w-lg break-words">
-                  Go from your first <code className="text-[#C6FF3D] font-mono text-sm sm:text-base">git init</code> to opening real pull requests — a hands-on, beginner-friendly session on how teams actually ship code.
+                  Go from <code className="text-[#C6FF3D] font-mono text-sm sm:text-base">git push</code> to a live deployment — build a full CI/CD pipeline with GitHub Actions, Docker, and Kubernetes on AWS EKS.
                 </p>
               </motion.div>
 
-              {/*
-                Meta stat grid — tightened for mobile: smaller padding, smaller
-                text at the base breakpoint, so "10:00 AM IST" etc. sit on one
-                line instead of awkwardly wrapping inside a cramped 2-column box.
-              */}
               <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-10">
                 {[
-                  { icon: <Calendar className="w-4 h-4" />, label: 'DATE',     value: 'OCT 17, 2026' },
-                  { icon: <Clock className="w-4 h-4" />,    label: 'TIME',     value: '10:00 AM IST' },
+                  { icon: <Calendar className="w-4 h-4" />, label: 'DATE',     value: 'NOV 7, 2026' },
+                  { icon: <Clock className="w-4 h-4" />,    label: 'TIME',     value: '11:00 AM IST' },
                   { icon: <Users className="w-4 h-4" />,    label: 'DURATION', value: '3 HOURS' },
-                  { icon: <Award className="w-4 h-4" />,    label: 'PRICE',    value: 'FREE', highlight: true },
+                  { icon: <Award className="w-4 h-4" />,    label: 'PRICE',    value: '₹299', highlight: true },
                 ].map((m, i) => (
                   <motion.div key={i} variants={fadeUp} className="flex items-center gap-2 sm:gap-3 bg-white/5 px-2.5 sm:px-3 py-2.5 sm:py-3 border-2 border-white/10 min-w-0">
                     <div className="text-[#C6FF3D] flex-shrink-0">{m.icon}</div>
@@ -256,18 +243,18 @@ export default function IntroToGitGithubPage() {
                 <button type="button" onClick={openModal}
                   className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold text-sm tracking-wide px-8 py-4 hover:brightness-95 active:scale-[0.97] transition-all"
                   style={{ fontFamily: MONO }}>
-                  <GitCommit className="w-4 h-4 flex-shrink-0" />
-                  RESERVE MY FREE SPOT
+                  <Rocket className="w-4 h-4 flex-shrink-0" />
+                  REGISTER & PAY ₹299
                 </button>
               </motion.div>
             </div>
 
-            {/* Right: signature — mission console terminal + branch graph */}
+            {/* Right: signature — pipeline console + stage tracker */}
             <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="space-y-5">
-              <TerminalDemo />
+              <PipelineConsole />
               <div className="bg-white border-2 border-[#14141A] px-4 sm:px-5 py-4">
-                <p className="text-xs text-[#14141A]/50 font-bold tracking-wide mb-2" style={{ fontFamily: MONO }}>FEATURE BRANCH → MERGED TO MAIN</p>
-                <BranchGraph />
+                <p className="text-xs text-[#14141A]/50 font-bold tracking-wide mb-3" style={{ fontFamily: MONO }}>PUSH → BUILD → TEST → DEPLOY</p>
+                <PipelineStages />
               </div>
             </motion.div>
           </div>
@@ -299,7 +286,7 @@ export default function IntroToGitGithubPage() {
         <div className="container mx-auto max-w-5xl">
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }} className="text-center mb-12">
             <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-5" style={{ fontFamily: MONO }}>What&apos;s Included</span>
-            <h2 className="text-3xl md:text-4xl text-[#14141A] break-words" style={{ fontFamily: DISPLAY }}>EVERYTHING YOU GET — FOR FREE</h2>
+            <h2 className="text-3xl md:text-4xl text-[#14141A] break-words" style={{ fontFamily: DISPLAY }}>EVERYTHING YOU GET</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={stagger} viewport={{ once: true }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {includes.map((item, i) => (
@@ -325,21 +312,21 @@ export default function IntroToGitGithubPage() {
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
             <div className="relative bg-white border-2 border-[#14141A] p-6 sm:p-8 md:p-12 flex flex-col md:flex-row items-center gap-6 sm:gap-8 overflow-hidden">
-              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#C6FF3D]" />
-              <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 border-2 border-[#14141A] flex items-center justify-center text-[#14141A] text-2xl sm:text-3xl font-extrabold" style={{ background: '#C6FF3D', fontFamily: MONO }}>
-                RS
+              <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#FFB800]" />
+              <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 border-2 border-[#14141A] flex items-center justify-center text-[#14141A] text-2xl sm:text-3xl font-extrabold" style={{ background: '#FFB800', fontFamily: MONO }}>
+                PD
               </div>
               <div className="min-w-0 text-center md:text-left">
-                <h3 className="text-2xl font-extrabold text-[#14141A] mb-1 break-words" style={{ fontFamily: DISPLAY }}>RAHUL SHARMA</h3>
-                <p className="text-[#14141A]/70 font-bold text-sm mb-2" style={{ fontFamily: MONO }}>Senior Software Engineer at Infosys</p>
+                <h3 className="text-2xl font-extrabold text-[#14141A] mb-1 break-words" style={{ fontFamily: DISPLAY }}>PRIYA DESAI</h3>
+                <p className="text-[#14141A]/70 font-bold text-sm mb-2" style={{ fontFamily: MONO }}>DevOps Lead at TCS</p>
                 <div className="flex items-center justify-center md:justify-start gap-1 mb-4 flex-wrap">
                   {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#FFB800] text-[#FFB800] flex-shrink-0" />)}
-                  <span className="text-sm text-[#14141A]/50 ml-1 font-semibold">4.9 · 600+ students trained</span>
+                  <span className="text-sm text-[#14141A]/50 ml-1 font-semibold">4.9 · 400+ engineers trained</span>
                 </div>
                 <p className="text-[#14141A]/70 leading-relaxed text-sm break-words">
-                  Rahul has spent years reviewing pull requests and mentoring new engineers on real production
-                  codebases. He built this session around the mistakes he sees beginners make most often —
-                  and how to avoid them from day one.
+                  Priya has spent years running production pipelines that ship dozens of times a day. She built this
+                  session around the pipeline mistakes that actually cause outages — and how to design around them
+                  from day one.
                 </p>
               </div>
             </div>
@@ -374,29 +361,30 @@ export default function IntroToGitGithubPage() {
         <div className="absolute bottom-10 left-10 w-24 h-24 border-b-2 border-l-2 border-white/10 hidden md:block" />
         <div className="relative z-10 max-w-xl mx-auto">
           <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>Limited Seats</span>
-          <h2 className="text-3xl md:text-4xl text-white mb-4 break-words" style={{ fontFamily: DISPLAY }}>READY TO COMMIT TO LEARNING GIT?</h2>
-          <p className="text-white/60 mb-8">Join hundreds of learners who picked up Git &amp; GitHub in a single afternoon.</p>
+          <h2 className="text-3xl md:text-4xl text-white mb-4 break-words" style={{ fontFamily: DISPLAY }}>READY TO SHIP LIKE A PRO?</h2>
+          <p className="text-white/60 mb-8">Join engineers who went from manual deploys to a real push-to-production pipeline in one session.</p>
           <button type="button" onClick={openModal}
             className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
             style={{ fontFamily: MONO }}>
-            <GitPullRequest className="w-4 h-4 flex-shrink-0" />
-            REGISTER FREE FOR THE WORKSHOP
+            <GitBranch className="w-4 h-4 flex-shrink-0" />
+            REGISTER & PAY ₹299
+            <ArrowRight className="w-4 h-4 flex-shrink-0" />
           </button>
         </div>
       </section>
-
 
       {/* ── Registration Modal ── */}
       <WorkshopRegistrationModal
         isOpen={modalOpen}
         onClose={closeModal}
         workshop={{
-          title: 'Introduction to Git & GitHub for Beginners',
-          dateLabel: 'Oct 17, 2026',
-          timeLabel: '10:00 AM – 1:00 PM IST',
+          title: 'DevOps CI/CD Pipeline — Build to Deploy',
+          dateLabel: 'Nov 7, 2026',
+          timeLabel: '11:00 AM – 2:00 PM IST',
           durationLabel: '3 Hours',
-          host: 'Rahul Sharma',
-          isFree: true,
+          host: 'Priya Desai',
+          isFree: false,
+          price: 299,
         }}
       />
     </div>

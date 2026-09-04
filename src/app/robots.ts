@@ -6,8 +6,6 @@ export default function robots() {
         userAgent: '*',
         allow: '/',
         disallow: [
-          '/workshop-checkout',
-          '/workshop-success',
           '/api/',
         ],
       },

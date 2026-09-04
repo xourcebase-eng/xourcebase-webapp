@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import {
   MessageCircle, Mail, BookOpen, Users, ChevronDown,
-  Phone, Search, LifeBuoy, CheckCircle2,
+  Phone, Search, LifeBuoy,
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -105,12 +105,12 @@ export default function HelpAndSupportPage() {
               className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6"
               style={{ fontFamily: "'Space Grotesk', sans-serif" }}
             >
-              <LifeBuoy className="inline w-3.5 h-3.5 mr-1" /> WE'RE HERE TO HELP
+              <LifeBuoy className="inline w-3.5 h-3.5 mr-1" /> WE&apos;RE HERE TO HELP
             </motion.span>
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               HELP &amp;<br />SUPPORT

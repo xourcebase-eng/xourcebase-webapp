@@ -123,7 +123,7 @@ export default function XourceBaseForBusinessPage() {
                 className="bg-white border-2 border-[#14141A] p-8 relative flex flex-col"
               >
                 <div className="absolute left-0 top-0 bottom-0 w-2" style={{ background: b.accent }} />
-                <b.icon className="w-10 h-10 mb-6" style={{ color: b.accent }} />
+                <b.icon className="w-10 h-10 mb-6" style={{ color: b.accent === '#C6FF3D' ? '#14141A' : b.accent }} />
                 <h3 className="text-xl font-extrabold mb-3" style={{ fontFamily: "'Archivo Black', sans-serif" }}>
                   {b.title}
                 </h3>
@@ -166,7 +166,7 @@ export default function XourceBaseForBusinessPage() {
               <ul className="space-y-3">
                 {item.points.map((point, idx) => (
                   <li key={idx} className="flex items-start gap-3 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-[#C6FF3D] flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: item.accent }} />
                     {point}
                   </li>
                 ))}

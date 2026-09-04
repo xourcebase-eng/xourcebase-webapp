@@ -18,7 +18,6 @@ import {
   Pin,
   Flame,
   Clock,
-  Plus,
   Award,
   Users,
   BookOpen,
@@ -318,7 +317,7 @@ function NotifyModal({ onClose }: { onClose: () => void }) {
               GET NOTIFIED
             </h3>
             <p className="text-xs text-[#14141A]/50 mb-5">
-              The XourceBase Community forum is launching soon. Leave your email and we'll let you know the moment it's live.
+              The XourceBase Community forum is launching soon. Leave your email and we&apos;ll let you know the moment it&apos;s live.
             </p>
             <form onSubmit={handleSubmit} className="space-y-3">
               <input
@@ -338,10 +337,10 @@ function NotifyModal({ onClose }: { onClose: () => void }) {
               <CheckCircle2 className="w-7 h-7 text-[#14141A]" />
             </div>
             <h3 className="text-lg font-extrabold text-[#14141A] mb-1" style={{ fontFamily: DISPLAY }}>
-              YOU'RE ON THE LIST
+              YOU&apos;RE ON THE LIST
             </h3>
             <p className="text-sm text-[#14141A]/60 mb-5">
-              We'll email <span className="font-semibold text-[#14141A]">{email}</span> as soon as the community opens.
+              We&apos;ll email <span className="font-semibold text-[#14141A]">{email}</span> as soon as the community opens.
             </p>
             <button onClick={onClose} className="px-6 py-2.5 bg-[#14141A] text-white text-sm font-bold hover:bg-black transition-colors" style={{ fontFamily: MONO }}>
               Done
@@ -502,7 +501,7 @@ export default function CommunityPage() {
               A forum for questions, wins, resources, and mentorship — built for students, alumni, and industry mentors across the XourceBase community.
             </motion.p>
             <motion.p variants={fadeInUp} className="text-sm text-white/50 mb-10 max-w-xl mx-auto">
-              We're still building this. What you see below is a preview of what's coming — browsing works, but posting and joining open once we launch.
+              We&apos;re still building this. What you see below is a preview of what&apos;s coming — browsing works, but posting and joining open once we launch.
             </motion.p>
 
             <motion.div variants={fadeInUp} className="grid grid-cols-2 sm:grid-cols-4 max-w-2xl mx-auto border-2 border-white/20 divide-x-2 divide-y-2 sm:divide-y-0 divide-white/20 mb-10">
@@ -726,7 +725,7 @@ export default function CommunityPage() {
                   {[
                     { label: 'Upcoming Workshops', href: '/workshops' },
                     { label: 'Training Programs', href: '/trainings' },
-                    { label: 'Plans & Pricing', href: '/plans-pricing' },
+                    { label: 'Documentation', href: '/docs' },
                     { label: 'Contact & Support', href: '/help-support' },
                   ].map(({ label, href }) => (
                     <li key={label}>
