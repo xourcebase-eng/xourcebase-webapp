@@ -24,6 +24,7 @@ export interface WorkshopReceiptData {
   experience?: string;
   coupon?: string;
   paymentId?: string;
+  registrationId?: string;
   workshop?: string;
   workshopDate?: string;
   workshopTime?: string;
@@ -57,6 +58,7 @@ export function buildWorkshopReceiptPdf(data: WorkshopReceiptData): jsPDF {
     experience = '',
     coupon = 'None',
     paymentId,
+    registrationId,
     workshop = 'Career Accelerator Workshop',
     workshopDate = 'Saturday, 7th November 2026',
     workshopTime = '7:00 PM - 9:00 PM IST',
@@ -88,6 +90,7 @@ export function buildWorkshopReceiptPdf(data: WorkshopReceiptData): jsPDF {
   doc.text('PAYMENT SUCCESSFUL ✓', 105, 63, { align: 'center' });
 
   const bodyRows: RowInput[] = [
+    ...(registrationId ? [['Registration ID', registrationId]] : []),
     ['Participant Name', fullName],
     ['Email Address', email],
     ['Phone Number', phone],

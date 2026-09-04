@@ -16,7 +16,7 @@
 //      `client_email` -> give it Editor access.
 //   5. In that Sheet, create/rename a tab called exactly "Registrations"
 //      with a header row, e.g.:
-//      Timestamp | Workshop | Full Name | Email | Phone | WhatsApp | Current Role | Experience | Type | Amount Paid | Payment ID | Coupon
+//      Timestamp | Workshop | Full Name | Email | Phone | WhatsApp | Current Role | Experience | Type | Amount Paid | Payment ID | Coupon | Registration ID
 //   6. Copy the spreadsheet ID from its URL:
 //      https://docs.google.com/spreadsheets/d/<THIS-PART>/edit
 //   7. Set these in .env.local (never commit real values):
@@ -33,6 +33,15 @@ import crypto from 'crypto';
 const SHEETS_SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SHEET_RANGE = 'Registrations!A:A'; // append() finds the next empty row on its own
+const SHEET_READ_RANGE = 'Registrations!A:M'; // all 13 columns, header row included
+
+// Column order written by appendRegistrationRow — kept in one place so the
+// writer and the reader can never drift apart.
+const COLUMNS = [
+  'timestamp', 'workshop', 'fullName', 'email', 'phone', 'whatsapp',
+  'currentRole', 'experience', 'type', 'amountPaid', 'paymentId', 'coupon',
+  'registrationId',
+] as const;
 
 function base64url(input: Buffer | string): string {
   return Buffer.from(input)
@@ -91,6 +100,7 @@ export interface RegistrationRow {
   amountPaid?: string;
   paymentId?: string;
   coupon?: string;
+  registrationId: string;
 }
 
 /**
@@ -120,6 +130,7 @@ export async function appendRegistrationRow(row: RegistrationRow): Promise<void>
       row.amountPaid || '',
       row.paymentId || '',
       row.coupon || '',
+      row.registrationId,
     ]];
 
     // RAW (not USER_ENTERED): registrant data like "+91 87677-65307" must be
@@ -141,4 +152,66 @@ export async function appendRegistrationRow(row: RegistrationRow): Promise<void>
   } catch (error) {
     console.error('Google Sheets logging error:', error);
   }
+}
+
+export interface RegistrationLookupResult {
+  registrationId: string;
+  workshop: string;
+  fullName: string;
+  type: 'Free' | 'Paid';
+  amountPaid: string;
+  timestamp: string;
+}
+
+/**
+ * Looks up registrations by Registration ID (exact match) or email
+ * (case-insensitive; can match more than one registration for the same
+ * person). Returns only the fields safe to show a public lookup page —
+ * never phone, WhatsApp, payment ID, or coupon.
+ *
+ * Throws on genuine misconfiguration/network failure (unlike
+ * appendRegistrationRow) so the API route can tell the user "lookup is
+ * temporarily unavailable" instead of a false "not found".
+ */
+export async function findRegistrations(query: { registrationId?: string; email?: string }): Promise<RegistrationLookupResult[]> {
+  const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
+  if (!spreadsheetId) {
+    throw new Error('Google Sheets is not configured (GOOGLE_SHEETS_SPREADSHEET_ID).');
+  }
+
+  const accessToken = await getAccessToken();
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(SHEET_READ_RANGE)}`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${accessToken}` } });
+
+  if (!res.ok) {
+    throw new Error(`Failed to read the registrations sheet: ${await res.text()}`);
+  }
+
+  const data = await res.json();
+  const rows: string[][] = data.values || [];
+  const dataRows = rows.slice(1); // skip header
+
+  const wantedId = query.registrationId?.trim().toUpperCase();
+  const wantedEmail = query.email?.trim().toLowerCase();
+
+  const matches: RegistrationLookupResult[] = [];
+  for (const cells of dataRows) {
+    const record: Record<string, string> = {};
+    COLUMNS.forEach((key, i) => { record[key] = cells[i] || ''; });
+
+    const idMatches = wantedId && record.registrationId.trim().toUpperCase() === wantedId;
+    const emailMatches = wantedEmail && record.email.trim().toLowerCase() === wantedEmail;
+    if (idMatches || emailMatches) {
+      matches.push({
+        registrationId: record.registrationId,
+        workshop: record.workshop,
+        fullName: record.fullName,
+        type: record.type === 'Paid' ? 'Paid' : 'Free',
+        amountPaid: record.amountPaid,
+        timestamp: record.timestamp,
+      });
+    }
+  }
+
+  return matches;
 }
