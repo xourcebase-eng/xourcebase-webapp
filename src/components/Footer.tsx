@@ -22,6 +22,7 @@ const FOOTER_COLS = [
     links: [
       { label: 'Teach on XourceBase', href: '/teach-xourcebase' },
       { label: 'Help & Support', href: '/help-support' },
+      { label: 'Check Registration', href: '/check-registration' },
     ],
   },
   {

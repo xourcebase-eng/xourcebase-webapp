@@ -144,6 +144,7 @@ export default function WorkshopRegistrationModal({
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [registrationId, setRegistrationId] = useState<string | null>(null);
 
   // Countdown timer (15 min) — creates gentle urgency, resets each time the modal opens.
   const [timeLeft, setTimeLeft] = useState(900);
@@ -187,6 +188,7 @@ export default function WorkshopRegistrationModal({
       setErrors({});
       setForm(EMPTY_FORM);
       setPaymentId(null);
+      setRegistrationId(null);
     }, 300);
   };
 
@@ -200,6 +202,7 @@ export default function WorkshopRegistrationModal({
       experience: form.experience,
       coupon: 'None',
       paymentId: paymentId ?? undefined,
+      registrationId: registrationId ?? undefined,
       workshop: workshop.title,
       workshopDate: workshop.dateLabel,
       workshopTime: workshop.timeLabel,
@@ -226,6 +229,7 @@ export default function WorkshopRegistrationModal({
     });
     const data = await res.json();
     if (!data?.success) throw new Error('Could not complete registration. Please try again.');
+    setRegistrationId(data.registrationId ?? null);
     await sendWhatsAppBestEffort(form.whatsapp || form.phone, form.fullName, workshop);
   };
 
@@ -278,7 +282,7 @@ export default function WorkshopRegistrationModal({
 
             setPaymentId(verifyData.payment_id ?? response.razorpay_payment_id);
 
-            await fetch('/api/send-receipt', {
+            const receiptRes = await fetch('/api/send-receipt', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
@@ -298,6 +302,8 @@ export default function WorkshopRegistrationModal({
                 bonuses: workshop.bonusesLabel ? [workshop.bonusesLabel] : [],
               }),
             });
+            const receiptData = await receiptRes.json();
+            setRegistrationId(receiptData?.registrationId ?? null);
             await sendWhatsAppBestEffort(form.whatsapp || form.phone, form.fullName, workshop);
             resolve();
           } catch {
@@ -586,10 +592,33 @@ export default function WorkshopRegistrationModal({
                 <h3 className="text-2xl font-extrabold text-[#14141A] mb-2" style={{ fontFamily: DISPLAY }}>
                   YOU&apos;RE REGISTERED!
                 </h3>
-                <p className="text-[#14141A]/60 text-sm mb-2 leading-relaxed break-words">
+                <p className="text-[#14141A]/60 text-sm mb-4 leading-relaxed break-words">
                   Check your inbox at <span className="font-bold text-[#14141A]">{form.email}</span> for a confirmation email
                   {workshop.isFree ? ' with the joining link and pre-read resources.' : ', including your payment receipt.'}
                 </p>
+                {registrationId && (
+                  <div className="bg-[#C6FF3D]/15 border-2 border-[#14141A] px-4 py-3 mb-4 text-left">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#14141A]/60 mb-1" style={{ fontFamily: MONO }}>
+                      Your Registration ID
+                    </p>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-lg font-extrabold text-[#14141A] tracking-wide" style={{ fontFamily: MONO }}>
+                        {registrationId}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard?.writeText(registrationId)}
+                        className="text-xs font-bold text-[#14141A]/60 hover:text-[#14141A] underline flex-shrink-0"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                    <p className="text-xs text-[#14141A]/50 mt-1.5">
+                      Save this — use it anytime at{' '}
+                      <Link href="/check-registration" className="underline hover:text-[#14141A]">xourcebase.com/check-registration</Link>.
+                    </p>
+                  </div>
+                )}
                 {paymentId && (
                   <p className="text-xs text-[#14141A]/40 mb-6">
                     Payment ID: <span className="font-mono font-bold text-[#14141A]/60">{paymentId}</span>

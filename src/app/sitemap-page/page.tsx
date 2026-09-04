@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   ChevronRight,
   ExternalLink,
+  Search,
 } from 'lucide-react';
 
 // ─── Design tokens ─────────────────────────────────────────────────────────────
@@ -78,6 +79,7 @@ const CATEGORIES = [
       { name: 'Blog', path: '/blog', icon: BookOpen, desc: 'Articles, tips & insights' },
       { name: 'Help & Support', path: '/help-support', icon: LifeBuoy, desc: 'FAQs and assistance' },
       { name: 'Teach on XourceBase', path: '/teach-xourcebase', icon: Mic2, desc: 'Become an instructor' },
+      { name: 'Check Registration', path: '/check-registration', icon: Search, desc: 'Look up a workshop registration' },
     ],
   },
   {

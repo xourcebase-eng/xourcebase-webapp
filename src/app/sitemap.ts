@@ -15,5 +15,6 @@ export default function sitemap() {
     { url: `${baseUrl}/xourcebase-business`, lastModified: new Date(), priority: 0.7 },
     { url: `${baseUrl}/terms-conditions`, lastModified: new Date(), priority: 0.5 },
     { url: `${baseUrl}/privacy-policy`, lastModified: new Date(), priority: 0.5 },
+    { url: `${baseUrl}/check-registration`, lastModified: new Date(), priority: 0.4 },
   ];
 }
