@@ -121,7 +121,7 @@ export default function BlogPage() {
               NO POSTS YET
             </h2>
             <p className="text-[#14141A]/60 text-sm leading-relaxed">
-              We're working on some great content — career tips, cloud
+              We&apos;re working on some great content — career tips, cloud
               tutorials, and team stories. Check back soon!
             </p>
           </motion.div>

@@ -49,10 +49,11 @@ export async function POST(request: Request) {
       amount: order.amount, // in paise
       currency: order.currency,
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Razorpay order creation failed:', error);
+    const message = error instanceof Error ? error.message : 'Payment initiation failed';
     return NextResponse.json(
-      { success: false, message: error.message || 'Payment initiation failed' },
+      { success: false, message },
       { status: 500 }
     );
   }

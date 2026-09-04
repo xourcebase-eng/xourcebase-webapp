@@ -119,7 +119,7 @@ export default function SitemapPage() {
               SITEMAP
             </h1>
             <p className="text-white/70 text-sm md:text-base max-w-xl leading-relaxed">
-              A complete overview of every page on XourceBase — find exactly what you're looking for, fast.
+              A complete overview of every page on XourceBase — find exactly what you&apos;re looking for, fast.
             </p>
           </motion.div>
         </div>

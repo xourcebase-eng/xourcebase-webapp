@@ -263,7 +263,7 @@ export default function ContactPage() {
                 <span className="inline-block bg-[#C6FF3D] px-2">CONVERSATION</span>
               </h1>
               <p className="text-base md:text-lg text-[#14141A]/60 max-w-lg">
-                Have questions about our workshops, trainings, or partnerships? We'd love to hear from you — and we respond within 24 business hours.
+                Have questions about our workshops, trainings, or partnerships? We&apos;d love to hear from you — and we respond within 24 business hours.
               </p>
             </motion.div>
 
@@ -297,7 +297,7 @@ export default function ContactPage() {
                   <CheckCircle2 className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Message sent!</p>
-                    <p className="mt-0.5">We'll get back to you within 24 business hours.</p>
+                    <p className="mt-0.5">We&apos;ll get back to you within 24 business hours.</p>
                   </div>
                 </motion.div>
               )}

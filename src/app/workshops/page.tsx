@@ -19,6 +19,7 @@ import {
   Calendar, Clock, Wifi, MapPin, Tag, ArrowRight, ArrowUpRight,
   Search, Filter, CheckCircle2, BookOpen, SlidersHorizontal, X, ArrowUpDown,
 } from 'lucide-react';
+import WorkshopRegistrationModal from '@/components/WorkshopRegistrationModal';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -74,7 +75,7 @@ const workshops: Workshop[] = [
     title: 'Introduction to Git & GitHub for Beginners',
     host: 'Rahul Sharma',
     hostRole: 'Senior Software Engineer at Infosys',
-    date: 'May 18, 2025',
+    date: 'Oct 17, 2026',
     time: '10:00 AM – 1:00 PM IST',
     duration: '3 hrs',
     mode: 'Online',
@@ -100,7 +101,7 @@ const workshops: Workshop[] = [
     title: 'DevOps CI/CD Pipeline — Build to Deploy',
     host: 'Priya Desai',
     hostRole: 'DevOps Lead at TCS',
-    date: 'May 24, 2025',
+    date: 'Nov 7, 2026',
     time: '11:00 AM – 2:00 PM IST',
     duration: '3 hrs',
     mode: 'Online',
@@ -109,8 +110,8 @@ const workshops: Workshop[] = [
     isFree: false,
     price: '₹299',
     priceValue: 299,
-    status: 'coming_soon',
-    opensOn: 'May 10, 2025',
+    status: 'open',
+    detailPage: '/workshops/devops-cicd-pipeline',
     description:
       'Hands-on workshop: build a full CI/CD pipeline using GitHub Actions, Docker, and Kubernetes. Participants leave with a working pipeline deployed to AWS EKS.',
     agenda: [
@@ -331,14 +332,17 @@ function ModeTag({ mode }: { mode: string }) {
 
 // ── WorkshopCard — "mission brief" ticket ──────────────────────────────────────
 
-function WorkshopCard({ w }: { w: Workshop }) {
+function WorkshopCard({ w, onRegister }: { w: Workshop; onRegister: (w: Workshop) => void }) {
   const [expanded, setExpanded] = useState(false);
 
   const isComingSoon = w.status === 'coming_soon';
   const isFull = w.status === 'full';
   const accent = TRACK_STYLE[w.category];
   const status = STATUS_STYLE[w.status];
-  const ctaHref = w.detailPage ?? '/contact';
+  // Workshops with a dedicated page (e.g. the Git & GitHub workshop) navigate there —
+  // it has its own richer content plus the same registration modal embedded in it.
+  // Everything else registers directly via the modal, right from this card.
+  const ctaHref = w.detailPage;
 
   return (
     <motion.div
@@ -483,7 +487,7 @@ function WorkshopCard({ w }: { w: Workshop }) {
             <span className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 text-sm font-bold tracking-wide text-[#14141A]/40 border-2 border-[#14141A]/20 cursor-not-allowed whitespace-nowrap">
               SEATS FULL
             </span>
-          ) : (
+          ) : ctaHref ? (
             <Link
               href={ctaHref}
               className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 text-sm font-bold tracking-wide bg-[#C6FF3D] text-[#14141A] hover:brightness-95 transition-all whitespace-nowrap group/btn"
@@ -491,6 +495,15 @@ function WorkshopCard({ w }: { w: Workshop }) {
               {w.isFree ? 'REGISTER FREE' : 'REGISTER NOW'}
               <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform flex-shrink-0" />
             </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onRegister(w)}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 py-2.5 text-sm font-bold tracking-wide bg-[#C6FF3D] text-[#14141A] hover:brightness-95 transition-all whitespace-nowrap group/btn"
+            >
+              {w.isFree ? 'REGISTER FREE' : 'REGISTER NOW'}
+              <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform flex-shrink-0" />
+            </button>
           )}
         </div>
       </div>
@@ -550,58 +563,30 @@ function ChipRow<T extends string>({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function WorkshopsPage() {
-  useAcceleratorFonts();
+// Reusable filter controls — rendered both in the mobile collapsible panel
+// and inline on desktop, so the logic/markup lives in one place. Declared at
+// module scope (not inside WorkshopsPage) so it isn't recreated every render.
+interface FilterControlsProps {
+  category: WCategory;
+  setCategory: (c: WCategory) => void;
+  mode: Mode;
+  setMode: (m: Mode) => void;
+  freeOnly: boolean;
+  setFreeOnly: (v: boolean) => void;
+  comingSoonOnly: boolean;
+  setComingSoonOnly: (v: boolean) => void;
+  sortBy: SortBy;
+  setSortBy: (s: SortBy) => void;
+}
 
-  const [search, setSearch] = useState('');
-  const [mode, setMode] = useState<Mode>('All');
-  const [category, setCategory] = useState<WCategory>('All');
-  const [freeOnly, setFreeOnly] = useState(false);
-  const [comingSoonOnly, setComingSoonOnly] = useState(false);
-  const [sortBy, setSortBy] = useState<SortBy>('date');
-  const [showFilters, setShowFilters] = useState(false); // mobile filter panel toggle
-
-  const activeFilterCount =
-    (mode !== 'All' ? 1 : 0) +
-    (category !== 'All' ? 1 : 0) +
-    (freeOnly ? 1 : 0) +
-    (comingSoonOnly ? 1 : 0);
-
-  const clearAll = () => {
-    setSearch('');
-    setMode('All');
-    setCategory('All');
-    setFreeOnly(false);
-    setComingSoonOnly(false);
-    setSortBy('date');
-  };
-
-  const filtered = workshops
-    .filter((w) => {
-      const q = search.toLowerCase();
-      const matchSearch =
-        w.title.toLowerCase().includes(q) ||
-        w.description.toLowerCase().includes(q) ||
-        w.host.toLowerCase().includes(q);
-      const matchMode = mode === 'All' || w.mode === mode;
-      const matchCategory = category === 'All' || w.category === category;
-      const matchFree = !freeOnly || w.isFree;
-      const matchComingSoon = !comingSoonOnly || w.status === 'coming_soon';
-      return matchSearch && matchMode && matchCategory && matchFree && matchComingSoon;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'price_low') return a.priceValue - b.priceValue;
-      if (sortBy === 'price_high') return b.priceValue - a.priceValue;
-      // date: workshops array is already in chronological order, use id as proxy
-      return a.id - b.id;
-    });
-
-  const freeCount = workshops.filter((w) => w.isFree).length;
-  const comingSoonCount = workshops.filter((w) => w.status === 'coming_soon').length;
-
-  // Reusable filter controls — rendered both in the mobile collapsible panel
-  // and inline on desktop, so the logic/markup lives in one place.
-  const FilterControls = () => (
+function FilterControls({
+  category, setCategory,
+  mode, setMode,
+  freeOnly, setFreeOnly,
+  comingSoonOnly, setComingSoonOnly,
+  sortBy, setSortBy,
+}: FilterControlsProps) {
+  return (
     <div className="flex flex-col gap-3">
       {/* Category — horizontal scroll */}
       <div className="flex items-center gap-2">
@@ -652,6 +637,65 @@ export default function WorkshopsPage() {
       </div>
     </div>
   );
+}
+
+export default function WorkshopsPage() {
+  useAcceleratorFonts();
+
+  const [search, setSearch] = useState('');
+  const [mode, setMode] = useState<Mode>('All');
+  const [category, setCategory] = useState<WCategory>('All');
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [comingSoonOnly, setComingSoonOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<SortBy>('date');
+  const [showFilters, setShowFilters] = useState(false); // mobile filter panel toggle
+  const [registeringWorkshop, setRegisteringWorkshop] = useState<Workshop | null>(null);
+
+  const activeFilterCount =
+    (mode !== 'All' ? 1 : 0) +
+    (category !== 'All' ? 1 : 0) +
+    (freeOnly ? 1 : 0) +
+    (comingSoonOnly ? 1 : 0);
+
+  const clearAll = () => {
+    setSearch('');
+    setMode('All');
+    setCategory('All');
+    setFreeOnly(false);
+    setComingSoonOnly(false);
+    setSortBy('date');
+  };
+
+  const filtered = workshops
+    .filter((w) => {
+      const q = search.toLowerCase();
+      const matchSearch =
+        w.title.toLowerCase().includes(q) ||
+        w.description.toLowerCase().includes(q) ||
+        w.host.toLowerCase().includes(q);
+      const matchMode = mode === 'All' || w.mode === mode;
+      const matchCategory = category === 'All' || w.category === category;
+      const matchFree = !freeOnly || w.isFree;
+      const matchComingSoon = !comingSoonOnly || w.status === 'coming_soon';
+      return matchSearch && matchMode && matchCategory && matchFree && matchComingSoon;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'price_low') return a.priceValue - b.priceValue;
+      if (sortBy === 'price_high') return b.priceValue - a.priceValue;
+      // date: workshops array is already in chronological order, use id as proxy
+      return a.id - b.id;
+    });
+
+  const freeCount = workshops.filter((w) => w.isFree).length;
+  const comingSoonCount = workshops.filter((w) => w.status === 'coming_soon').length;
+
+  const filterControlsProps: FilterControlsProps = {
+    category, setCategory,
+    mode, setMode,
+    freeOnly, setFreeOnly,
+    comingSoonOnly, setComingSoonOnly,
+    sortBy, setSortBy,
+  };
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -762,7 +806,7 @@ export default function WorkshopsPage() {
 
             {/* Desktop: controls stay inline */}
             <div className="hidden sm:block flex-1 min-w-0">
-              <FilterControls />
+              <FilterControls {...filterControlsProps} />
             </div>
           </div>
 
@@ -777,7 +821,7 @@ export default function WorkshopsPage() {
                 className="sm:hidden overflow-hidden"
               >
                 <div className="pt-3">
-                  <FilterControls />
+                  <FilterControls {...filterControlsProps} />
                 </div>
               </motion.div>
             )}
@@ -835,7 +879,7 @@ export default function WorkshopsPage() {
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start"
             >
               {filtered.map((w) => (
-                <WorkshopCard key={w.id} w={w} />
+                <WorkshopCard key={w.id} w={w} onRegister={setRegisteringWorkshop} />
               ))}
             </motion.div>
           )}
@@ -888,6 +932,24 @@ export default function WorkshopsPage() {
           </motion.div>
         </div>
       </section>
+
+      <WorkshopRegistrationModal
+        isOpen={registeringWorkshop !== null}
+        onClose={() => setRegisteringWorkshop(null)}
+        workshop={
+          registeringWorkshop
+            ? {
+                title: registeringWorkshop.title,
+                dateLabel: registeringWorkshop.date,
+                timeLabel: registeringWorkshop.time,
+                durationLabel: registeringWorkshop.duration,
+                host: registeringWorkshop.host,
+                isFree: registeringWorkshop.isFree,
+                price: registeringWorkshop.priceValue || undefined,
+              }
+            : { title: '', dateLabel: '', timeLabel: '', isFree: true }
+        }
+      />
     </div>
   );
 }

@@ -49,14 +49,14 @@ export default function CareersPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <span className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] bg-[#C6FF3D] text-[#14141A] px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>
               <Briefcase className="w-3.5 h-3.5" />
-              We're Hiring
+              We&apos;re Hiring
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl mb-5 leading-[0.98]" style={{ fontFamily: DISPLAY }}>
               CAREERS AT<br />
               <span className="bg-[#3D5AFF] px-2">XOURCEBASE</span>
             </h1>
             <p className="text-white/70 text-base md:text-lg max-w-xl mx-auto">
-              We're building something ambitious. Join a small team on a mission to make world-class tech education accessible to every Indian learner.
+              We&apos;re building something ambitious. Join a small team on a mission to make world-class tech education accessible to every Indian learner.
             </p>
           </motion.div>
         </div>
@@ -101,7 +101,7 @@ export default function CareersPage() {
             </div>
             <h3 className="text-xl font-extrabold text-[#14141A] mb-2" style={{ fontFamily: DISPLAY }}>NO OPEN ROLES RIGHT NOW</h3>
             <p className="text-sm text-[#14141A]/60 leading-relaxed max-w-xs mx-auto">
-              We're a small team and roles open up quickly. Leave your details and we'll reach out when something fits.
+              We&apos;re a small team and roles open up quickly. Leave your details and we&apos;ll reach out when something fits.
             </p>
           </div>
 
@@ -112,7 +112,7 @@ export default function CareersPage() {
             <div className="relative z-10">
               <Users className="w-7 h-7 text-[#C6FF3D] mx-auto mb-3" />
               <h3 className="text-lg font-extrabold text-white mb-1" style={{ fontFamily: DISPLAY }}>INTERESTED IN JOINING?</h3>
-              <p className="text-white/60 text-sm mb-6">Drop us a message — we're always keen to meet talented people.</p>
+              <p className="text-white/60 text-sm mb-6">Drop us a message — we&apos;re always keen to meet talented people.</p>
               <Link
                 href="/contact"
                 className="inline-flex items-center gap-2 bg-[#C6FF3D] text-[#14141A] font-bold px-7 py-3 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"

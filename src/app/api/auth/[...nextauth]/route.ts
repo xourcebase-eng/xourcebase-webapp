@@ -61,7 +61,7 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     // Persist provider info into the JWT token
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account }) {
       if (account) {
         token.provider = account.provider;
       }
@@ -71,7 +71,7 @@ export const authOptions: NextAuthOptions = {
     // Expose token data to the session object
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).provider = token.provider;
+        session.user.provider = token.provider;
       }
       return session;
     },
