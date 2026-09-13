@@ -79,7 +79,7 @@ export default function XourceBaseForBusinessPage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               BUILD YOUR<br />FUTURE-READY<br />

@@ -6,7 +6,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Shield, Lock, Cookie, UserCheck, Mail, Eye, Database,
+  Shield, Lock, Cookie, UserCheck, Mail, Eye, Database, Share2,
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -26,9 +26,11 @@ const SECTIONS = [
     title: 'Information We Collect',
     intro: 'We collect information to provide and improve our services:',
     bullets: [
-      { label: 'Personal Information', text: 'Name, email, phone, and payment details when you enroll or contact us.' },
-      { label: 'Usage Data', text: 'How you interact with our platform to improve experience.' },
-      { label: 'Cookies & Tracking', text: 'Small files to remember preferences and analyse performance.' },
+      { label: 'Registration Information', text: 'Full name, email, phone number, WhatsApp number, current role, and experience level when you register for a workshop.' },
+      { label: 'Payment Information', text: 'For paid workshops, the amount paid and a payment/order reference from our payment processor. We never see or store your card, UPI, or bank details — those are handled entirely by Razorpay.' },
+      { label: 'Account Information', text: 'If you sign in with Google or GitHub, we receive your name, email address, and profile picture from that provider.' },
+      { label: 'Usage Data', text: 'How you interact with our platform, collected via Google Analytics, to improve experience.' },
+      { label: 'Cookies', text: 'Small files used to keep you signed in and to analyse site performance.' },
     ],
     footer: 'We only collect what is necessary and never sell your data.',
   },
@@ -38,12 +40,28 @@ const SECTIONS = [
     title: 'How We Use Information',
     intro: 'Your information helps us:',
     bullets: [
-      { label: null, text: 'Process enrollments and deliver personalised learning.' },
-      { label: null, text: 'Send important updates and optional marketing content.' },
+      { label: null, text: 'Confirm your workshop registration and send you joining links, receipts, and reminders by email and WhatsApp.' },
+      { label: null, text: 'Process payments for paid workshops.' },
+      { label: null, text: 'Let you look up your own registration later using your Registration ID or email.' },
       { label: null, text: 'Improve our platform through analytics.' },
       { label: null, text: 'Comply with legal obligations.' },
     ],
     footer: 'Payments are processed securely — we do not store sensitive card details.',
+  },
+  {
+    id: 'sharing',
+    icon: Share2,
+    title: 'Third-Party Services We Use',
+    intro: 'We share the minimum information necessary with the following services in order to operate XourceBase. We do not sell your data to anyone.',
+    bullets: [
+      { label: 'Razorpay', text: 'Processes payments for paid workshops. Receives your name, email, phone, and payment amount.' },
+      { label: 'Google (Sign-In & Analytics)', text: 'Provides "Sign in with Google" and anonymised usage analytics via Google Analytics.' },
+      { label: 'GitHub', text: 'Provides "Sign in with GitHub" if you choose that option.' },
+      { label: 'UltraMsg', text: 'A WhatsApp messaging provider we use to send registration confirmations. Receives your phone number and name.' },
+      { label: 'EmailJS / Email Delivery', text: 'Used to deliver contact-form messages and confirmation/receipt emails.' },
+      { label: 'Google Sheets', text: 'Workshop registrations (contact details, workshop, and payment status) are securely stored in a private Google Sheet accessible only to XourceBase staff, so we can manage seats and respond to support requests.' },
+    ],
+    footer: 'Each of these providers has its own privacy policy governing how it handles data on our behalf.',
   },
   {
     id: 'security',
@@ -63,9 +81,8 @@ const SECTIONS = [
     title: 'Cookies Policy',
     intro: 'We use cookies to enhance your experience:',
     bullets: [
-      { label: 'Essential', text: 'Required for core functionality.' },
-      { label: 'Analytics', text: 'Understand usage patterns (anonymised).' },
-      { label: 'Marketing', text: 'For personalised content (manage via browser).' },
+      { label: 'Essential', text: 'Required for core functionality, such as keeping you signed in.' },
+      { label: 'Analytics', text: 'Google Analytics cookies help us understand usage patterns in aggregate.' },
     ],
     footer: 'You can disable cookies in your browser settings.',
   },
@@ -116,7 +133,7 @@ export default function PrivacyPolicyPage() {
             >
               PRIVACY<br />POLICY
             </motion.h1>
-            <p className="text-[#14141A]/60">Last updated: December 15, 2025</p>
+            <p className="text-[#14141A]/60">Last updated: September 13, 2026</p>
           </motion.div>
         </div>
       </section>

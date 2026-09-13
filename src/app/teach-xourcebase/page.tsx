@@ -54,7 +54,7 @@ export default function TeachOnXourceBasePage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6 max-w-5xl"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6 max-w-5xl"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               SHARE YOUR EXPERTISE.<br />

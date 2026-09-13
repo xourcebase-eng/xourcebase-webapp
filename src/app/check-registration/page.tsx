@@ -163,11 +163,11 @@ export default function CheckRegistrationPage() {
 
         <div className="mt-6 text-center">
           <Link
-            href="/workshops"
+            href="/"
             className="inline-flex items-center gap-2 text-sm font-bold text-[#14141A]/60 hover:text-[#14141A] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Workshops
+            Back to Home
           </Link>
         </div>
       </div>

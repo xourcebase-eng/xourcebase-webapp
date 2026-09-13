@@ -413,7 +413,7 @@ export default function TrainingsPage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] text-[#14141A] mb-6 max-w-4xl"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] text-[#14141A] mb-6 max-w-4xl"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               BUILT FOR

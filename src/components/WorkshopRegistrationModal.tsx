@@ -17,12 +17,26 @@ import Link from 'next/link';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import confetti from 'canvas-confetti';
-import { AlertCircle, ArrowRight, CheckCircle2, Clock, Download, Lock, Mail, X } from 'lucide-react';
+import { AlertCircle, ArrowRight, CheckCircle2, Clock, Download, Info, Lock, Mail, Tag, X } from 'lucide-react';
 import type { RazorpayPaymentResponse, RazorpayCheckoutOptions } from '@/types/razorpay';
 import { buildWorkshopReceiptPdf } from '@/lib/workshopReceiptPdf';
 
 const DISPLAY = "'Archivo Black', sans-serif";
 const MONO = "'Space Grotesk', sans-serif";
+
+class AlreadyRegisteredError extends Error {
+  constructor(public registrationId: string) {
+    super('You are already registered for this workshop.');
+  }
+}
+
+// Percentage-based so the same codes work across any paid workshop's price,
+// not tied to one specific amount. Applies to all paid workshops uniformly —
+// revisit if a workshop-specific coupon set is ever needed.
+const COUPONS: Record<string, { discountPercent: number; message: string }> = {
+  SAVE50: { discountPercent: 50, message: '🎉 SAVE50 applied — 50% off!' },
+  FREEPASS: { discountPercent: 100, message: '🎊 FREEPASS applied — free access!' },
+};
 
 export interface WorkshopRegistrationInfo {
   title: string;
@@ -145,6 +159,27 @@ export default function WorkshopRegistrationModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [paymentId, setPaymentId] = useState<string | null>(null);
   const [registrationId, setRegistrationId] = useState<string | null>(null);
+  const [alreadyRegisteredId, setAlreadyRegisteredId] = useState<string | null>(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [couponStatus, setCouponStatus] = useState<{ code: string; valid: boolean; discountPercent: number; message: string } | null>(null);
+
+  const finalPrice = workshop.price && couponStatus?.valid
+    ? Math.max(0, Math.round(workshop.price * (100 - couponStatus.discountPercent) / 100))
+    : workshop.price;
+
+  const applyCoupon = () => {
+    const code = couponInput.trim().toUpperCase();
+    if (!code) {
+      setCouponStatus(null);
+      return;
+    }
+    const match = COUPONS[code];
+    if (match) {
+      setCouponStatus({ code, valid: true, discountPercent: match.discountPercent, message: match.message });
+    } else {
+      setCouponStatus({ code, valid: false, discountPercent: 0, message: '❌ Invalid coupon code' });
+    }
+  };
 
   // Countdown timer (15 min) — creates gentle urgency, resets each time the modal opens.
   const [timeLeft, setTimeLeft] = useState(900);
@@ -189,6 +224,9 @@ export default function WorkshopRegistrationModal({
       setForm(EMPTY_FORM);
       setPaymentId(null);
       setRegistrationId(null);
+      setAlreadyRegisteredId(null);
+      setCouponInput('');
+      setCouponStatus(null);
     }, 300);
   };
 
@@ -200,14 +238,14 @@ export default function WorkshopRegistrationModal({
       whatsapp: form.whatsapp || form.phone,
       currentRole: form.currentRole,
       experience: form.experience,
-      coupon: 'None',
+      coupon: couponStatus?.valid ? couponStatus.code : 'None',
       paymentId: paymentId ?? undefined,
       registrationId: registrationId ?? undefined,
       workshop: workshop.title,
       workshopDate: workshop.dateLabel,
       workshopTime: workshop.timeLabel,
       workshopDuration: workshop.durationLabel,
-      amountPaid: workshop.price ? `₹${workshop.price}` : undefined,
+      amountPaid: finalPrice !== undefined ? `₹${finalPrice}` : undefined,
       bonuses: workshop.bonusesLabel ? [workshop.bonusesLabel] : [],
     });
     doc.save(`XourceBase_${workshop.title.replace(/\s+/g, '_')}_Receipt.pdf`);
@@ -228,7 +266,10 @@ export default function WorkshopRegistrationModal({
       }),
     });
     const data = await res.json();
-    if (!data?.success) throw new Error('Could not complete registration. Please try again.');
+    if (!data?.success) {
+      if (data?.alreadyRegistered) throw new AlreadyRegisteredError(data.registrationId);
+      throw new Error('Could not complete registration. Please try again.');
+    }
     setRegistrationId(data.registrationId ?? null);
     await sendWhatsAppBestEffort(form.whatsapp || form.phone, form.fullName, workshop);
   };
@@ -236,10 +277,43 @@ export default function WorkshopRegistrationModal({
   const registerPaid = async () => {
     if (!workshop.price) throw new Error('This workshop is not configured for payment yet.');
 
+    const couponCode = couponStatus?.valid ? couponStatus.code : 'None';
+    const amountDue = finalPrice ?? workshop.price;
+
+    // A 100%-off coupon needs no payment at all — skip Razorpay entirely and
+    // go straight to the same receipt/WhatsApp confirmation a paid booking gets.
+    if (amountDue <= 0) {
+      const receiptRes = await fetch('/api/send-receipt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          email: form.email,
+          phone: form.phone,
+          whatsapp: form.whatsapp || form.phone,
+          currentRole: form.currentRole,
+          experience: form.experience,
+          coupon: couponCode,
+          paymentId: 'N/A (100% coupon)',
+          workshop: workshop.title,
+          workshopDate: workshop.dateLabel,
+          workshopTime: workshop.timeLabel,
+          workshopDuration: workshop.durationLabel,
+          amountPaid: 'FREE (Coupon)',
+          bonuses: workshop.bonusesLabel ? [workshop.bonusesLabel] : [],
+        }),
+      });
+      const receiptData = await receiptRes.json();
+      if (!receiptData?.success) throw new Error('Could not complete registration. Please try again.');
+      setRegistrationId(receiptData?.registrationId ?? null);
+      await sendWhatsAppBestEffort(form.whatsapp || form.phone, form.fullName, workshop);
+      return;
+    }
+
     const orderRes = await fetch('/api/create-razorpay-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: workshop.price, receipt: `workshop_${Date.now()}` }),
+      body: JSON.stringify({ amount: amountDue, receipt: `workshop_${Date.now()}` }),
     });
     const orderData = await orderRes.json();
     if (!orderData?.success) throw new Error(orderData?.message || 'Could not start payment. Please try again.');
@@ -292,13 +366,13 @@ export default function WorkshopRegistrationModal({
                 whatsapp: form.whatsapp || form.phone,
                 currentRole: form.currentRole,
                 experience: form.experience,
-                coupon: 'None',
+                coupon: couponCode,
                 paymentId: verifyData.payment_id ?? response.razorpay_payment_id,
                 workshop: workshop.title,
                 workshopDate: workshop.dateLabel,
                 workshopTime: workshop.timeLabel,
                 workshopDuration: workshop.durationLabel,
-                amountPaid: `₹${workshop.price}`,
+                amountPaid: `₹${amountDue}`,
                 bonuses: workshop.bonusesLabel ? [workshop.bonusesLabel] : [],
               }),
             });
@@ -328,11 +402,26 @@ export default function WorkshopRegistrationModal({
     setSaving(true);
     setSubmitError(null);
     try {
+      // Checked up front — before charging payment for paid workshops — so
+      // the same email can't register (or be double-charged) for the same
+      // workshop twice. A different workshop with the same email is fine.
+      const dupRes = await fetch('/api/check-existing-registration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, workshop: workshop.title }),
+      });
+      const dupData = await dupRes.json();
+      if (dupData?.exists) throw new AlreadyRegisteredError(dupData.registrationId);
+
       if (workshop.isFree) await registerFree();
       else await registerPaid();
       setSubmitted(true);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      if (err instanceof AlreadyRegisteredError) {
+        setAlreadyRegisteredId(err.registrationId);
+      } else {
+        setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      }
     } finally {
       setSaving(false);
     }
@@ -362,7 +451,50 @@ export default function WorkshopRegistrationModal({
             className="relative bg-white border-2 border-[#14141A] w-full max-w-lg max-h-[92vh] overflow-y-auto"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
-            {!submitted ? (
+            {alreadyRegisteredId ? (
+              /* Already-registered state */
+              <div className="p-8 sm:p-10 text-center">
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 20 }}>
+                  <div className="w-20 h-20 mx-auto border-2 border-[#14141A] flex items-center justify-center mb-6" style={{ background: '#3D5AFF' }}>
+                    <Info className="w-10 h-10 text-white" />
+                  </div>
+                </motion.div>
+                <h3 className="text-2xl font-extrabold text-[#14141A] mb-2" style={{ fontFamily: DISPLAY }}>
+                  YOU&apos;RE ALREADY REGISTERED
+                </h3>
+                <p className="text-[#14141A]/60 text-sm mb-4 leading-relaxed break-words">
+                  This email is already registered for <span className="font-bold text-[#14141A]">{workshop.title}</span>. No need to register again.
+                </p>
+                <div className="bg-[#3D5AFF]/10 border-2 border-[#14141A] px-4 py-3 mb-6 text-left">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[#14141A]/60 mb-1" style={{ fontFamily: MONO }}>
+                    Your Registration ID
+                  </p>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-lg font-extrabold text-[#14141A] tracking-wide" style={{ fontFamily: MONO }}>
+                      {alreadyRegisteredId}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard?.writeText(alreadyRegisteredId)}
+                      className="text-xs font-bold text-[#14141A]/60 hover:text-[#14141A] underline flex-shrink-0"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <p className="text-xs text-[#14141A]/50 mt-1.5">
+                    Look it up anytime at{' '}
+                    <Link href="/check-registration" className="underline hover:text-[#14141A]">xourcebase.com/check-registration</Link>.
+                  </p>
+                </div>
+                <button
+                  onClick={resetAndClose}
+                  className="bg-[#14141A] text-white px-10 py-3 font-bold text-sm tracking-wide hover:bg-black transition-colors"
+                  style={{ fontFamily: MONO }}
+                >
+                  CLOSE
+                </button>
+              </div>
+            ) : !submitted ? (
               <>
                 {/* Modal header */}
                 <div className="sticky top-0 bg-white z-10 flex justify-between items-start gap-3 border-b-2 border-[#14141A] px-5 sm:px-6 py-5">
@@ -515,15 +647,54 @@ export default function WorkshopRegistrationModal({
                     </div>
                   </div>
 
+                  {/* Coupon — paid workshops only */}
+                  {!workshop.isFree && (
+                    <div>
+                      <label className="block text-sm font-bold text-[#14141A] mb-1.5">Coupon Code</label>
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Tag className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#14141A]/40 pointer-events-none" />
+                          <input
+                            type="text"
+                            value={couponInput}
+                            onChange={(e) => { setCouponInput(e.target.value); setCouponStatus(null); }}
+                            placeholder="e.g., SAVE50"
+                            className="w-full pl-10 pr-4 py-3 text-sm text-[#14141A] bg-[#F5F5F2] border-2 border-[#14141A]/20 focus:outline-none focus:border-[#14141A] transition placeholder-[#14141A]/30 uppercase"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={applyCoupon}
+                          className="px-5 py-3 bg-[#14141A] text-white text-sm font-bold hover:bg-black active:scale-[0.98] transition-all flex-shrink-0"
+                          style={{ fontFamily: MONO }}
+                        >
+                          APPLY
+                        </button>
+                      </div>
+                      {couponStatus && (
+                        <p className={`mt-1.5 text-xs font-semibold ${couponStatus.valid ? 'text-[#3D5AFF]' : 'text-[#FF3D57]'}`}>
+                          {couponStatus.message}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   {/* Price summary */}
                   <div className="bg-[#F5F5F2] border-2 border-[#14141A] px-4 sm:px-5 py-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
                       <p className="text-xs text-[#14141A]/50 font-bold tracking-wide" style={{ fontFamily: MONO }}>
                         TOTAL DUE TODAY
                       </p>
-                      <p className="text-2xl font-extrabold text-[#14141A] mt-0.5" style={{ fontFamily: MONO }}>
-                        {workshop.isFree ? 'FREE' : `₹${workshop.price}`}
-                      </p>
+                      <div className="flex items-baseline gap-2 mt-0.5">
+                        {couponStatus?.valid && couponStatus.discountPercent > 0 && (
+                          <span className="text-sm text-[#14141A]/40 line-through" style={{ fontFamily: MONO }}>
+                            ₹{workshop.price}
+                          </span>
+                        )}
+                        <p className="text-2xl font-extrabold text-[#14141A]" style={{ fontFamily: MONO }}>
+                          {workshop.isFree ? 'FREE' : finalPrice === 0 ? 'FREE' : `₹${finalPrice}`}
+                        </p>
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-[#14141A]/50 font-semibold">Workshop date</p>
@@ -561,17 +732,22 @@ export default function WorkshopRegistrationModal({
                         <ArrowRight className="w-4 h-4 flex-shrink-0" />
                         RESERVE MY FREE SPOT
                       </>
+                    ) : finalPrice === 0 ? (
+                      <>
+                        <ArrowRight className="w-4 h-4 flex-shrink-0" />
+                        CLAIM FREE ACCESS
+                      </>
                     ) : (
                       <>
                         <Lock className="w-4 h-4 flex-shrink-0" />
-                        REGISTER &amp; PAY ₹{workshop.price}
+                        REGISTER &amp; PAY ₹{finalPrice}
                       </>
                     )}
                   </button>
 
                   {/* Trust line */}
                   <p className="text-center text-xs text-[#14141A]/40 pb-1">
-                    {workshop.isFree ? 'No payment required · No spam, ever.' : 'Secured by Razorpay · Instant confirmation.'}
+                    {workshop.isFree || finalPrice === 0 ? 'No payment required · No spam, ever.' : 'Secured by Razorpay · Instant confirmation.'}
                   </p>
                   <p className="text-center text-xs text-[#14141A]/40">
                     By registering you agree to our{' '}

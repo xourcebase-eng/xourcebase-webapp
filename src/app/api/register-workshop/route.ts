@@ -3,7 +3,7 @@
 // No payment involved — just validates the submission and emails a confirmation.
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
-import { appendRegistrationRow } from '@/lib/googleSheets';
+import { appendRegistrationRow, findRegistrations } from '@/lib/googleSheets';
 import { generateRegistrationId } from '@/lib/registrationId';
 
 const transporter = nodemailer.createTransport({
@@ -42,6 +42,26 @@ export async function POST(request: Request) {
         { success: false, message: 'Invalid email address' },
         { status: 400 }
       );
+    }
+
+    // Block a repeat registration for the SAME workshop with the SAME email
+    // (the same person registering for a different workshop is fine). Fails
+    // open — a Sheets outage should never block a legitimate registration.
+    try {
+      const existing = await findRegistrations({ email, workshop });
+      if (existing.length > 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            alreadyRegistered: true,
+            registrationId: existing[0].registrationId,
+            message: 'You are already registered for this workshop.',
+          },
+          { status: 409 }
+        );
+      }
+    } catch (checkError) {
+      console.error('Duplicate-registration check failed (failing open):', checkError);
     }
 
     const registrationId = generateRegistrationId();

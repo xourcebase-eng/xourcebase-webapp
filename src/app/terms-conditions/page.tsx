@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   Scale, Shield, Gavel, AlertTriangle,
-  Globe, Mail, XCircle,
+  Globe, Mail, XCircle, RefreshCcw,
 } from 'lucide-react';
 
 const fadeInUp = {
@@ -49,6 +49,17 @@ const SECTIONS = [
     content: [
       'All content on the Service — including courses, materials, branding, and logos — is owned by XourceBase or its licensors and is protected by copyright, trademark, and applicable laws.',
       'You may not modify, distribute, or create derivative works without written permission.',
+    ],
+  },
+  {
+    id: 'refunds',
+    icon: RefreshCcw,
+    title: 'Refund & Cancellation Policy',
+    content: [
+      'Paid workshops are covered by a money-back guarantee: if you request a refund at least 48 hours before the scheduled workshop start time, we will refund the full amount paid, no questions asked.',
+      'Requests made less than 48 hours before the workshop, or after the workshop has taken place, are not eligible for a refund, except where the workshop is cancelled, rescheduled, or materially changed by XourceBase — in which case you may choose a full refund or a transfer to a future session.',
+      'To request a refund, email contact@xourcebase.com with your Registration ID and payment details. Approved refunds are processed to your original payment method via Razorpay within 5–7 business days.',
+      'Free workshops carry no payment and are not subject to this section — you may simply stop attending at any time.',
     ],
   },
   {
@@ -106,7 +117,7 @@ export default function TermsAndConditionsPage() {
 
             <motion.h1
               variants={fadeInUp}
-              className="text-[13vw] sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
+              className="text-4xl sm:text-6xl md:text-7xl leading-[0.95] font-extrabold mb-6"
               style={{ fontFamily: "'Archivo Black', sans-serif" }}
             >
               TERMS &amp;<br />CONDITIONS
@@ -115,7 +126,7 @@ export default function TermsAndConditionsPage() {
             <motion.p variants={fadeInUp} className="text-[#14141A]/60 max-w-xl">
               Please read these terms carefully before using XourceBase.
             </motion.p>
-            <p className="text-xs text-[#14141A]/50 mt-2">Last updated: December 15, 2025</p>
+            <p className="text-xs text-[#14141A]/50 mt-2">Last updated: September 13, 2026</p>
           </motion.div>
         </div>
       </section>
