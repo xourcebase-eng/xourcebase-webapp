@@ -173,7 +173,7 @@ export interface RegistrationLookupResult {
  * appendRegistrationRow) so the API route can tell the user "lookup is
  * temporarily unavailable" instead of a false "not found".
  */
-export async function findRegistrations(query: { registrationId?: string; email?: string }): Promise<RegistrationLookupResult[]> {
+export async function findRegistrations(query: { registrationId?: string; email?: string; workshop?: string }): Promise<RegistrationLookupResult[]> {
   const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID;
   if (!spreadsheetId) {
     throw new Error('Google Sheets is not configured (GOOGLE_SHEETS_SPREADSHEET_ID).');
@@ -193,6 +193,7 @@ export async function findRegistrations(query: { registrationId?: string; email?
 
   const wantedId = query.registrationId?.trim().toUpperCase();
   const wantedEmail = query.email?.trim().toLowerCase();
+  const wantedWorkshop = query.workshop?.trim().toLowerCase();
 
   const matches: RegistrationLookupResult[] = [];
   for (const cells of dataRows) {
@@ -201,7 +202,8 @@ export async function findRegistrations(query: { registrationId?: string; email?
 
     const idMatches = wantedId && record.registrationId.trim().toUpperCase() === wantedId;
     const emailMatches = wantedEmail && record.email.trim().toLowerCase() === wantedEmail;
-    if (idMatches || emailMatches) {
+    const workshopMatches = !wantedWorkshop || record.workshop.trim().toLowerCase() === wantedWorkshop;
+    if ((idMatches || emailMatches) && workshopMatches) {
       matches.push({
         registrationId: record.registrationId,
         workshop: record.workshop,

@@ -213,7 +213,7 @@ const upcomingWorkshops = [
     description:
       'Build a full CI/CD pipeline with GitHub Actions, Docker, and Kubernetes. Hands-on project included.',
     isFree: false,
-    status: 'open',
+    status: 'coming_soon',
     slug: 'devops-cicd-pipeline',
   },
   {

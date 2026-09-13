@@ -147,6 +147,10 @@ function PipelineStages() {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+// Flip this to `false` when the workshop is confirmed and ready to open for
+// real registrations — everything else on this page (content, modal, pricing)
+// is already fully built and needs no other change.
+const COMING_SOON = true;
 
 export default function DevOpsCiCdPipelinePage() {
   useAcceleratorFonts();
@@ -240,12 +244,21 @@ export default function DevOpsCiCdPipelinePage() {
               </motion.div>
 
               <motion.div initial="hidden" whileInView="visible" variants={fadeUp} viewport={{ once: true }}>
-                <button type="button" onClick={openModal}
-                  className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold text-sm tracking-wide px-8 py-4 hover:brightness-95 active:scale-[0.97] transition-all"
-                  style={{ fontFamily: MONO }}>
-                  <Rocket className="w-4 h-4 flex-shrink-0" />
-                  REGISTER & PAY ₹299
-                </button>
+                {COMING_SOON ? (
+                  <span
+                    className="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-white/40 font-bold text-sm tracking-wide px-8 py-4 border-2 border-white/20 cursor-not-allowed"
+                    style={{ fontFamily: MONO }}
+                  >
+                    COMING SOON
+                  </span>
+                ) : (
+                  <button type="button" onClick={openModal}
+                    className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold text-sm tracking-wide px-8 py-4 hover:brightness-95 active:scale-[0.97] transition-all"
+                    style={{ fontFamily: MONO }}>
+                    <Rocket className="w-4 h-4 flex-shrink-0" />
+                    REGISTER & PAY ₹299
+                  </button>
+                )}
               </motion.div>
             </div>
 
@@ -363,13 +376,22 @@ export default function DevOpsCiCdPipelinePage() {
           <span className="inline-block text-[11px] font-bold uppercase tracking-[0.2em] bg-[#FF3D57] text-white px-3 py-1.5 mb-6" style={{ fontFamily: MONO }}>Limited Seats</span>
           <h2 className="text-3xl md:text-4xl text-white mb-4 break-words" style={{ fontFamily: DISPLAY }}>READY TO SHIP LIKE A PRO?</h2>
           <p className="text-white/60 mb-8">Join engineers who went from manual deploys to a real push-to-production pipeline in one session.</p>
-          <button type="button" onClick={openModal}
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
-            style={{ fontFamily: MONO }}>
-            <GitBranch className="w-4 h-4 flex-shrink-0" />
-            REGISTER & PAY ₹299
-            <ArrowRight className="w-4 h-4 flex-shrink-0" />
-          </button>
+          {COMING_SOON ? (
+            <span
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto text-white/40 font-bold px-10 py-4 text-sm tracking-wide border-2 border-white/20 cursor-not-allowed"
+              style={{ fontFamily: MONO }}
+            >
+              COMING SOON
+            </span>
+          ) : (
+            <button type="button" onClick={openModal}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#C6FF3D] text-[#14141A] font-bold px-10 py-4 text-sm tracking-wide hover:brightness-95 active:scale-[0.97] transition-all"
+              style={{ fontFamily: MONO }}>
+              <GitBranch className="w-4 h-4 flex-shrink-0" />
+              REGISTER & PAY ₹299
+              <ArrowRight className="w-4 h-4 flex-shrink-0" />
+            </button>
+          )}
         </div>
       </section>
 

@@ -110,7 +110,7 @@ const workshops: Workshop[] = [
     isFree: false,
     price: '₹299',
     priceValue: 299,
-    status: 'open',
+    status: 'coming_soon',
     detailPage: '/workshops/devops-cicd-pipeline',
     description:
       'Hands-on workshop: build a full CI/CD pipeline using GitHub Actions, Docker, and Kubernetes. Participants leave with a working pipeline deployed to AWS EKS.',
