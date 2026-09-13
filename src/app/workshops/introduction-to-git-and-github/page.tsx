@@ -193,8 +193,34 @@ export default function IntroToGitGithubPage() {
     ['What do I need to bring?',              'Just a laptop with Git installed (we will walk through setup together) and a free GitHub account.'],
   ];
 
+  const courseJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: 'Introduction to Git & GitHub for Beginners',
+    description: 'A hands-on, beginner-friendly live workshop on version control with Git and collaboration on GitHub — commits, branching, merging, pull requests, and real-world team workflows.',
+    provider: { '@type': 'Organization', name: 'XourceBase', sameAs: 'https://xourcebase.com' },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'INR', availability: 'https://schema.org/InStock' },
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+      instructor: { '@type': 'Person', name: 'Rahul Sharma' },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://xourcebase.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Workshops', item: 'https://xourcebase.com/workshops' },
+      { '@type': 'ListItem', position: 3, name: 'Introduction to Git & GitHub for Beginners', item: 'https://xourcebase.com/workshops/introduction-to-git-and-github' },
+    ],
+  };
+
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }} className="text-[#14141A] antialiased">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* ── Back ── */}
       <div className="bg-[#F5F5F2] border-b-2 border-[#14141A] px-4 sm:px-6 py-4">

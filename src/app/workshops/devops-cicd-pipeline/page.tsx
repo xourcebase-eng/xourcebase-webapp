@@ -189,8 +189,34 @@ export default function DevOpsCiCdPipelinePage() {
     ['Is there a refund policy?',             'Yes — full refund if you’re not satisfied, no questions asked. Just email contact@xourcebase.com.'],
   ];
 
+  const courseJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: 'DevOps CI/CD Pipeline — Build to Deploy',
+    description: 'A hands-on workshop on building a full CI/CD pipeline with GitHub Actions, Docker, and Kubernetes — deploy a real application to AWS EKS.',
+    provider: { '@type': 'Organization', name: 'XourceBase', sameAs: 'https://xourcebase.com' },
+    offers: { '@type': 'Offer', price: '299', priceCurrency: 'INR', availability: 'https://schema.org/InStock' },
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'Online',
+      instructor: { '@type': 'Person', name: 'Priya Desai' },
+    },
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://xourcebase.com/' },
+      { '@type': 'ListItem', position: 2, name: 'Workshops', item: 'https://xourcebase.com/workshops' },
+      { '@type': 'ListItem', position: 3, name: 'DevOps CI/CD Pipeline — Build to Deploy', item: 'https://xourcebase.com/workshops/devops-cicd-pipeline' },
+    ],
+  };
+
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }} className="text-[#14141A] antialiased">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       {/* ── Back ── */}
       <div className="bg-[#F5F5F2] border-b-2 border-[#14141A] px-4 sm:px-6 py-4">
